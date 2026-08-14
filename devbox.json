@@ -1,11 +1,11 @@
 {
   "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.17.2/.schema/devbox.schema.json",
   "packages": {
-    "github:openserbia/go-flake#go_1_26_5": "",
+    "github:openserbia/go-flake#go_1_26_6": "",
     "github:openserbia/go-flake#golangci-lint_2_12_2": "",
     "github:openserbia/go-flake#gofumpt_0_10_0": "",
-    "github:openserbia/go-flake#govulncheck_1_6_0": "",
-    "github:openserbia/go-flake#gopls_0_22_0": "",
+    "github:openserbia/go-flake#govulncheck_1_7_0": "",
+    "github:openserbia/go-flake#gopls_0_23_0": "",
     "go-task": "latest",
     "gci": "latest",
     "gitleaks": "8.30.1"

@@ -53,9 +53,9 @@
       "last_modified": "2026-07-24T05:48:35Z",
       "resolved": "github:NixOS/nixpkgs/335f0738cb2fa9708f3f428e39d2eae975d1338d?lastModified=1784872115&narHash=sha256-THPEF2po0fsoH8gNtp%2BAe0XFDJH3N%2Fol7xO3v6VMTJU%3D"
     },
-    "github:openserbia/go-flake#go_1_26_5": {
-      "last_modified": "2026-08-04T08:36:17Z",
-      "resolved": "github:openserbia/go-flake/0bd6efdd1b5592df7bd261f2585b51c762230d2f?lastModified=1785832577&narHash=sha256-%2BRstNKQy%2Bs9bDt3MelwG2jRnOrylaxCydI0EYzp2O28%3D#go_1_26_5"
+    "github:openserbia/go-flake#go_1_26_6": {
+      "last_modified": "2026-08-14T07:24:33Z",
+      "resolved": "github:openserbia/go-flake/5ddca63f9a9b313effcd4e7c4e0a6bd09080af0c?lastModified=1786692273&narHash=sha256-bBvlXj7LcXQ76BVULJcKhbrNfx8genwdNAS%2FSpgSRHs%3D#go_1_26_6"
     },
     "github:openserbia/go-flake#gofumpt_0_10_0": {
       "last_modified": "2026-08-04T08:36:17Z",
@@ -65,13 +65,13 @@
       "last_modified": "2026-08-04T08:36:17Z",
       "resolved": "github:openserbia/go-flake/0bd6efdd1b5592df7bd261f2585b51c762230d2f?lastModified=1785832577&narHash=sha256-%2BRstNKQy%2Bs9bDt3MelwG2jRnOrylaxCydI0EYzp2O28%3D#golangci-lint_2_12_2"
     },
-    "github:openserbia/go-flake#gopls_0_22_0": {
-      "last_modified": "2026-08-04T08:36:17Z",
-      "resolved": "github:openserbia/go-flake/0bd6efdd1b5592df7bd261f2585b51c762230d2f?lastModified=1785832577&narHash=sha256-%2BRstNKQy%2Bs9bDt3MelwG2jRnOrylaxCydI0EYzp2O28%3D#gopls_0_22_0"
+    "github:openserbia/go-flake#gopls_0_23_0": {
+      "last_modified": "2026-08-14T07:24:33Z",
+      "resolved": "github:openserbia/go-flake/5ddca63f9a9b313effcd4e7c4e0a6bd09080af0c?lastModified=1786692273&narHash=sha256-bBvlXj7LcXQ76BVULJcKhbrNfx8genwdNAS%2FSpgSRHs%3D#gopls_0_23_0"
     },
-    "github:openserbia/go-flake#govulncheck_1_6_0": {
-      "last_modified": "2026-08-04T08:36:17Z",
-      "resolved": "github:openserbia/go-flake/0bd6efdd1b5592df7bd261f2585b51c762230d2f?lastModified=1785832577&narHash=sha256-%2BRstNKQy%2Bs9bDt3MelwG2jRnOrylaxCydI0EYzp2O28%3D#govulncheck_1_6_0"
+    "github:openserbia/go-flake#govulncheck_1_7_0": {
+      "last_modified": "2026-08-14T07:24:33Z",
+      "resolved": "github:openserbia/go-flake/5ddca63f9a9b313effcd4e7c4e0a6bd09080af0c?lastModified=1786692273&narHash=sha256-bBvlXj7LcXQ76BVULJcKhbrNfx8genwdNAS%2FSpgSRHs%3D#govulncheck_1_7_0"
     },
     "gitleaks@8.30.1": {
       "last_modified": "2026-08-01T16:34:20Z",
