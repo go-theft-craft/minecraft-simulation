@@ -1,0 +1,10 @@
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Generated local workspaces are not repository content"
+paths = [
+  '''^reference/work/''',
+  '''^\.devbox/''',
+  '''^coverage\.out$'''
+]

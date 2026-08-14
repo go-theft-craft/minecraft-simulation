@@ -1,0 +1,109 @@
+version: "3"
+
+vars:
+  MODULE:
+    sh: go list -m
+  MCREFERENCE_VERSION: '{{.MCREFERENCE_VERSION | default "main"}}'
+
+tasks:
+  deps:
+    desc: Download and normalize Go dependencies
+    sources: [go.mod, go.sum]
+    cmds:
+      - go mod download
+      - go mod tidy
+
+  fmt:
+    desc: Format Go source
+    deps: [deps]
+    cmds:
+      - gci write -s standard -s default -s "prefix(github.com/go-theft-craft)" -s "prefix({{.MODULE}})" .
+      - gofumpt -w .
+
+  fmt:check:
+    desc: Check Go formatting without changing files
+    deps: [deps]
+    cmds:
+      - |
+        formatting_diff="$(golangci-lint fmt --diff)"
+        if [ -n "$formatting_diff" ]; then
+          printf '%s\n' "$formatting_diff"
+          exit 1
+        fi
+
+  lint:
+    desc: Run static analysis
+    deps: [fmt:check]
+    cmds:
+      - golangci-lint run
+
+  test:
+    desc: Run unit tests with the race detector
+    deps: [deps]
+    cmds:
+      - go test -race -covermode=atomic -coverprofile=coverage.out {{.CLI_ARGS | default "./..."}}
+
+  build:
+    desc: Build every package
+    deps: [deps]
+    cmds:
+      - go build ./...
+
+  vuln:
+    desc: Check dependencies for known vulnerabilities
+    deps: [deps]
+    cmds:
+      - govulncheck ./...
+
+  secrets:
+    desc: Scan project files except generated local workspaces
+    cmds:
+      - gitleaks dir --config .gitleaks.toml --no-banner --redact --verbose .
+
+  secrets:staged:
+    desc: Scan staged changes for secrets
+    cmds:
+      - gitleaks git --config .gitleaks.toml --no-banner --redact --verbose --staged
+
+  precommit:
+    desc: Run checks required before a commit
+    cmds:
+      - task: lint
+      - task: secrets:staged
+
+  verify:
+    desc: Run all local checks
+    cmds:
+      - task: lint
+      - task: secrets
+      - task: test
+      - task: vuln
+      - task: build
+
+  reference:prepare:
+    desc: Prepare Minecraft reference artifacts with minecraft-reference
+    requires:
+      vars: [VERSIONS]
+    vars:
+      SIDES: '{{.SIDES | default "client,server"}}'
+      REFERENCE_DIR: '{{.REFERENCE_DIR | default "reference/work"}}'
+    cmds:
+      - >-
+        go run github.com/go-theft-craft/minecraft-reference/cmd/mcreference@{{.MCREFERENCE_VERSION}} prepare
+        --versions '{{.VERSIONS}}'
+        --sides '{{.SIDES}}'
+        --workspace .
+        --reference-dir '{{.REFERENCE_DIR}}'
+
+  reference:clean:
+    desc: Remove the validated local reference workspace
+    vars:
+      REFERENCE_DIR: '{{.REFERENCE_DIR | default "reference/work"}}'
+    cmds:
+      - >-
+        go run github.com/go-theft-craft/minecraft-reference/cmd/mcreference@{{.MCREFERENCE_VERSION}} clean
+        --workspace . --reference-dir '{{.REFERENCE_DIR}}' --yes
+
+  default:
+    cmds:
+      - task --list
