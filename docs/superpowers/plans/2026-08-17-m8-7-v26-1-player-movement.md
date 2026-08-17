@@ -4,6 +4,15 @@
 
 **Goal:** Deliver `profile/java/v26_1` for the player, so that the M8.4 scenario suite passes on Java Edition 26.1.2, and extend the ground-truth pipeline far enough to supply that version's constants.
 
+**Status:** Task 1 is done and its answer is in
+`docs/superpowers/notes/2026-08-17-v26-1-oracle-feasibility.md`. A jar-backed
+oracle is possible and cheaper than 1.8.9's, because Mojang ships this version
+unobfuscated — so this milestone takes the strong branch below and the gate is
+the game. Three things the note changes: the collision variant is a prerequisite
+task rather than a contingency, the oracle's world stub is its largest piece
+rather than an afterthought, and four quantities differ from 1.8.9 in formula
+rather than in width, so nothing may be ported by analogy.
+
 **Architecture:** The same shape as M8.4 and deliberately not the same code. `profile/java/v26_1` owns 26.1.2's constants, its `float32` arithmetic, and its own phase order. Rules that genuinely coincide with 1.8.9's move into `movement` as shared functions; rules that differ get their own. `collision`, `geom`, `sim`, and `runtime` do not change.
 
 **Tech Stack:** Go 1.26.6, `minecraft-reference` for extraction, `minecraft-protocol` for generated data, Devbox, go-task.
@@ -92,9 +101,9 @@ Answer four questions and commit the answers with the commands that produced the
 3. **Is the entity movement method reachable the same way?** The 1.8.9 harness drove a minimal living-entity subclass. Determine whether the modern hierarchy allows the same, or whether a concrete player type is needed, or whether neither works.
 4. **Which constants are `float` and which are `double`?** For gravity, the drags, the friction product, the step height, and the input scale. This is the M8.2 lesson applied before writing code rather than after.
 
-- [ ] **Step 1: Answer all four, with evidence**
+- [x] **Step 1: Answer all four, with evidence**
 
-- [ ] **Step 2: State the consequence for this milestone**
+- [x] **Step 2: State the consequence for this milestone**
 
 Write, explicitly, one of:
 
@@ -103,7 +112,7 @@ Write, explicitly, one of:
 
 Do not start Task 3 until this is written down. A milestone whose verification strategy is decided halfway through is a milestone that will be verified by whatever was convenient.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add docs/superpowers/notes/2026-08-17-v26-1-oracle-feasibility.md
