@@ -16,6 +16,7 @@ persistence, rendering, and AI remain outside this repository.
 | `entity` | Entity identity, physics families, and the body state a tick moves |
 | `sim` | The tick contract: input, result, canonical digest, profile, phases, kernel |
 | `runtime` | The store, its revision check, and a runner that drives one tick after another |
+| `adapter` | The seam a consumer implements to drive one kernel, and the tick assembly they share |
 
 Packages depend in one direction only:
 
