@@ -66,9 +66,9 @@ messages, and in this session's history.
 
 Dropped items and arrows leave M8. M8 delivers one deterministic movement slice
 for the player across two profiles, which is what its master-plan row claims.
-Items and arrows depend on captured traces for their exit criterion, and
-capture now depends on infrastructure that does not exist, so keeping them in
-M8 would block the whole milestone behind a new repository.
+Items and arrows depend on captured traces for their exit criterion, and when
+this was decided no capture infrastructure existed at all, so keeping them in
+M8 would have blocked the whole milestone behind it.
 
 ### M8.4 is gated on fixtures, not on a live server
 
@@ -82,17 +82,27 @@ client adapter exists anyway.
 This is the same split M8.1 used for its transcribed constants: build against
 what can be checked now, and gate on the authoritative oracle when it exists.
 
-### Capture gets its own repository
+### Capture is proxy-shaped
 
-Entity-trace capture goes into a new repository speaking Java protocol 47
-through `minecraft-protocol`, not into the legacy proxy and not into the
-headless client. The legacy proxy cannot speak the protocol. The headless
-client could, once M8.8 lands, but capture is a proxy-shaped problem — sitting
-between a real client and a real server and recording both directions — and
-folding it into the client would couple the oracle to the thing it verifies.
+Entity-trace capture speaks Java protocol 47 through `minecraft-protocol`, and
+it goes neither into the legacy proxy nor into the headless client. The legacy
+proxy cannot speak the protocol. The headless client could, once M8.8 lands,
+but capture is a proxy-shaped problem — sitting between a real client and a
+real server and recording both directions — and folding it into the client
+would couple the oracle to the thing it verifies. The same argument rules out
+recording inside `server`: an endpoint only ever sees its own view, and our
+server is what the oracle is meant to judge.
 
-The cost is honest: this is a new repository, not the 400-line subcommand the
-parent design budgeted.
+**Revised 2026-08-17.** This section originally called for a new repository,
+and the cost paragraph called that honest: a repository rather than the
+400-line subcommand the parent design budgeted. `relay` v0.2.0 has since landed
+as a protocol-agnostic proxy framework, with listeners, per-direction pumps, a
+session registry, hooks, and a `Sink` that receives decoded messages and raw
+chunks alike; its `examples/minecraft` already carries a framer, a codec, and a
+prober. Capture is now a consumer of that framework in the examples module, not
+a repository. "Proxy-shaped, not endpoint-shaped" was the load-bearing claim
+and it is unchanged — only the question of who owns the socket is settled
+differently, and it is settled by code that already exists.
 
 ## Milestones
 
@@ -118,7 +128,7 @@ independently verifiable.
 
 | Stage | Deliverable | Gate |
 | --- | --- | --- |
-| M9.1 | entity-trace capture in a new protocol-47 proxy repository | a captured trace replays deterministically from its recording |
+| M9.1 | entity-trace capture in `relay`'s protocol-47 consumer | a captured trace replays deterministically from its recording |
 | M9.2 | dropped item and arrow rules, both profiles | captured traces replay within one thirty-second of a block |
 | M9.3 | movement scenarios | correction, teleport, and disconnect mid-action behave as vanilla |
 | M9.4 | digging and block breaking | break times match vanilla for tool, block, and effect combinations |
@@ -220,9 +230,13 @@ format; and the digest algorithm. M8.3 and M8.6 decide those.
 
 ## Risks
 
-**The capture repository does not exist.** M9.1 is a new repository, and the
-parent design's estimate for it assumed an existing proxy could be extended.
-Re-estimate before scheduling M9.
+**The capture consumer does not exist yet.** M9.1 is retired as a new
+repository (see the revision above) and is now a consumer of `relay` in its
+examples module. The transport it was going to hand-roll is already built and
+tested; what remains unbuilt is login termination on both sides, which `relay`
+deliberately declines to do, plus the capture sink, trace extraction, and the
+replay gate. Re-estimate against that seam rather than against the parent
+design's 400-line subcommand.
 
 **The determinism matrix needs runners.** M8.6 gates on identical digests
 across three operating systems and two architectures. Whether that CI capacity
