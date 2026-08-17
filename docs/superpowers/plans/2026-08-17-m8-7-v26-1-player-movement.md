@@ -192,6 +192,37 @@ git commit -m "feat(data): pin and generate Java 26.1.2 physics constants"
 
 ---
 
+## Task 4a: The collision variant, done before the phases that call it
+
+**Status:** done. It was Task 1's finding that this is a prerequisite rather
+than a contingency, and it landed as `collision.ResolveVoxel`, `geom.Shape.GridY`,
+and `movement.StepWith`, with `internal/oracle/java/ShapeOracle26.java` checking
+each piece against a real 26.1.2 server.
+
+What it settled, beyond the code:
+
+- The axis order is Y and then the larger horizontal axis, so it depends on the
+  motion. Every comparison works to a tolerance where 1.8.9 compares exactly.
+  The step-up tries whatever heights the obstacle offers, ascending, and takes
+  the first that beats the flat move.
+- **A shape is a grid, not a list of boxes.** The game snaps a block-local box
+  to a power-of-two grid up to eighths and stores which cells are filled, and the
+  step-up collects its candidate heights from every line of that grid — so a
+  plate an eighth thick offers eight heights, seven of them empty air. A box that
+  lands on no grid line keeps its own two faces instead. This is a fact about the
+  data model, not about the algorithm, and no reading of the movement code would
+  have produced it.
+- The horizontal collision flags forgive a shortfall under a hundred-thousandth;
+  the vertical flag still compares exactly.
+
+What it does not cover: the step-up *assembly* — building the grounded box,
+choosing the first improving candidate, and subtracting the drop — is written
+from the version's own code but checked only by this module's own tests, because
+driving `Entity.collide` needs the Level stub that Task 6 builds. The movement
+oracle covers it end to end once that exists.
+
+---
+
 ## Task 4: The v26_1 block table
 
 **Files:** `profile/java/v26_1/blocks.go` and its test

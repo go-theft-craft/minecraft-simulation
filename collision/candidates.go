@@ -35,6 +35,26 @@ type Candidates struct {
 // an order that does not depend on map iteration. A non-positive limit means
 // no limit.
 func Gather(view world.BlockView, region geom.AABB, limit int) (Candidates, error) {
+	candidates, _, err := gather(view, region, limit, false)
+
+	return candidates, err
+}
+
+// GatherWithSteps also collects the heights the shapes in the region offer.
+//
+// The heights are what a modern step-up climbs to, and they are not the faces of
+// the boxes: a shape stores a grid, and every line of that grid is a height it
+// offers. Only the shape-based resolve asks for them, so the walk that the 1.8.9
+// path shares does not compute them.
+func GatherWithSteps(
+	view world.BlockView, region geom.AABB, limit int,
+) (Candidates, []float64, error) {
+	return gather(view, region, limit, true)
+}
+
+func gather(
+	view world.BlockView, region geom.AABB, limit int, wantCoords bool,
+) (Candidates, []float64, error) {
 	minPos := geom.BlockPos{
 		X: geom.Floor(region.MinX),
 		Y: geom.Floor(region.MinY),
@@ -47,13 +67,14 @@ func Gather(view world.BlockView, region geom.AABB, limit int) (Candidates, erro
 	}
 
 	var candidates Candidates
+	var coords []float64
 	visited := 0
 	for x := minPos.X; x <= maxPos.X; x++ {
 		for y := minPos.Y; y <= maxPos.Y; y++ {
 			for z := minPos.Z; z <= maxPos.Z; z++ {
 				visited++
 				if limit > 0 && visited > limit {
-					return Candidates{}, fmt.Errorf("%w: %d cells", ErrCandidateLimit, visited)
+					return Candidates{}, nil, fmt.Errorf("%w: %d cells", ErrCandidateLimit, visited)
 				}
 
 				pos := geom.BlockPos{X: x, Y: y, Z: z}
@@ -64,10 +85,15 @@ func Gather(view world.BlockView, region geom.AABB, limit int) (Candidates, erro
 				case world.LookupAir:
 				case world.LookupShape:
 					candidates.Boxes = shape.BoxesAt(pos, candidates.Boxes)
+					if wantCoords {
+						for _, coord := range shape.GridY() {
+							coords = append(coords, coord+float64(pos.Y))
+						}
+					}
 				}
 			}
 		}
 	}
 
-	return candidates, nil
+	return candidates, coords, nil
 }
