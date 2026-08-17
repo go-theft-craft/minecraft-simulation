@@ -6,6 +6,16 @@ This file records notable user-visible changes. It follows [Keep a Changelog](ht
 
 ### Fixed
 
+- `collision`: `Gather` no longer offers a shape the sweep only reaches the cell
+  of. The game collects a block's collider where the sweep overlaps the block in
+  a volume, and sharing a face is not overlapping; collecting per cell instead
+  gave the shape-based step-up rises no candidate list of the game's contains,
+  which made a body climb onto a block it was floating above. It also reported a
+  horizontal collision, on either version, for a body flush against a wall and
+  moving into it by less than its own coordinates can hold. Both were found by
+  asking the game: a 26.1.2 server for the first and a 1.8.9 server for the
+  second. One committed determinism recording changes with it, at the one tick
+  where a fall carried a motion of 2e-18 into a face.
 - `movement`: the heading rule and the cosine's table index now narrow each
   product before adding it, which stops arm64 contracting the multiply and the
   add into one rounding. Java never contracts, so the fused answer was a
@@ -13,6 +23,13 @@ This file records notable user-visible changes. It follows [Keep a Changelog](ht
 
 ### Added
 
+- `internal/oracle`: a 26.1.2 harness that drives the game's whole
+  `Entity.collide`, so the step-up assembly around the pieces — the grounded box,
+  the probe the candidate rises come from, the first improving rise, and the drop
+  back to the original feet — is checked against the game rather than against a
+  reading of it. It stands up a level the game accepts, which is what the earlier
+  shape harness said it would take, and places real blocks by name so the shapes
+  compared against are the game's own.
 - `geom`, `world`, and `collision`: swept axis-aligned collision reproducing
   Java Edition 1.8.9 axis order and step-up, over a block view that
   distinguishes known air from unknown regions.

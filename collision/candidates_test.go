@@ -79,19 +79,60 @@ func TestGatherVisitsCellsInAFixedOrder(t *testing.T) {
 	}
 }
 
-func TestGatherIncludesTheCellAtAFlushMaxEdge(t *testing.T) {
+func TestGatherExcludesAShapeItOnlyTouches(t *testing.T) {
 	blocks := world.NewBlocks()
 	blocks.Fill(geom.BlockPos{}, geom.BlockPos{X: 1}, geom.EmptyShape())
 	blocks.Set(geom.BlockPos{X: 1}, geom.FullCube())
 
-	// The region's max X lands exactly on the boundary of the solid cell.
+	// The region's max X lands exactly on the boundary of the solid cell, so the
+	// two share a face and overlap in nothing.
+	//
+	// This test used to require the opposite, on the reasoning that a cell the
+	// region reaches is a cell worth clamping against. The game disagrees: it
+	// gathers a collider only where the sweep overlaps the block in a volume, and
+	// the oracle's TestAFlushFaceIsNotACollider asked a 1.8.9 server to settle
+	// it. A body flush against a wall and moving into it by an amount too small
+	// to see is not stopped by that wall.
 	region := geom.AABB{MinX: 0, MinY: 0, MinZ: 0, MaxX: 1, MaxY: 0.5, MaxZ: 0.5}
 	got, err := Gather(blocks, region, 0)
 	if err != nil {
 		t.Fatalf("Gather: %v", err)
 	}
+	if len(got.Boxes) != 0 {
+		t.Fatalf("Gather returned %d boxes, want the touched cell to be left out", len(got.Boxes))
+	}
+
+	// A region that reaches past the face by any amount does gather it.
+	reaching := region
+	reaching.MaxX = 1.0000001
+	got, err = Gather(blocks, reaching, 0)
+	if err != nil {
+		t.Fatalf("Gather: %v", err)
+	}
 	if len(got.Boxes) != 1 {
-		t.Fatalf("Gather returned %d boxes, want the flush cell to be included", len(got.Boxes))
+		t.Fatalf("Gather returned %d boxes, want the overlapped cell to be included", len(got.Boxes))
+	}
+}
+
+func TestGatherKeepsEveryBoxOfAShapeItTouches(t *testing.T) {
+	// The game gathers a block's shape whole: one collider, every box in it. So a
+	// shape the region reaches by one box contributes all of them, and a shape it
+	// reaches by none contributes nothing.
+	blocks := world.NewBlocks()
+	blocks.Fill(geom.BlockPos{X: -1}, geom.BlockPos{X: 1}, geom.EmptyShape())
+	stair := geom.NewShape(
+		geom.AABB{MaxX: 1, MaxY: 0.5, MaxZ: 1},
+		geom.AABB{MinY: 0.5, MaxX: 1, MaxY: 1, MaxZ: 0.5},
+	)
+	blocks.Set(geom.BlockPos{}, stair)
+
+	// Only the lower box is in reach, and both boxes come back.
+	got, err := Gather(blocks, geom.AABB{MaxX: 0.5, MaxY: 0.25, MaxZ: 1}, 0)
+	if err != nil {
+		t.Fatalf("Gather: %v", err)
+	}
+	if len(got.Boxes) != 2 {
+		t.Fatalf("Gather returned %d boxes, want both boxes of the shape", len(got.Boxes))
 	}
 }
 

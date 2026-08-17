@@ -84,7 +84,26 @@ func gather(
 					candidates.Unknown = append(candidates.Unknown, pos)
 				case world.LookupAir:
 				case world.LookupShape:
+					// A cell the region reaches is not the same as a shape the
+					// region touches. The game collects a block's collider only
+					// when the shape itself overlaps the region in a volume, and
+					// it collects the shape whole: one collider, all its boxes.
+					//
+					// The clamp cannot tell the difference — a box the region
+					// does not reach is too far along the axis to shorten a
+					// motion, or does not overlap the other two at all — but the
+					// step-up can. It asks the colliders what heights they offer,
+					// and a slab in a cell the probe only clips would offer a
+					// rise the game never considers. That was a real defect
+					// rather than a hypothetical: it made a body step onto the
+					// top of a table it was floating above.
+					first := len(candidates.Boxes)
 					candidates.Boxes = shape.BoxesAt(pos, candidates.Boxes)
+					if !touches(candidates.Boxes[first:], region) {
+						candidates.Boxes = candidates.Boxes[:first]
+
+						continue
+					}
 					if wantCoords {
 						for _, coord := range shape.GridY() {
 							coords = append(coords, coord+float64(pos.Y))
@@ -96,4 +115,19 @@ func gather(
 	}
 
 	return candidates, coords, nil
+}
+
+// touches reports whether any of a shape's boxes overlaps the region in a
+// volume.
+//
+// Sharing a face is not overlapping, which is the same rule the game's own
+// intersection test applies: a body flush against a wall is not inside it.
+func touches(boxes []geom.AABB, region geom.AABB) bool {
+	for _, box := range boxes {
+		if box.Intersects(region) {
+			return true
+		}
+	}
+
+	return false
 }

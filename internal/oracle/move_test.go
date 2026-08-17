@@ -279,6 +279,73 @@ func TestMoveMatchesTheGame(t *testing.T) {
 		checked, stepped, skipped)
 }
 
+// TestAFlushFaceIsNotACollider pins the rule the random scenes cannot reach.
+//
+// The game gathers a block's collider only when the sweep overlaps the block's
+// box in a volume, and sharing a face is not overlapping. A body already flush
+// against a wall therefore has no wall in its candidate list until the sweep
+// reaches past the face — and a motion small enough to vanish into the body's own
+// coordinates never reaches past it.
+//
+// It takes a hand-built case because it takes a motion of 1e-18: the swept
+// region's face has to land exactly on the block's, and any motion large enough
+// to see does not. The two cases differ in nothing but that, and the game
+// answers them differently.
+//
+// This is what a gather that visited cells rather than shapes got wrong: it
+// stopped the invisible move and reported a collision the game does not report.
+func TestAFlushFaceIsNotACollider(t *testing.T) {
+	jar := newOracle(t)
+
+	// Feet on a floor, shoulder against a wall at x = 1.
+	body := geom.AABB{MinX: 0.4, MinY: 0, MinZ: 0.2, MaxX: 1, MaxY: 1.8, MaxZ: 0.8}
+	blocks := world.NewBlocks()
+	blocks.Fill(geom.BlockPos{X: -1, Y: -2, Z: -1}, geom.BlockPos{X: 2, Y: 2, Z: 2}, geom.EmptyShape())
+	blocks.Set(geom.BlockPos{X: 0, Y: -1}, geom.FullCube())
+	blocks.Set(geom.BlockPos{X: 1, Y: -1}, geom.FullCube())
+	blocks.Set(geom.BlockPos{X: 1}, geom.FullCube())
+
+	moves := []collision.Move{
+		{Body: body, Motion: geom.Vec3{X: 1e-18}, OnGround: true},
+		{Body: body, Motion: geom.Vec3{X: 0.2}, OnGround: true},
+	}
+
+	input := []string{"C", "B 0 -1 0 0", "B 1 -1 0 0", "B 1 0 0 0"}
+	for _, move := range moves {
+		input = append(input, fmt.Sprintf("M %s %s %s %s %t %s",
+			renderBox(move.Body),
+			hex(move.Motion.X), hex(move.Motion.Y), hex(move.Motion.Z),
+			move.OnGround, hex(move.StepHeight)))
+	}
+
+	answers := jar.run(t, "MoveOracle", input, len(moves))
+	for index, move := range moves {
+		got, err := collision.Resolve(blocks, move)
+		if err != nil {
+			t.Fatalf("Resolve: %v", err)
+		}
+
+		wantBody, wantHorizontal, _, _ := parseMove(t, answers[index])
+		if !identicalBox(got.Body, wantBody) {
+			t.Fatalf("motion %v: body after move = %+v, the game says %+v",
+				move.Motion.X, got.Body, wantBody)
+		}
+		if got.CollidedHorizontally() != wantHorizontal {
+			t.Fatalf("motion %v: collidedHorizontally = %v, the game says %v",
+				move.Motion.X, got.CollidedHorizontally(), wantHorizontal)
+		}
+	}
+
+	// Stated as well as compared, so that a harness that started answering
+	// "false" to everything could not pass this test quietly.
+	if _, horizontal, _, _ := parseMove(t, answers[0]); horizontal {
+		t.Error("the game reported a collision against a face it only touches")
+	}
+	if _, horizontal, _, _ := parseMove(t, answers[1]); !horizontal {
+		t.Error("the game reported no collision against a wall it moved into")
+	}
+}
+
 // parseMove reads one answer line from the movement harness.
 func parseMove(t *testing.T, text string) (body geom.AABB, horizontal, vertical, ground bool) {
 	t.Helper()

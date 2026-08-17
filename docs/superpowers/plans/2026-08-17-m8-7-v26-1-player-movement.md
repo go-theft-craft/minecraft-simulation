@@ -236,11 +236,70 @@ What it settled, beyond the code:
 - The horizontal collision flags forgive a shortfall under a hundred-thousandth;
   the vertical flag still compares exactly.
 
-What it does not cover: the step-up *assembly* — building the grounded box,
-choosing the first improving candidate, and subtracting the drop — is written
-from the version's own code but checked only by this module's own tests, because
-driving `Entity.collide` needs the Level stub that Task 6 builds. The movement
-oracle covers it end to end once that exists.
+**The step-up assembly is covered too, as of 2026-08-18.** This paragraph used
+to say it was not: that building the grounded box, choosing the first improving
+candidate, and subtracting the drop were written from the version's own code and
+checked only by this module's own tests, because driving `Entity.collide` needs a
+Level and a Level was Task 6's job. It turned out not to need Task 6.
+`internal/oracle/java/MoveOracle26.java` stands one up and runs the whole
+`Entity.collide` against it, and `TestTheWholeCollideMatchesTheGame` compares
+2,400 moves bit for bit — a fifth of them stepping.
+
+Three things that cost less than the estimate said, and two the check found:
+
+- **A level does not have to be constructed to be used.** Its constructor wants a
+  writable level record, a layered registry access, and a dimension type, and
+  eagerly builds a damage-source table from them, so an honest one means loading
+  the vanilla data pack. The instance is allocated without a constructor instead,
+  which is sound because the whole of what a move asks a level for is entity
+  colliders, the world border, and the blocks in a chunk. Every other duty throws,
+  so a version that starts asking for something else fails loudly rather than
+  being answered with a default.
+- **The blocks come from the game, not from the harness.** Scenes are placed by
+  registry name and the harness reports each block's shape, so this side builds
+  its world from the same answer. A committed table of shapes would have been a
+  second transcription to keep true.
+- **The shape model round-trips.** `TestTheBlockShapeGridMatchesTheGame` checks
+  that a shape rebuilt here from the boxes the game stores offers the game's own
+  rises, for six blocks that between them cover the grid at halves, quarters, and
+  eighths and the fallback to a box's own faces. It is the premise the whole-move
+  comparison rests on, so it is asserted rather than assumed.
+- **Found: the sweep gathered per cell where the game gathers per shape.** A
+  block whose shape the probe does not reach still contributed its rises, because
+  `Gather` collected from every cell the region's bounds touched. That made a body
+  floating above an enchanting table step onto it. Fixed by gathering a shape only
+  where it overlaps the region in a volume, which is the game's own rule; the
+  shape is still collected whole, one collider with every box in it, which is also
+  the game's.
+- **Found, on both versions: a face is not a collider.** The same defect reported
+  a horizontal collision for a body flush against a wall moving into it by less
+  than its own coordinates can hold. A 1.8.9 server settled it —
+  `TestAFlushFaceIsNotACollider` is that case, and it takes a motion of 1e-18
+  because any larger motion carries the sweep past the face and makes the wall a
+  collider honestly. One determinism recording changed with the fix, at the single
+  tick where a fall carried a 2e-18 motion into a face.
+
+What is still not covered here: the flags. `Entity.move` combines the two
+horizontal shortfalls into one boolean and derives `onGround` from the vertical
+one, and reaching those means driving `move` rather than `collide` — which wants a
+profiler, fall damage, block callbacks, and the sounds this level does not have.
+The rules are three lines transcribed from that method, and the tolerance they
+compare with is `Mth.equal`'s.
+
+**One divergence is known and not fixed: a body that starts inside a shape.** The
+game's clamp works on a shape's grid, scanning from the cell after the one the
+moving face is in, so a body already inside a multi-cell shape is stopped at that
+shape's next interior grid line. This module clamps against a shape's boxes,
+where a face already past a box does not stop at all. The case that found it: a
+body at `x 0.58..1.18, y 1.349..3.149, z -0.3..0.3` moving
+`(0.302, -0.0205, 0.503)` with stairs at `(0, 1, 0)` is stopped at `z = 0.2` by
+the game and not at all here, because the stair's z grid has a line at a half
+that the body straddles. Closing it means a discrete voxel grid in `geom` and a
+clamp that walks it, which is a task rather than a fix, and it is the last piece
+of "a shape is a grid, not a list of boxes" that this milestone left as boxes. It
+is owned by M8.7 and needs a task of its own; until then
+`TestTheWholeCollideMatchesTheGame` keeps its bodies out of the blocks they stand
+against, so a failure there means the assembly.
 
 ---
 
