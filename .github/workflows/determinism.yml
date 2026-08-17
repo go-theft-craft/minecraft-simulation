@@ -1,0 +1,62 @@
+# The determinism matrix: the same recordings, replayed on six targets, must
+# produce the same digests.
+#
+# This job is separate from CI and uses a different toolchain, deliberately.
+# Every other check in this repository runs through Devbox, which provisions
+# through Nix, and Nix does not run natively on Windows. Rather than drop
+# Windows from a gate whose whole point is cross-platform agreement, the
+# verification job keeps Devbox on one platform and this job uses
+# actions/setup-go on six. internal/buildcheck fails if the Go version named
+# here ever drifts from the one devbox.json names, because two toolchains are
+# affordable and two compilers are not: the matrix would silently stop testing
+# the compiler everything else uses.
+#
+# What this actually tests is the float32 arithmetic in movement and the
+# sine-table indexing, not the canonical encoder. The encoder is integer and
+# byte work and was never plausibly platform-dependent. The recordings in
+# replay/testdata exist to reach the arithmetic; a matrix over empty ticks would
+# pass everywhere and prove nothing.
+#
+# No JDK, no game jar, and no game data beyond the pinned module: the
+# recordings are committed and replay reads them.
+name: Determinism
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  digest:
+    name: ${{ matrix.target.label }}
+    runs-on: ${{ matrix.target.runner }}
+    strategy:
+      # Every target reports. A shared failure and a single-platform failure are
+      # different findings, and fail-fast would hide which one this is.
+      fail-fast: false
+      matrix:
+        target:
+          - { runner: ubuntu-latest, label: linux-amd64 }
+          - { runner: ubuntu-24.04-arm, label: linux-arm64 }
+          - { runner: macos-13, label: macos-amd64 }
+          - { runner: macos-latest, label: macos-arm64 }
+          - { runner: windows-latest, label: windows-amd64 }
+          - { runner: windows-11-arm, label: windows-arm64 }
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version: "1.26.6"
+          cache: false
+
+      - name: Report the toolchain
+        run: go version && go env GOOS GOARCH
+
+      - name: Replay the committed recordings
+        run: go test ./replay/ -run TestRecordingsAreReproducible -v

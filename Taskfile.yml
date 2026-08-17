@@ -49,6 +49,16 @@ tasks:
     cmds:
       - go build ./...
 
+  determinism:
+    # No deps, deliberately. This is the one task that runs where devbox does
+    # not: the determinism matrix covers Windows, which cannot provision through
+    # Nix. It needs a Go toolchain and nothing else — no linters, no scanners, no
+    # JDK, no game jar. Keep it that way, or the matrix stops covering six
+    # platforms.
+    desc: Replay the committed recordings and compare digests, with only a Go toolchain
+    cmds:
+      - go test ./replay/ -run TestRecordingsAreReproducible {{.CLI_ARGS}}
+
   vuln:
     desc: Check dependencies for known vulnerabilities
     deps: [deps]
