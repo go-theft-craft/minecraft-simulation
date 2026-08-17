@@ -8,6 +8,14 @@
 
 **Tech Stack:** Go 1.26.6, `minecraft-protocol` for generated game data, standard library otherwise, Devbox, go-task, `gofumpt` plus `gci`.
 
+**Status:** Tasks 1 to 7 are done; Tasks 8 to 10 — the movement oracle, the
+generated fixtures, and the milestone record — are not started, so nothing in the
+tick has yet been checked against the game. Six deviations from this plan and the
+three orderings Task 8 must settle are recorded in
+`docs/superpowers/notes/2026-08-17-m8-3-m8-4-implementation-record.md`. Read that
+first: two of this plan's stated expectations turned out to be wrong about the
+dataset, and the note says which.
+
 ## Global Constraints
 
 - Module is `github.com/go-theft-craft/minecraft-simulation`. Go directive is `1.26.6`.

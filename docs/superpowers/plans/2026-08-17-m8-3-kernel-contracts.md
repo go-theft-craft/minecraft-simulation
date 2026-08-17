@@ -8,6 +8,13 @@
 
 **Tech Stack:** Go 1.26.6, standard library only, Devbox, go-task, `gofumpt` plus `gci`.
 
+**Status:** complete. Six places where the code differs from this plan — the home of
+`Locomotion`, `Runner.Step`'s signature, `TickState.Commands`, where
+`ProfileID.validate` landed, why the empty-tick digest needed no re-pinning, and
+the two `Clone` methods — are recorded in
+`docs/superpowers/notes/2026-08-17-m8-3-m8-4-implementation-record.md`. Read that
+before treating this plan as a description of the code.
+
 ## Global Constraints
 
 - Module is `github.com/go-theft-craft/minecraft-simulation`. Go directive is `1.26.6`.
