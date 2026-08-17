@@ -4,7 +4,13 @@
 
 **Goal:** Run one kernel from both consumers — the headless client predicting locally, the server deciding authoritatively — and prove it by connecting to a real vanilla Java Edition 1.8.9 server and executing scripted input that draws zero correction packets.
 
-**Architecture:** `minecraft-simulation` gains a small adapter contract and nothing else; the simulation does not learn about packets. `headless-minecraft` gains an outbound action path, a prediction loop that forks a snapshot, and correction handling that discards the fork and replays retained commands. `server` drives the same kernel through `runtime.Runner` and treats its result as authoritative.
+**Architecture:** `minecraft-simulation` gains a small adapter contract and nothing else; the simulation does not learn about packets. `headless-minecraft` has already gained its outbound action path (see Task 1, reconciled below); this plan adds a prediction loop that forks a snapshot and correction handling that discards the fork and replays retained commands. `server` drives the same kernel through `runtime.Runner` and treats its result as authoritative.
+
+> **Reconciled 2026-08-17.** Task 1 landed in `headless-minecraft` ahead of this
+> plan, as `version/action.go` and `client/action.go`. Its section below now
+> records what landed and where it differs from the sketch, and Task 4 absorbs
+> the one responsibility the landed API deliberately declined: choosing which
+> movement packet a tick warrants. Execution starts at Task 2.
 
 **Tech Stack:** Go 1.26.6, `minecraft-protocol`, a pinned vanilla 1.8.9 server jar, Devbox, go-task.
 
@@ -14,9 +20,9 @@ This is the milestone the whole subproject is arranged around. It is the first p
 
 Two prerequisites are in place. M6.3 delivered a headless client that reaches play on protocol 47, and M7 delivered observed world state with immutable snapshots and wire-ordered reducers, including a player domain that already models the server's relative-position updates. M8.4 delivered movement checked against the game's own bytecode, so a correction here is unlikely to mean a wrong constant.
 
-Two prerequisites are missing, and finding that out is why this plan starts where it does.
+Two prerequisites were missing when this plan was written, and finding that out is why it starts where it does. One has since been met.
 
-**The client cannot send gameplay packets.** Its send path is unexported and M7's scope was observation. There is no public way to tell the server where the player went. That is the first task, it belongs to `headless-minecraft`, and it is a genuine API addition rather than plumbing.
+**The client can now send gameplay packets.** When this plan was written its send path was unexported, because M7's scope was observation, and there was no public way to tell the server where the player went. The outbound action path has since landed in `headless-minecraft` ahead of this milestone: `Client.Do` sends a version-neutral intent that the profile's adapter encodes, which is the shape Task 1 asked for. Task 1 is recorded as complete below, with the differences between what it sketched and what landed, and execution starts at Task 2.
 
 **Only offline mode is available.** M6.4, Microsoft device-code authentication, is postponed by deliberate decision, and the master plan already records the cost: "every check from here runs against offline mode, including M8's and M9's vanilla lanes." A local vanilla server in offline mode is a complete oracle for movement, so this milestone is not blocked — but the gate must state that it ran offline, and nothing here should be read as evidence about online-mode behaviour.
 
@@ -63,8 +69,9 @@ minecraft-simulation/
   adapter/adapter_test.go
 
 headless-minecraft/
-  client/action.go            The outbound action path
-  client/action_test.go
+  version/action.go           The intents and the measured cadence rule — landed
+  client/action.go            The outbound action path, Client.Do — landed
+  client/action_test.go       — landed
   predict/predict.go          The prediction loop, forks, and reconciliation
   predict/reconcile.go
   predict/*_test.go
@@ -79,38 +86,53 @@ server/
 
 ---
 
-## Task 1: An outbound action path for the client
+## Task 1: An outbound action path for the client — complete, landed ahead of this plan
 
 **Repository:** `headless-minecraft`
 
-**Files:**
-- Create: `client/action.go`
-- Test: `client/action_test.go`
+- [x] Landed as `version/action.go` and `client/action.go` before this plan
+  started executing, with `ActionRespawn` following it. Nothing is left in this
+  task.
 
-**Interfaces:**
-- Produces:
-  - `type Action interface { ... }` — a version-neutral outbound intent
-  - `func (c *Client) Do(ctx context.Context, action Action) error`
-  - `ActionMove`, `ActionLook`, `ActionMoveLook`, and `ActionGround` as the concrete intents this milestone needs
-  - `version.Adapter` gains the encoding of an action for its protocol
+What landed matches the sketch in shape — `Client.Do` is the only public entry
+point, serialized against the loop's own replies, refusing before play
+(`ErrNotInPlay`) and after close, surfacing a failed write — and differs in
+five particulars Task 4 must know before consuming it:
 
-M7 stopped at observation, so this is where the client learns to act. The intents are version-neutral for the same reason the rest of the module is: protocol 47 and protocol 775 encode player movement differently, and the profile-selected adapter is where that difference belongs. `version.Adapter` already carries `Handshake` for the same reason, so the pattern exists.
+- **The intents live in `version`, not `client`.** `version.Action` is the
+  interface — one method, `ActionKind() string` — and `client` re-exports every
+  type as an alias, so `client.ActionMove` and `version.ActionMove` are the
+  same type. Either import works.
+- **`version.Adapter` gained `EncodeAction`**, the seam the sketch asked for,
+  plus `version.ErrUnsupportedAction` and the shared `UnsupportedAction`
+  helper, so both protocols refuse an inexpressible intent the same way.
+- **Every movement intent carries `HorizontalCollision`** alongside `OnGround`.
+  Protocol 775 carries it in its movement flags; protocol 47 has no field for
+  it and drops it. The kernel computes it — M8.2's collision flags — so the
+  prediction loop must feed it from the tick's result rather than defaulting it
+  false.
+- **`ActionRespawn` exists too**, beyond the sketch, because a dead client that
+  cannot respawn is stuck. This milestone's scenarios never die, but the loop
+  should not assume every action is a movement.
+- **The cadence rule is documented and deliberately not encoded.** The sketch
+  asked for the rule to be established from the reference workspace and
+  recorded in the doc comment; `version/action.go` records it, read off a real
+  1.8.9 client's own traffic — 3,703 movement packets over five minutes, 3,700
+  agreeing, the two exceptions at the login boundary. Moved means squared
+  distance from the last reported position above `9.0e-4`, or twenty ticks
+  since a position was reported; rotated means the yaw or pitch differs
+  exactly. Moved and rotated send position-look, moved alone position, rotated
+  alone look, neither a bare ground flag. Deciding which intent a tick warrants
+  belongs to the caller that tracks the previous tick — nothing in `Do` or the
+  adapters guesses. **That makes the cadence Task 4's job**, and it converts
+  Task 5's likeliest first-failure cause, "the packet cadence", from a rule the
+  gate discovers into one the loop implements from a documented, measured spec.
 
-`Do` is the only public entry point, it is serialized against the loop's writer, and it returns an error rather than swallowing one, because a caller predicting locally needs to know its intent never left.
-
-**Movement packets are stateful in protocol 47** in a way the encoding must respect: the client sends position, look, position-and-look, or a bare ground flag depending on what changed, and a server that receives the wrong one for the wrong reason will disagree. Establish which packet a tick should send from the same reference workspace the rest of M8 used, and record the rule in the doc comment.
-
-- [ ] **Step 1: Write the failing test**
-
-Cover: each action encodes to the expected packet on protocol 47 and on protocol 775, asserted against the generated codecs rather than against bytes typed by hand; `Do` before the client reaches play returns an error naming the state; `Do` after close returns an error rather than blocking; and concurrent `Do` calls are serialized, which a test with two goroutines and a recording writer can establish.
-
-- [ ] **Step 2 to 6: Fail, implement, verify, check, commit**
-
-```bash
-cd ../headless-minecraft
-git add client/action.go client/action_test.go
-git commit -m "feat(client): add a version-neutral outbound action path"
-```
+The sketched tests exist as `client/action_test.go`: encoding asserted against
+the generated codecs on both protocols, refusal before play and after close,
+and serialization of concurrent `Do` calls. One addition worth using: `Do`
+publishes every action as a `PacketSent` event, so the gate can watch actions
+and corrections in one subscription.
 
 ---
 
@@ -188,7 +210,9 @@ git commit -m "feat(sim): drive the shared kernel authoritatively"
   - `func (l *Loop) Predicted() world.PlayerView` — what the client currently believes
   - `type Correction struct { Tick sim.Tick; From, To geom.Vec3 }` published as an event
 
-The loop, once per tick: take the caller's input, build a command, `Drive` against the forked store, send the resulting position through `client.Do`, and retain the command.
+The loop, once per tick: take the caller's input, build a command, `Drive` against the forked store, send the result through `client.Do`, and retain the command.
+
+**The loop owns the packet cadence.** The landed action API documents the measured rule in `version/action.go` and deliberately encodes none of it, so choosing the intent is this loop's job: track the last reported position and rotation and the twenty-tick counter, and send `ActionMoveLook`, `ActionMove`, `ActionLook`, or `ActionGround` accordingly, carrying `OnGround` and `HorizontalCollision` from the tick's own collision result. A server reads the choice as information — a position for a tick where nothing moved is itself a disagreement — so the cadence is gate-relevant behaviour, not formatting.
 
 On a correction: replace the fork with a store built from the authoritative observed snapshot, drop retained commands the server has acknowledged, replay the rest, and publish a `Correction` event. Publishing it matters beyond diagnostics — the gate counts these, and a consumer wants to know its prediction was wrong.
 
@@ -197,6 +221,7 @@ Reconciliation is where the subtle bugs live, so the tests are the deliverable a
 - A correction that agrees with the prediction to within the wire's precision must still reset the fork, because 1.8.9 transmits positions as fixed point in units of one thirty-second of a block and a client that treated a rounding difference as a disagreement would fight the server forever.
 - A correction arriving while a tick is in flight must not be applied to a half-built state.
 - Retained commands must be bounded, and the bound must be reached in a test rather than reasoned about.
+- The cadence must match the measured rule without a server present: an idle run reports a bare ground flag each tick and a forced position on the twenty-first, and a drift below the `9.0e-4` squared-distance threshold must not report a position before the counter forces one. A recording writer makes this assertable tick by tick.
 
 - [ ] **Step 1: Write the failing tests against a scripted server**
 
@@ -259,7 +284,7 @@ Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/headless-minecraft && 
 
 This is the first time the simulation meets a real server, and something will be wrong. The likely causes, in the order they are worth checking:
 
-- **The packet cadence.** Which movement packet, how often, and whether the ground flag matches. This is the most likely cause and has nothing to do with physics.
+- **The packet cadence.** Which movement packet, how often, and whether the ground flag matches. This is the most likely cause and has nothing to do with physics. The rule is now measured and documented in `version/action.go` and Task 4 implements it from that spec, so a cadence failure here means the loop diverged from the documented rule — or the capture's two login-boundary exceptions matter after all.
 - **The tick alignment.** Our tick boundary against the server's twenty per second.
 - **The acknowledgement boundary.** Corrections counted that are not corrections.
 - **A constant.** Least likely, because M8.4 checked them against the game's own bytecode, and the most important reason that milestone was built the way it was.
@@ -299,7 +324,7 @@ git commit -m "docs(plan): close M8, and what the vanilla gate found"
 
 - One kernel, built from one profile, is driven by both consumers through `adapter.Drive`. Neither consumer has its own movement rules.
 - `minecraft-simulation` gained no protocol import.
-- The client can send version-neutral actions on protocol 47 and protocol 775, serialized against its writer, with errors surfaced.
+- The client can send version-neutral actions on protocol 47 and protocol 775, serialized against its writer, with errors surfaced. Already true — landed ahead of this plan — and the loop must additionally implement the cadence rule those actions deliberately leave to it.
 - Prediction forks the store, a correction discards the fork and replays retained commands from the authoritative snapshot, retention is bounded, and a difference within the wire's fixed-point precision does not cause the client to fight the server.
 - **Scripted walk, sprint, jump, sneak, fall, and collide draw zero corrections from a real vanilla 1.8.9 server**, with no "moved wrongly" or "moved too quickly" in its log, over at least 200 ticks per scenario after the login boundary.
 - The same suite runs against 26.1.2 with the v26_1 profile.
