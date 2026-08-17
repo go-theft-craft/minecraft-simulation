@@ -90,3 +90,43 @@ func TestFitsReportsUnknownForAnUndescribedCell(t *testing.T) {
 		t.Fatalf("Fits = %v, want FitUnknown", fit)
 	}
 }
+
+func TestGroundReportsSolidOverAFloor(t *testing.T) {
+	query := Query{View: room(), Body: testBody}
+
+	ground, err := query.Ground(FeetOf(geom.BlockPos{X: 0, Y: 0, Z: 0}))
+	if err != nil {
+		t.Fatalf("Ground returned an error: %v", err)
+	}
+	if ground != GroundSolid {
+		t.Fatalf("Ground = %v, want GroundSolid", ground)
+	}
+}
+
+func TestGroundReportsOpenOverAHole(t *testing.T) {
+	blocks := room()
+	blocks.SetAir(geom.BlockPos{X: 0, Y: -1, Z: 0})
+	query := Query{View: blocks, Body: testBody}
+
+	ground, err := query.Ground(FeetOf(geom.BlockPos{X: 0, Y: 0, Z: 0}))
+	if err != nil {
+		t.Fatalf("Ground returned an error: %v", err)
+	}
+	if ground != GroundOpen {
+		t.Fatalf("Ground = %v, want GroundOpen", ground)
+	}
+}
+
+func TestGroundReportsUnknownForAnUndescribedFloor(t *testing.T) {
+	blocks := room()
+	blocks.Forget(geom.BlockPos{X: 0, Y: -1, Z: 0})
+	query := Query{View: blocks, Body: testBody}
+
+	ground, err := query.Ground(FeetOf(geom.BlockPos{X: 0, Y: 0, Z: 0}))
+	if err != nil {
+		t.Fatalf("Ground returned an error: %v", err)
+	}
+	if ground != GroundUnknown {
+		t.Fatalf("Ground = %v, want GroundUnknown", ground)
+	}
+}
