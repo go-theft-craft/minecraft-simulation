@@ -50,6 +50,13 @@ type Locomotion struct {
 // It is a sim.Command: a semantic intent with no packet in it. The kernel hands
 // it to the phases, which decide whether the body's state permits it.
 type Input struct {
+	// Entity is the body the intent is for.
+	//
+	// A command carries its subject because a tick may simulate several bodies:
+	// a server steps every player it holds from one tick's worth of queued
+	// input, and an intent that did not name its body could only ever be applied
+	// to one of them.
+	Entity entity.ID
 	// Strafe and Forward are the raw input axes, before the decay a tick applies
 	// to them. Positive forward is the direction the body faces.
 	Strafe  float32

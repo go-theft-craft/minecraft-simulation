@@ -1,0 +1,398 @@
+package v1_8
+
+import (
+	"context"
+	"fmt"
+
+	"github.com/go-theft-craft/minecraft-simulation/entity"
+	"github.com/go-theft-craft/minecraft-simulation/geom"
+	"github.com/go-theft-craft/minecraft-simulation/movement"
+	"github.com/go-theft-craft/minecraft-simulation/sim"
+	"github.com/go-theft-craft/minecraft-simulation/world"
+)
+
+// sneakScale multiplies both input axes while a body is sneaking. The game
+// applies it to the input before the per-tick decay.
+const sneakScale float32 = 0.3
+
+// body is the per-tick working state for one entity.
+//
+// The phases carry their intermediate values here rather than writing them
+// through the tick, so a tick that turns out to be incomplete leaves nothing
+// behind: the kernel drops operations, and the commit phase is the only one that
+// produces any.
+type body struct {
+	id    entity.ID
+	state entity.State
+	loco  movement.Locomotion
+
+	strafe   float32
+	forward  float32
+	friction float32
+	speed    float32
+
+	collided bool
+	landed   bool
+	// present is false for an entity in scope that the store does not hold, or
+	// holds without locomotion state. Later phases skip it.
+	present bool
+}
+
+// scratch is one tick's working state, shared by the phases of one phase list.
+//
+// A phase list is stateful within a tick and belongs to one kernel: NewKernel
+// takes the list once, and a kernel steps one tick at a time, so nothing here is
+// ever touched by two ticks at once. Phases() returns a fresh list precisely so
+// that two kernels built from one profile do not share this.
+//
+// The first phase resets it, so a tick that failed halfway cannot leak a value
+// into the next one.
+type scratch struct {
+	bodies []body
+}
+
+// buildPhases returns the eleven phases of the 1.8.9 land tick, in order.
+//
+// The order is data. A custom profile may reorder or replace a phase, and M8.7
+// builds a different order for 26.1.2 without touching a rule. That is also why
+// friction and acceleration are separate phases even though one feeds the other:
+// a profile that wants different friction should not have to reimplement
+// acceleration to get it.
+func (p *profile) buildPhases() []sim.Phase {
+	shared := &scratch{}
+
+	return []sim.Phase{
+		phase{id: "v1_8.jump-countdown", run: func(tick *sim.TickState) error {
+			return p.adoptInput(tick, shared)
+		}},
+		phase{id: "v1_8.jump", run: func(*sim.TickState) error {
+			return p.jump(shared)
+		}},
+		phase{id: "v1_8.input-decay", run: func(*sim.TickState) error {
+			return p.decayInput(shared)
+		}},
+		phase{id: "v1_8.friction", run: func(tick *sim.TickState) error {
+			return p.friction(tick, shared)
+		}},
+		phase{id: "v1_8.acceleration", run: func(*sim.TickState) error {
+			return p.acceleration(shared)
+		}},
+		phase{id: "v1_8.apply-input", run: func(*sim.TickState) error {
+			return p.applyInput(shared)
+		}},
+		phase{id: "v1_8.move", run: func(tick *sim.TickState) error {
+			return p.move(tick, shared)
+		}},
+		phase{id: "v1_8.gravity", run: func(*sim.TickState) error {
+			return p.gravity(shared)
+		}},
+		phase{id: "v1_8.vertical-drag", run: func(*sim.TickState) error {
+			return p.verticalDrag(shared)
+		}},
+		phase{id: "v1_8.horizontal-drag", run: func(*sim.TickState) error {
+			return p.horizontalDrag(shared)
+		}},
+		phase{id: "v1_8.commit", run: func(tick *sim.TickState) error {
+			return p.commit(tick, shared)
+		}},
+	}
+}
+
+// phase adapts a function to sim.Phase.
+type phase struct {
+	id  string
+	run func(*sim.TickState) error
+}
+
+// ID implements sim.Phase.
+func (p phase) ID() string { return p.id }
+
+// Run implements sim.Phase.
+func (p phase) Run(_ context.Context, tick *sim.TickState) error { return p.run(tick) }
+
+// adoptInput starts the tick: it gathers the bodies in scope, decrements each
+// jump counter, and adopts this tick's input flags and facing.
+//
+// The flags are adopted at the top of the tick because everything after this
+// reads them: the game sets them on the entity before its movement runs, and a
+// phase that adopted them later would be applying last tick's facing to this
+// tick's motion.
+func (p *profile) adoptInput(tick *sim.TickState, shared *scratch) error {
+	shared.bodies = shared.bodies[:0]
+
+	inputs := latestInputs(tick.Commands())
+	for _, id := range tick.Scope().Entities {
+		working := body{id: id}
+
+		state, ok := tick.Entity(id)
+		if !ok {
+			shared.bodies = append(shared.bodies, working)
+
+			continue
+		}
+		loco, ok := tick.Locomotion(id)
+		if !ok {
+			shared.bodies = append(shared.bodies, working)
+
+			continue
+		}
+
+		working.state = state
+		working.loco = movement.Countdown(loco)
+		working.present = true
+
+		if input, ok := inputs[id]; ok {
+			working.loco.Jumping = input.Jump
+			working.loco.Sprinting = input.Sprint
+			working.loco.Sneaking = input.Sneak
+			working.loco.Yaw = input.Yaw
+			working.loco.Pitch = input.Pitch
+			working.strafe = input.Strafe
+			working.forward = input.Forward
+		}
+
+		shared.bodies = append(shared.bodies, working)
+	}
+
+	return nil
+}
+
+// latestInputs indexes the tick's movement intents by body, keeping the last one
+// for each. A controller that sent two intents for one tick meant the second.
+func latestInputs(commands []sim.Command) map[entity.ID]movement.Input {
+	inputs := make(map[entity.ID]movement.Input, len(commands))
+	for _, command := range commands {
+		if input, ok := command.(movement.Input); ok {
+			inputs[input.Entity] = input
+		}
+	}
+
+	return inputs
+}
+
+// jump applies the jump impulse to every body whose state permits one.
+func (p *profile) jump(shared *scratch) error {
+	for index := range shared.bodies {
+		working := &shared.bodies[index]
+		if !working.present {
+			continue
+		}
+
+		loco, motion, _ := movement.Jump(
+			p.table, working.loco, working.state.Motion, working.state.OnGround, jumpUpwards,
+		)
+		working.loco = loco
+		working.state.Motion = motion
+	}
+
+	return nil
+}
+
+// decayInput scales the input axes: the sneak factor first, then the per-tick
+// decay the game applies to both axes before they are used.
+func (p *profile) decayInput(shared *scratch) error {
+	for index := range shared.bodies {
+		working := &shared.bodies[index]
+		if !working.present {
+			continue
+		}
+
+		if working.loco.Sneaking {
+			working.strafe *= sneakScale
+			working.forward *= sneakScale
+		}
+		working.strafe *= inputDecay
+		working.forward *= inputDecay
+	}
+
+	return nil
+}
+
+// friction computes each body's horizontal multiplier from the block beneath it,
+// before the body moves.
+//
+// Reading it here rather than in the drag phase is what makes a player who walks
+// off ice keep ice friction for the tick that leaves it. The move phase runs
+// between the two and cannot change what this recorded.
+func (p *profile) friction(tick *sim.TickState, shared *scratch) error {
+	for index := range shared.bodies {
+		working := &shared.bodies[index]
+		if !working.present {
+			continue
+		}
+
+		slipperiness := p.slipperiness(0)
+		if working.state.OnGround {
+			below := movement.GroundFrictionBlock(working.state.Box, position(working.state.Box))
+			ref, lookup := tick.BlockState(below)
+			if lookup == world.LookupUnknown {
+				// The tick is already incomplete; the kernel drops its work.
+				continue
+			}
+			slipperiness = p.slipperiness(ref)
+		}
+		working.friction = movement.Friction(slipperiness, working.state.OnGround)
+	}
+
+	return nil
+}
+
+// acceleration turns the friction into this tick's input scale.
+func (p *profile) acceleration(shared *scratch) error {
+	for index := range shared.bodies {
+		working := &shared.bodies[index]
+		if !working.present {
+			continue
+		}
+
+		working.speed = movement.Speed(
+			working.friction, working.state.OnGround, working.loco.MoveSpeed, working.loco.JumpFactor,
+		)
+	}
+
+	return nil
+}
+
+// applyInput adds the scaled input to each body's motion.
+func (p *profile) applyInput(shared *scratch) error {
+	for index := range shared.bodies {
+		working := &shared.bodies[index]
+		if !working.present {
+			continue
+		}
+
+		working.state.Motion = movement.ApplyHeading(
+			p.table, working.state.Motion,
+			working.strafe, working.forward, working.speed, working.loco.Yaw,
+		)
+	}
+
+	return nil
+}
+
+// move resolves each body's motion against the world.
+//
+// A clamped axis zeroes that component of the motion, which is what stops a body
+// pressed against a wall from accumulating speed into it. The vertical clamp is
+// also where standing comes from: a body whose downward motion was stopped is on
+// the ground.
+func (p *profile) move(tick *sim.TickState, shared *scratch) error {
+	for index := range shared.bodies {
+		working := &shared.bodies[index]
+		if !working.present {
+			continue
+		}
+
+		result, err := movement.Step(tick.Blocks(), working.state, tick.Limits().CollisionCandidates)
+		if err != nil {
+			return fmt.Errorf("resolving entity %d: %w", working.id, err)
+		}
+		if len(result.Unknown) != 0 {
+			// collision reports incompleteness in its own return value, so the
+			// phase is what tells the kernel. Without this the tick would report
+			// itself complete over a region nobody described.
+			tick.MissingBlocks(result.Unknown)
+
+			continue
+		}
+
+		wasAirborne := !working.state.OnGround
+		working.state.Box = result.Body
+		working.state.OnGround = result.OnGround
+		working.collided = result.CollidedHorizontally()
+		working.landed = wasAirborne && result.OnGround
+
+		if result.CollidedX {
+			working.state.Motion.X = 0
+		}
+		if result.CollidedY {
+			working.state.Motion.Y = 0
+		}
+		if result.CollidedZ {
+			working.state.Motion.Z = 0
+		}
+	}
+
+	return nil
+}
+
+// gravity applies one tick of fall to every body.
+func (p *profile) gravity(shared *scratch) error {
+	constants := p.Motion(entity.FamilyPlayer)
+	for index := range shared.bodies {
+		working := &shared.bodies[index]
+		if !working.present {
+			continue
+		}
+
+		working.state.Motion = movement.ApplyGravity(working.state.Motion, constants.Gravity)
+	}
+
+	return nil
+}
+
+// verticalDrag applies the vertical multiplier.
+func (p *profile) verticalDrag(shared *scratch) error {
+	constants := p.Motion(entity.FamilyPlayer)
+	for index := range shared.bodies {
+		working := &shared.bodies[index]
+		if !working.present {
+			continue
+		}
+
+		working.state.Motion = movement.ApplyVerticalDrag(
+			working.state.Motion, float32(constants.VerticalDrag),
+		)
+	}
+
+	return nil
+}
+
+// horizontalDrag applies the friction this tick's friction phase recorded.
+func (p *profile) horizontalDrag(shared *scratch) error {
+	for index := range shared.bodies {
+		working := &shared.bodies[index]
+		if !working.present {
+			continue
+		}
+
+		working.state.Motion = movement.ApplyHorizontalDrag(working.state.Motion, working.friction)
+	}
+
+	return nil
+}
+
+// commit writes the tick's results and reports what happened.
+//
+// It is the only phase that produces operations. Everything before it worked on
+// the scratch, so an incomplete tick had nothing to drop.
+func (p *profile) commit(tick *sim.TickState, shared *scratch) error {
+	for index := range shared.bodies {
+		working := &shared.bodies[index]
+		if !working.present {
+			continue
+		}
+
+		tick.SetEntity(working.id, working.state)
+		tick.SetLocomotion(working.id, working.loco)
+
+		if working.collided {
+			tick.EmitDomain(sim.DomainEvent{Kind: "movement.collided", Entity: working.id})
+		}
+		if working.landed {
+			tick.EmitDomain(sim.DomainEvent{Kind: "movement.landed", Entity: working.id})
+		}
+	}
+
+	return nil
+}
+
+// position returns the point the game treats as a body's location: the centre of
+// its box horizontally, and its feet vertically.
+func position(box geom.AABB) geom.Vec3 {
+	return geom.Vec3{
+		X: (box.MinX + box.MaxX) / 2,
+		Y: box.MinY,
+		Z: (box.MinZ + box.MaxZ) / 2,
+	}
+}
