@@ -168,3 +168,141 @@ func TestResolveZeroMotionIsAFixedPoint(t *testing.T) {
 		t.Fatalf("Applied = %+v, want zero", got.Applied)
 	}
 }
+
+// slab is a half-height block. A 0.6 step height clears one of these and
+// cannot clear a full cube, which is exactly vanilla's behaviour: a player
+// walks onto a slab and has to jump onto a full block.
+func slab() geom.Shape {
+	return geom.NewShape(geom.AABB{MaxX: 1, MaxY: 0.5, MaxZ: 1})
+}
+
+func TestResolveStepsOntoASlab(t *testing.T) {
+	blocks := worldWithFloor()
+	blocks.Set(geom.BlockPos{X: 1, Y: 0, Z: 0}, slab())
+	blocks.Set(geom.BlockPos{X: 1, Y: 0, Z: -1}, slab())
+
+	got, err := Resolve(blocks, Move{
+		Body:       player(),
+		Motion:     geom.Vec3{X: 1},
+		OnGround:   true,
+		StepHeight: 0.6,
+	})
+	if err != nil {
+		t.Fatalf("Resolve: %v", err)
+	}
+	if !got.Stepped {
+		t.Fatalf("Resolve did not step: %+v", got)
+	}
+	if got.Body.MinY != 0.5 {
+		t.Fatalf("Body.MinY = %v, want 0.5: the body should stand on the slab", got.Body.MinY)
+	}
+	if got.Applied.X != 1 {
+		t.Fatalf("Applied.X = %v, want the full motion after stepping", got.Applied.X)
+	}
+	if !got.OnGround {
+		t.Error("OnGround is false after stepping onto a surface")
+	}
+}
+
+func TestResolveCannotStepOntoAFullBlock(t *testing.T) {
+	blocks := worldWithFloor()
+	blocks.Set(geom.BlockPos{X: 1, Y: 0, Z: 0}, geom.FullCube())
+	blocks.Set(geom.BlockPos{X: 1, Y: 0, Z: -1}, geom.FullCube())
+
+	got, err := Resolve(blocks, Move{
+		Body:       player(),
+		Motion:     geom.Vec3{X: 1},
+		OnGround:   true,
+		StepHeight: 0.6,
+	})
+	if err != nil {
+		t.Fatalf("Resolve: %v", err)
+	}
+	if got.Stepped {
+		t.Fatalf("Resolve stepped onto a full block with a 0.6 step height: %+v", got)
+	}
+	if got.Applied.X != 0.7 {
+		t.Fatalf("Applied.X = %v, want 0.7", got.Applied.X)
+	}
+}
+
+func TestResolveDoesNotStepAboveTheStepHeight(t *testing.T) {
+	blocks := worldWithFloor()
+	// A two-block wall: 0.6 of step height cannot clear it.
+	blocks.Fill(geom.BlockPos{X: 1, Y: 0, Z: -1}, geom.BlockPos{X: 1, Y: 1, Z: 0}, geom.FullCube())
+
+	got, err := Resolve(blocks, Move{
+		Body:       player(),
+		Motion:     geom.Vec3{X: 1},
+		OnGround:   true,
+		StepHeight: 0.6,
+	})
+	if err != nil {
+		t.Fatalf("Resolve: %v", err)
+	}
+	if got.Stepped {
+		t.Fatalf("Resolve stepped over a two-block wall: %+v", got)
+	}
+	if got.Body.MinY != 0 {
+		t.Fatalf("Body.MinY = %v, want the body still on the floor", got.Body.MinY)
+	}
+	if got.Applied.X != 0.7 {
+		t.Fatalf("Applied.X = %v, want 0.7", got.Applied.X)
+	}
+}
+
+func TestResolveDoesNotStepWhileAirborne(t *testing.T) {
+	blocks := worldWithFloor()
+	blocks.Set(geom.BlockPos{X: 1, Y: 1, Z: 0}, geom.FullCube())
+	blocks.Set(geom.BlockPos{X: 1, Y: 1, Z: -1}, geom.FullCube())
+
+	got, err := Resolve(blocks, Move{
+		Body:       player().Offset(geom.Vec3{Y: 1}),
+		Motion:     geom.Vec3{X: 1, Y: 0.2},
+		OnGround:   false,
+		StepHeight: 0.6,
+	})
+	if err != nil {
+		t.Fatalf("Resolve: %v", err)
+	}
+	if got.Stepped {
+		t.Fatalf("Resolve stepped while rising through the air: %+v", got)
+	}
+}
+
+func TestResolveDoesNotStepWithoutAHorizontalCollision(t *testing.T) {
+	got, err := Resolve(worldWithFloor(), Move{
+		Body:       player(),
+		Motion:     geom.Vec3{X: 0.2},
+		OnGround:   true,
+		StepHeight: 0.6,
+	})
+	if err != nil {
+		t.Fatalf("Resolve: %v", err)
+	}
+	if got.Stepped {
+		t.Fatalf("Resolve stepped with nothing in the way: %+v", got)
+	}
+	if got.Applied.X != 0.2 {
+		t.Fatalf("Applied.X = %v, want 0.2", got.Applied.X)
+	}
+}
+
+func TestResolveStepHeightZeroNeverSteps(t *testing.T) {
+	// A slab the entity could clear if it had any step height at all.
+	blocks := worldWithFloor()
+	blocks.Set(geom.BlockPos{X: 1, Y: 0, Z: 0}, slab())
+	blocks.Set(geom.BlockPos{X: 1, Y: 0, Z: -1}, slab())
+
+	got, err := Resolve(blocks, Move{
+		Body:     player(),
+		Motion:   geom.Vec3{X: 1},
+		OnGround: true,
+	})
+	if err != nil {
+		t.Fatalf("Resolve: %v", err)
+	}
+	if got.Stepped {
+		t.Fatalf("Resolve stepped with a zero step height: %+v", got)
+	}
+}
