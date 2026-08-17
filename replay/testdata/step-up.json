@@ -1,0 +1,2380 @@
+{
+  "name": "step-up",
+  "note": "A staircase climbed and walked off. Half-block rises alternate slabs and cubes, because a step height of float64(float32(0.6)) clears half a block and not a whole one, so every stride reaches the retry the collision oracle checked and the settle value it corrected.",
+  "profile": {
+    "Edition": "java",
+    "GameVersion": "1.8.9",
+    "RulesRevision": "1"
+  },
+  "data_digest": "afe786eeca22291215086fcf4e85da48406457c82c00af1c741f2f8f15ef4df5",
+  "world": {
+    "min": {
+      "X": -10,
+      "Y": -1,
+      "Z": -10
+    },
+    "max": {
+      "X": 10,
+      "Y": 8,
+      "Z": 10
+    },
+    "fill": "air",
+    "blocks": [
+      {
+        "pos": {
+          "X": -10,
+          "Y": 0,
+          "Z": -10
+        },
+        "to": {
+          "X": 10,
+          "Y": 0,
+          "Z": 10
+        },
+        "name": "stone"
+      },
+      {
+        "pos": {
+          "X": -9,
+          "Y": 1,
+          "Z": -9
+        },
+        "to": {
+          "X": 9,
+          "Y": 4,
+          "Z": -9
+        },
+        "name": "stone"
+      },
+      {
+        "pos": {
+          "X": -9,
+          "Y": 1,
+          "Z": 9
+        },
+        "to": {
+          "X": 9,
+          "Y": 4,
+          "Z": 9
+        },
+        "name": "stone"
+      },
+      {
+        "pos": {
+          "X": -9,
+          "Y": 1,
+          "Z": -9
+        },
+        "to": {
+          "X": -9,
+          "Y": 4,
+          "Z": 9
+        },
+        "name": "stone"
+      },
+      {
+        "pos": {
+          "X": 9,
+          "Y": 1,
+          "Z": -9
+        },
+        "to": {
+          "X": 9,
+          "Y": 4,
+          "Z": 9
+        },
+        "name": "stone"
+      },
+      {
+        "pos": {
+          "X": 2,
+          "Y": 1,
+          "Z": 0
+        },
+        "name": "stone_slab"
+      },
+      {
+        "pos": {
+          "X": 3,
+          "Y": 1,
+          "Z": 0
+        },
+        "name": "stone"
+      },
+      {
+        "pos": {
+          "X": 4,
+          "Y": 2,
+          "Z": 0
+        },
+        "name": "stone_slab"
+      },
+      {
+        "pos": {
+          "X": 5,
+          "Y": 2,
+          "Z": 0
+        },
+        "name": "stone"
+      },
+      {
+        "pos": {
+          "X": 6,
+          "Y": 3,
+          "Z": 0
+        },
+        "name": "stone_slab"
+      },
+      {
+        "pos": {
+          "X": 7,
+          "Y": 3,
+          "Z": 0
+        },
+        "name": "stone"
+      }
+    ]
+  },
+  "bodies": [
+    {
+      "id": 1,
+      "family": 1,
+      "box": {
+        "MinX": 0.19999998807907104,
+        "MinY": 1,
+        "MinZ": 0.19999998807907104,
+        "MaxX": 0.800000011920929,
+        "MaxY": 2.799999952316284,
+        "MaxZ": 0.800000011920929
+      },
+      "motion": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "on_ground": true,
+      "step_height": 0.6000000238418579,
+      "locomotion": {
+        "JumpTicks": 0,
+        "Yaw": 0,
+        "Pitch": 0,
+        "Sprinting": false,
+        "Sneaking": false,
+        "Jumping": false,
+        "MoveSpeed": 0.1,
+        "JumpFactor": 0.02
+      }
+    }
+  ],
+  "limits": {
+    "EntitySteps": 0,
+    "BlockUpdates": 0,
+    "CollisionCandidates": 0,
+    "Events": 0
+  },
+  "random": {
+    "Streams": null
+  },
+  "ticks": [
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "c99f69ff8f243020138be7e9f4cfc89f83ccdddbc36a41c9337d4323360a845a"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "336984d8b6dbcd092e48f8c74b84a8c068fabc4aade6f9aecce46bc60d8e6895"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "b76516f196cc12370e01bc07e91995faf9b4b0ca79df90480aec5ca25401237e"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "f74fc2212e6144083a5c5f45545401a52b7f629227829877f66bca1f6fd428d1"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "881f077778f4b89d1919d6a50f3b8fbf078648ae06f2d589b82e63d6d63bea37"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "3dc51bb54b89f7905b2f77f0bce5ed89afd955301f56664acdaea3f077649101"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "b3a1abd7388fea9c7ab30bd1c19a03a73595d6d818be19bb7ee568ab4935dcca"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "4592f5afd7afa90b2c1cd483ee00b5c65594b83e10f9e590e368331df8b6f124"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "8431a95e731262c1e6d178c4403c3304a01ad5e2893481b444d3d587e3f1089e"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "eb721b575bef287145a715664de5f104a5348cc8eff3f266342c04a255ec10a1"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "cc9b21abd3815a5e531b46b53a291cb6a4ce5f7b6d9d7ce048869a26e73035e1"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "cf979a2d24356ff0f322cab64199c38181e82e6ece0f8b27c71344f1eb031a14"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "6f4b36d5b9fb171c9ac6d99a098c66cebb6905eec8a4e54be52d4bdf4f9df65b"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "4d01020719f3e28c072efe24fe987a902bb884579e8fd873b89dbd3ae0aad7f9"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "7a8508f98b802edec3599dbc4d16f993222fe083cea0d668c8be5f64c75ab51d"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "1e270f2a2870581e9819d039feb0a94f779a73c4c10b936e538580eee269fb58"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "c4be2ff64133c7fc9197b1797c921cff3655204adcc55421b0d689222ec6616b"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "206f7ca8d2b653f5e0857d4fbcc245f22db398d3bb5b8ccf43c0499e4c8102d1"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "19074f40a348158ffa3523b7086bb999131b98d3381917a8664c73f1a51d6742"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "cdceb93c76a511f2865d053f59c5ef400a76b91654fceec046012d87c11e437f"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "ea0ea3857e0938f2ece43941617b7c3919e4a6086d9ad1d41f8d4d72f212fdbf"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "49041478d4ab74b7133bafee9b1804c8ec5c2870e45ae6e32a88d64872801298"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "debc4ef06bbd98e2ebfec4aff3dc25c0c8ed6836b1ada2056905f9fef770e5b6"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "9dd6a3f02f1d9cc2de25a9418e7a019d49b8ca1b2f27bed69b8ae3dc76a07a2b"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "3342d809aa02e4edced67e641b200211f0d476b7f9271b761baed15967868e1c"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "43378093df86813ee87cc2be8fc5eebea28eb3a6a26512789766007e24838280"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "162826e55230446d96ff0be7e0829f1716df35a5437549a066c19626821ca60f"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "ed9cc8e3c4c4ab5ec1e5f015e6c830050cfb1314c0687ea92fc2be4de3dacbd1"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "f1736b44f589706984ed091ee983ca06d1eed8550d7e20090e60192f8b60046d"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "44fbcd9b80a05bb710f675c65087f2a6d29b79cccb7cc94b9c4a576108156c54"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "6e06c74894984796bae058512b6cb9a8416511871092bee7167e188911143f74"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "0c7c37bfea129e3a389acbd5f9fb9d590ebb795f51c5f97a7cbd794790ed8998"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "c7c3104d00a2730bbb7f98616453c8c504929f787fef38f8aa8186d7af0a035a"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "e3e9a439af33da0e587f0e19555b12b09a6eeae4ee592fe64cdf78953138f666"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "8d1a106aa7e576036ef9201983f69b3ea9811ac18005057957b9c233ba2a3be3"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "bcbb2a0dd351af517c54e272b64c68be45dd6fb096799e74099b74114b5d7350"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "375bb0739201ec5e6e01e1e496feef0224d89317d21e0d31a523e9a21c78980a"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "1aa49ebdec976d63c3f5201c08eb74131b2d6dd26cfa839c067cc21077d19bfa"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "1373dc81d04c1cf73213ef6036128ae8212543b1f3aaf2cbe58775e3882bc875"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "7902e43c15b5590a708d86c70b02bdef3eef065b94b229a58b5ea9d0451e97cd"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "d0b9aee43cf487ad257feb149620899ce9179c501a26bd3d6d81baac0c6b3e52"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "ae64f034bffee99b4896f5c9b95a52c8d83487f56dceba60c78766e3247e9664"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "cc87bf627e0cda364d67e82bd099aec05687a8e1da41e438eda0902b0399b8a8"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "f485b98c5004aa6386b258e46da5e55b9ba74cd603233a3b2dfa230a5b4ab194"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "c63f070d0ae4214484eb9c35baf5e1abe8bb47f21818fa181902e259b1f057bd"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "eaf8cc6950279cd68d5c34cbb81b74fd920c4255860c06c87819b1dae387ad8e"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "b8fc8b6fbc9cd0f266486895c137706e7e673f44e410e97ae578e532c07cfda4"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "13189773ec4060d8439d976d394062c968ad4f75be87d91abfadfe2adf972196"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "dbeb210f9ec3562ad5c3d3ce0091270d18fb21ceb8879c57cfc55e224526cad5"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "a9314cf9feeb27e1e26334631ff9640792fcd615becedb675669f68e4f0d14ae"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "9b028cc08c07df867e60275ae702c146246958417fc7791a4d4852614247bf60"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "46e6651f959e5e68e1e20c7326968a582abd7530a0589813ebf32d6903afdb78"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "3a32cff8da9834e93ef7ea1d17634397be2869d1d3038815c4f9e57316d3ff0f"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "94305c7cfcc9c42bcc3ac54a8791c5b49070f0c1d5e738ab72ee4be0b00bd287"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "9c51dd01c36e659ed9a1f7934a98e25c9569a6b2f557f26fa6994f71284186d6"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "492f700786cf4a1181cff5c4a579d001ecc7a76384bf25acf1706111348b2e0a"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "28918045b96c7ad7a5e5e992d5d94b7f6a19d5d852f51df0bef9e33f33e431ed"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "9d497bad5b81677d06d4d933e148798a67311f54d59b868b29d165f32be90c98"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "cb91b47412140ce200e2409f3634eb6ce4dd024b466e23300f798d54a89c5a68"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "a3d61dc92611435496a6f69eb38dcbfc474722e5d948f34d63e7173e4dfd4c98"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "89a38b9be201f0ad4ee5650d70709dbcb80b3e02452ab269b4fdce0ebd1cbc8d"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "2e18ca88b2dec1d74cf6b3ae63a298191636378a543dc0844fb346062d595576"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "cc2399e1362873deab334df097fb58138f30ccd881a9cdd819683b16d14ff2e3"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "c9a40ec8c79e94e41b91c92a5be01666e344069f077779ea882034c813dd6776"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "1565ae21534bff799585f6713e7c5fdd58432eea6df0d206c7082b295737effd"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "e9d79c1fec717860380bb95d7f15de5da1e910e0f36a2f3b18dd5903a9f40a2f"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "998a0756ffa3e7cbd182d3ad5d9b29c0eee33d7264b3dc30c617277833cc055d"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "2254d05948cf85c274729a27aa2bb84143365a658e6fa4ef806c298acde50b8d"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "8dd8b0de4eb494e05fab0296733fe8b27e461b0a8bd9e40c94348df31e1311c9"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "719d679a58b3a2d0566715bb15107d2e1ddf8b3420c8e666a9d350a162162918"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "62cefd958c48775ad0d0bc19f482098b5ce6461f8178dc228ade90ec75614b30"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "1b6bee66c4161da9db33cd28fa6a6174acac893ac425e7314d29826c071a1bca"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "7b9afff4d5be20e86fa92e5a8d8f5c5b0a0bb3b8e6a6efdc8fb2509f4329b811"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "b6d29a406ead500fd745d71d3695f6eb35fd03a98682069b3955baaefc46aa9f"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "dc09109c69a37a78469720d72abaddbb53013dcb4c0e195081339852602a3211"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "3c5b64503bb5e3a2a17a281953fd3251b67e057ddcb4213d646646cc7c7c6a02"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "b75aed6287334b8c47fd16e3434799109b3b69fbbdde307ae1f633973c2031f0"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "78d6fc8e17d59984ac5c72dfd14f6b70d8ae8829f25e66ddb32d0b9d9e5d6b0e"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "d317d40c3ddffa61fc2a3a66c0b927b280b25584ff0349e0750c5b7b0dbf8b1b"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "a9adfe5024d2de9b659fba670f23df5427ade09fd734477eee434bc6b3e01ac3"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "915a9977b93b89a91acd806001f96344a20f816e0a864a3004866049418649b2"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "334c023c984e85885413413c4150409246f643e8b57cc72e8bbc20b61bb25239"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "4ccbebf65a2e1dedf6ab9be416dd6af4875d8bcb232046817e5b235e7a61de72"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "19983c63e7ecce42ee9b3f6cb6c8c80830b2eba4cbc7fcfd7111351c9544847b"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "194a5e1bdbb9be5ee0820c9e217ee00c8356eda19e7f84230107d0b1898510d5"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "bfc33a8beb2ee04380677fdcf708ba5c236ba379477bdd44caf81a4c00ded672"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "85422cfd147720729e0d4cfe949db8c4a291b9c557cfcb3b3af8e883ddfbeaa2"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "332769f359b9dc49f109ce480ea8ae4d9ff007f813249555d44addab121dc565"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "86d299b38cfefba8b1a0298143c9fb5b4155e34fca980701710f8f7f226d1bc9"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "aaf928af861da1ca7d236f1ad03de5deb2a7965f4ae7c6bddd4ebb46a7485e63"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "91ce30f8d24ae88d7a1cd968821b661954d1062eebb96f68186636e4a35f0d0c"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "3b0963a4b1199fab0a2afa3bb2fd4efac45b387dae03b755651a043b9c93ca7d"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "ae2cce2feac0774196e63006b5da86d6412d2f1d0dfc4d9f76352370bfc21afc"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "c25f3a7dbbe87f0eac27f109eaa0e6605b474f4813aa3e54122e48f086e7b740"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "af208352ceffc023e850bc43764381bcbddb3bc347f352543a1b758922c003d0"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "6546a2504cd1ff88405eef631f010404f8e1cb3649721d90dc98efb43e123515"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "f8277090cc0d5c4cc5dd14387b4b818ed3940c2f29c697b1f48dee6a8106dbde"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "0c1173287df118d8bb95b1a898b371afaef50b89158f4e93b80698bdd3c67027"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "f16c6cc8a9eeaa1a81adc2eb9b64f16662d88e462163c0291424d03deaddbf21"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "f88f5a291c5bfb26b8e0956162886b17196f326b783efdb28ef77dfdd3b96a61"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "063ac05a887e0cd96c783fe3a3b91c7cd4ca2f52f880a2abdaa083ff4c58503c"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "60023535725b4b74a1e709bcd0696378667e152ef72cc2b6e7d7f8d504dd8739"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "d167c90deb72e81d30302f102437ba930ff420c1f4603497dd3aaa5e517383d6"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "c122b2c856a59b219f18aa12c40c9d20cc153a88ec81d09deeffbb76c2d886dd"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "baa326c56af092c005163c7b7e679f5b555af1a25fcf8b1419ae351a0eb8911e"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "3caf5fb27f0d0d5bdce9c24881c72a2262e15be5e1679a6d7ff163bf3d38fb62"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "b33d76a39c882e8104b33e18afea83bda7f8aea306bc00c511dcb20e10b49c7e"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "d705771a04b4f844d9c1db28fcd1b7f88194b92c7842862db37fbf2f778b581e"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "536e42d26c67d4642f86d2f60528967609ba578fd8e4f3a71537c24a4899a7c0"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "657ddd347d045edd875aed6590a6586648f70a9f2a1f4ccaf0e70fee2cbeeb54"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "9395d1696125404b2dc74b0ea7abdfb279eef64870a065ac3bfbe86bf8f097d3"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "11a327981349cb32157b0407d82e20d4fbce856b93586c182fa4534dc2bda8b3"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "2ea01e36240af8572f039e5ae8059fcafcb9fca480d7bfd45548354f19b2919e"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "41fe4d9bd4a91e91c892878780ff50c462b3e3653bb196b3f09a6e21dd510126"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "7cc7f0cadb111f6d0f8320ab99a86a6978d9058af027d912afafbb108dad2425"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "2a86888af10e6d8032c56e55c53c83f39132841b14779c258af03a98fcff6607"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "32a5f21b3f17291a351c1e11216bda410888b9a398c4ad49ba7c9c8f0a56d754"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "070a5cda26618088f3131b0a8f7f23e43c70be5b208e509f4ee3971e1c38fb04"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "4632fdb85a3dbf54620c634d6973cae85fdf40973af2124849db1f817ca44cd3"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "4e2b3eaf055ea3fb3dd98fc25f12b881a373422cbfb26d8f0276f7864bac2eff"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "bda3c4b2db747ffeb9c8c0dff800159727e19ee9f50f7d4574fa32946e88e097"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "51f32d58df7064182f77f25d6367a02ffb8e0a30395a243016caf49d65927cea"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "f9c471cb68c8e686e9b39d649e7df802534389af9ca28169100f209f5ad8556a"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "ec67010d0897e06780a950e1fbe57038f63e701efa01fe6cb7290096c6ecfcdc"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "f8653d410cc8ac018ea10d3f3e54accffad7ec910276a5e973d5428af4a2dec9"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "3ce614b058caaeaaeb74be788c5be6e28ad0d9ab827134bd02baae9ab2f6aea1"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "8ca389d5b8d53c6af8750fa10dbac343f8c2267ea46a8efc8b2612d1a9d07337"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "8fccc73f2a2e043d4584fd5c26daafa48c924409004a3c258ed691408c81681e"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "324cb23831d23e33d769bf75b8616c46481413b9c3a67524191bbaf0b172b36c"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "f03970687c5718eebbeea199ccd1372c05b1f74e5613540c71264f3cda844148"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "21908aea157cdf8d3718b77afbbc15a6b143a907cb685f0390770ffbfed8b51f"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "986b63fcbebbe1e833c16a0508867a7741b8ffc481aabc445b2b9a6fe4ec037e"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "75453dcb5b79863124c16fda68602097e479ae9d2da6b73b58e7d2071dd700e5"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "6c3c25cc36029ba3ea195ce5dad2cb0690e526f10833409390501c4bd62f12d9"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "19fb8592f53866d641d8703eb2210be5873279b7f1ba1d6071b3726a53b31456"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "f515c0062c351d9f13715266d6c9ea3114fbaac70187168ae5d0c915e7fc8d97"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "84f95f30c4ea618fb7ef325c2b3e2b0864ff2af9848c289d1dc8ad7fef72f7b3"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "9e5521bab872e8c1b930a20a010d4a0e7513baa73324a4d7741003f913ddaa0a"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "e90a35ea3f748ce6e1b45fd8e3a66aeacc1b1f0037b8303115bf4ee960c0fe74"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "8b74787f1f816081915eff8ee2b5efbe411a4beca0a2c0c56f0f31960ca9eff8"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "263778a716bfb6aa653214c3c0890f708602306cb70228859deed254c0525ac9"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "ea9dec5ad1fe3b3236f4c96c5f3bfde929e60f80d935dd7a7d5596708c529dff"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "504b6e7a8144652ab989a6d30763855734470a5941cc8a0cdd1fdf0bbf8ad5ac"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "7b558d09d7f4b371b395cdc762a9db39f7f8faa2804a73f49606e412a1a49cde"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "86030cd080bd505130fa6efb5814cf8db77d0032a8dd55a00ada6dd700816058"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "a1ec3ac95249d428514731743f3c87b28dacd61c47a9bb38d4061df2919ed60e"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "01711117d958d2cc9363d5fd2813aad648fd65e6d8b0021d719d6588c8a488e8"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "5882271f095caca44c6572fedd4402ce92fa19f6b2cc0814a8737006fd3e03c8"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "411e4c2798cba2c653aeccdcb67c46b97c11cbbcce2b80d7f0715b14f9f2ef15"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "4612ad90c1c6b42c265092f883136408d42cff024729c5f838e9957a8d82fa50"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "69dd1c25cf8aec7cfe84f4ab183cdb8ff9f1800a52454be233889d3bfa494722"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "ff3f29cb869417acd56cdf5785faceba8489788de3c4bce0bcd5427e15111f61"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "a569d6fa0e9aabc8a682e5632bf9bf024c4c15782cdef0cd643eba386746d674"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "1c5b8c72264e679e928a8f6fdd19f2cb52a1b0c8d6431d6ed5646eb3e8e1e5a8"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "06689341f9b51fcef25e44fe1cb602948a293fed71628614033bec2f2e367f9f"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "e621c9174f843c8b977240189d65e83352e557107e8c5c07e71041347911fae6"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "5263093a17cb8c444d3c78538850e2e962c99475f3bf34b31fd5c554c6d3ca98"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "5fc55b5968f4b31cac9fe76c87c5d164f636b99cf07518ef74f47bb8ba822e9c"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "6e83bb76471ba1e230832ffe72138b3a248d5f752f0cbf8438516035f065d6e0"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "a9298e44212ade3c9944c07b89f93f9de0eea0cd6cfafc918200438cd75ddd2e"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "fc2bb8c3789c8c246d9b7af11f995572444cc82e5efc10926bfd7238dcc44b03"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "0e95144486d458ed5a64faddf684d6f05a20df1e39183267b76abe2f171bde41"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "11a94654f58e37ade71242073433712e19e972f94f936cac0942438f29d7dce0"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "708634e5a5f9c4d1008f9a3dabfc59bd06cb0e43b27c553a8d5cff6bae090f84"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "d1897d4de91af9f2b383010e763cec54ec8873ef357456d7f64be83d2b12407c"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "6f1d60ede945c5566ee7603ddaaabcc375881de05f7b879b4e81448fc44f1455"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "5764fe3ad51de7d7e229bec742554121134838356caf07eebdaf39e58d9be6f2"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "a1b1101cfa5a5dea5f42d849c88bb5680c82c79dc15e2b7ce4e946867b7ca772"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "830879f439620037ba6268a5857fb66b47aad2d3b06768dd0d1e4d692dcaeeca"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "7e2306c8cf0525eb578525f31933396c8fcc0c9d44a72686b5413cab26ad6ce7"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "7ded4c912fb47e11ede7036b1d05201da29397a053e8238b0f178323b6e7a12b"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "c536b790e5f81419ca2eb5204f1dbb7bef92a1b59dd41ace6dd1e1887382f85f"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "8dae31b7eb01d3334785ea10b10b928c166dddcaf2c88e76d6c3d029bf8d948e"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "2e65b6a685435937e72b94d1a4c6629aee9bef8a92607176e82cb31be3680526"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": -90
+        }
+      ],
+      "digest": "3797ec3270fc18463a6b6f48786e0f454a7dfc4a20a9e88a23002726b03fd707"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "a4ea984e44c3145395f0c0dca3646bec04b97e05d32de162674b9d374fe36f25"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "b5c1bb23162f5e8326496f7b835a17915c5fe96508cbae7cee9b14c896478857"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "abb14930d2f935b7a775dbe67e96dae199da40379ba82cfa65612df9cef30e78"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "01adb870c61ad5bd0e178eec43ed88da0557be31285ba3f580c081536ca81785"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "4ae0acabf70641fa40867eb204529ae93d4602cd18854353d29ac6741acb1292"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "d917de13a5ae7dfe6cb990148dee3b8891cc9f296f952feaf380a8d848693cae"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "6855a4d40ebd47395919e8cb3a2faf88e2e45858a6b34c8dc5bb363aeda3a875"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "6ad45cf236ac5604fc8eb3bd5a8b0743118cecb494b60beec66f801e9a282741"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "1dae9954abb61d493213eb0b32debbc0516560bf80bc8a81d616517d414ae9a4"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "97b5e6db58dd84db63f95e19973076e7ee601fc60a2f2e6f9c3f41efbb74792f"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "ada9ff797b9199e14b15ab5c8ac33d3b42366dc6056a53c812536d884c65937e"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "d567484e84728f18085fe7b4379187b67bcb77e509cd28b80aa2050eb41e8c0f"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "6d4ea5d53da7a919fbf6749547ca95cb230ae0236d5c9c1581b85810774442f5"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "92abb965df730858b58bc707c90d0c3b01eec49c85365a638aae7e3869df4109"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "57c1f1f8764fe5e3a14d1793e4c0d6d45fcc49faa79668a368b64eb917314669"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "cce0f00d7ef3adf3f084f5c520df5608b91ff1f4af39c766fb7bc7d3a08583c0"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "9e5aff144670f62e394077040f01f58bc15a3723c972599ef9ac5885f154ec81"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "bc291aa1c7056a861ab0ab9dceab9a9d4d0266eb93e4abf05bf019d2cdbba529"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "168d2b84572ac4c99dbb94fadde757a5966c4bac4f99ceae20498da3e8461875"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "dcfe70761abf04e4b5ad4623ad9deb769bb0e27225d79e58dbf909061c9bbc70"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "9ec696a62306bb63bd6e2ae0b9436264a1c6e2bd40f4700140ed415f4873f7b6"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "bd85879d25f616da9d424a882ff8a1d2e9b88faebd80345564cb31fc4da65bf8"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "866c43729fe0bbf2e4acc501085ac853daa5eb02156b2d75eb395f3918f906c6"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "0c99c9a7be6ef66e74e9e8d48a1816ceb950cbd0f6391bbc0ce01ff4d4c81f82"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "forward": 1,
+          "yaw": 90
+        }
+      ],
+      "digest": "4e4cde9a6f41c7a4c244ca532e3f3d3f50964cea2e30534b44e65593d09f9112"
+    }
+  ]
+}

@@ -1,0 +1,2889 @@
+{
+  "name": "slime-and-soul-sand",
+  "note": "The remaining non-default slipperiness values, so the block table is exercised beyond stone and ice. Note what this recording is not: vanilla bounces a body that lands on slime, because the vertical clamp is a per-block landing callback whose slime override negates the motion, and this module implements only the default. The digests here are this build's answer, and on slime that answer is a known divergence from the game rather than a claim about it.",
+  "profile": {
+    "Edition": "java",
+    "GameVersion": "1.8.9",
+    "RulesRevision": "1"
+  },
+  "data_digest": "afe786eeca22291215086fcf4e85da48406457c82c00af1c741f2f8f15ef4df5",
+  "world": {
+    "min": {
+      "X": -10,
+      "Y": -1,
+      "Z": -10
+    },
+    "max": {
+      "X": 10,
+      "Y": 8,
+      "Z": 10
+    },
+    "fill": "air",
+    "blocks": [
+      {
+        "pos": {
+          "X": -10,
+          "Y": 0,
+          "Z": -10
+        },
+        "to": {
+          "X": 10,
+          "Y": 0,
+          "Z": 10
+        },
+        "name": "soul_sand"
+      },
+      {
+        "pos": {
+          "X": -9,
+          "Y": 1,
+          "Z": -9
+        },
+        "to": {
+          "X": 9,
+          "Y": 4,
+          "Z": -9
+        },
+        "name": "stone"
+      },
+      {
+        "pos": {
+          "X": -9,
+          "Y": 1,
+          "Z": 9
+        },
+        "to": {
+          "X": 9,
+          "Y": 4,
+          "Z": 9
+        },
+        "name": "stone"
+      },
+      {
+        "pos": {
+          "X": -9,
+          "Y": 1,
+          "Z": -9
+        },
+        "to": {
+          "X": -9,
+          "Y": 4,
+          "Z": 9
+        },
+        "name": "stone"
+      },
+      {
+        "pos": {
+          "X": 9,
+          "Y": 1,
+          "Z": -9
+        },
+        "to": {
+          "X": 9,
+          "Y": 4,
+          "Z": 9
+        },
+        "name": "stone"
+      },
+      {
+        "pos": {
+          "X": -8,
+          "Y": 0,
+          "Z": -10
+        },
+        "to": {
+          "X": -8,
+          "Y": 0,
+          "Z": 10
+        },
+        "name": "slime"
+      },
+      {
+        "pos": {
+          "X": -4,
+          "Y": 0,
+          "Z": -10
+        },
+        "to": {
+          "X": -4,
+          "Y": 0,
+          "Z": 10
+        },
+        "name": "slime"
+      },
+      {
+        "pos": {
+          "X": 0,
+          "Y": 0,
+          "Z": -10
+        },
+        "to": {
+          "X": 0,
+          "Y": 0,
+          "Z": 10
+        },
+        "name": "slime"
+      },
+      {
+        "pos": {
+          "X": 4,
+          "Y": 0,
+          "Z": -10
+        },
+        "to": {
+          "X": 4,
+          "Y": 0,
+          "Z": 10
+        },
+        "name": "slime"
+      },
+      {
+        "pos": {
+          "X": 8,
+          "Y": 0,
+          "Z": -10
+        },
+        "to": {
+          "X": 8,
+          "Y": 0,
+          "Z": 10
+        },
+        "name": "slime"
+      }
+    ]
+  },
+  "bodies": [
+    {
+      "id": 1,
+      "family": 1,
+      "box": {
+        "MinX": 0.19999998807907104,
+        "MinY": 1,
+        "MinZ": 0.19999998807907104,
+        "MaxX": 0.800000011920929,
+        "MaxY": 2.799999952316284,
+        "MaxZ": 0.800000011920929
+      },
+      "motion": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "on_ground": true,
+      "step_height": 0.6000000238418579,
+      "locomotion": {
+        "JumpTicks": 0,
+        "Yaw": 0,
+        "Pitch": 0,
+        "Sprinting": false,
+        "Sneaking": false,
+        "Jumping": false,
+        "MoveSpeed": 0.1,
+        "JumpFactor": 0.02
+      }
+    }
+  ],
+  "limits": {
+    "EntitySteps": 0,
+    "BlockUpdates": 0,
+    "CollisionCandidates": 0,
+    "Events": 0
+  },
+  "random": {
+    "Streams": null
+  },
+  "ticks": [
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 180,
+          "jump": true
+        }
+      ],
+      "digest": "4a42c6fbed60d1b2eeabbeebf152686f22e8510adb48f414bc3632b901f26607"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 178.7,
+          "jump": true
+        }
+      ],
+      "digest": "65c59b92efe9945245900d682e0956b7eea74d1afaa1ec261fa9aeeae49a8b94"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 177.4,
+          "jump": true
+        }
+      ],
+      "digest": "e2f1665c7d670ac1980382e2addabb128edd5b4fa57e628ec51f5aadec151fcd"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 176.1,
+          "jump": true
+        }
+      ],
+      "digest": "736eff053d6a33075b44cdbdbc2df4d751316e7ccde56ff3c6e183b368e6fea2"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 174.8
+        }
+      ],
+      "digest": "eb97011084707163b03dac71fa7a0e0db70db98f0b3966de72fe31a98f95c8fb"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 173.5
+        }
+      ],
+      "digest": "34e7646e18c13bd60f8b84d55d55de5c397722a191276ed79f659fcfa2a54445"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 172.2
+        }
+      ],
+      "digest": "3941ce2ab3016d422a9defac611b777b573994c6259715def53e0f706cdc3e78"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 170.9
+        }
+      ],
+      "digest": "6836a36fe7399b99a5a52f29cd4bb318803b6d87cb60b643d80917a617d72c1a"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 169.6
+        }
+      ],
+      "digest": "858a3cf781b3ef3dc5b828b07c5338ea0a8a2cd1c580a104ea1468b712adb927"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 168.3
+        }
+      ],
+      "digest": "7289f649572ff766ffb97d3e2b84dc7732e74fac0e6f81eae3a63090027b678a"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 167
+        }
+      ],
+      "digest": "0559db9e8bf9d44789088443ad5657095bb75e578c7176ca5622fdb6b3b63a37"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 165.7
+        }
+      ],
+      "digest": "660bbeebd3c6d3a7da915649d0f0ec9e4c69b91724f2512127bd1d0bd9b6c80f"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 164.4
+        }
+      ],
+      "digest": "9df13e3fcae7b28c2c0a6cd749282af43a309b1a96cc3eb5570bfa6362429885"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 163.1
+        }
+      ],
+      "digest": "3d66b337c0185b7c5dbce60b330fcafb8f58eb10619258ad2b304c1d8435264d"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 161.8
+        }
+      ],
+      "digest": "533698d5cadeb58a9d0a079626666d648ac013091246e8f53209064c2f9994b0"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 160.5
+        }
+      ],
+      "digest": "ff15399b4814b6a9e192274b2daef027aeed62559ff9e474044fb0ae98a532e1"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 159.2
+        }
+      ],
+      "digest": "e6d9f049a6e0f7c262c557994c128fb383a2ea0a362b039e9f236125cae9e0eb"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 157.9,
+          "jump": true
+        }
+      ],
+      "digest": "6767ba9400cb0cb41f7cabb82ba363e14fe537b68f61b8ce60c4f5b161329876"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 156.6,
+          "jump": true
+        }
+      ],
+      "digest": "ad01feab07b0c2988ec22e4747c7a2c2fcb2cdfd9bce098399693cfde71fb2e4"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 155.3,
+          "jump": true
+        }
+      ],
+      "digest": "dc8ebd62048a4abce694f4a145f1f2a2d57088030d9ec5f4012083bee81602a8"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 154,
+          "jump": true
+        }
+      ],
+      "digest": "7c13d0c194e3be54aca3090b97dc1f3c3bd67f082dfbc40b54eb1838674eb35e"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 152.7
+        }
+      ],
+      "digest": "01f27b10ae80db0abce3d2285da3c98942b8a76b1c24e4ac7ce7600540eb2884"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 151.4
+        }
+      ],
+      "digest": "74e7aa32d47ed250328ce306ea4635e2f0e7cdb3c8f05c4b7987529aee2d1882"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 150.1
+        }
+      ],
+      "digest": "d50d22148e5c4461221beb764989a8b48a24ba11fba75faea5b68bcb96d7a6c8"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 148.8
+        }
+      ],
+      "digest": "e0e8653778e907184efcaf7feabc90b12aaa27bce6f8fc2d09e7530a55ae042f"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 147.5
+        }
+      ],
+      "digest": "9a4372bf438c61efba4fcfb507953750d2bfe8a30bac502f152227dc99affcfe"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 146.2
+        }
+      ],
+      "digest": "4a8ef8145f69447f7aa85c1074b8619873ef91bc0c0e2048258e86ea6aea89b3"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 144.9
+        }
+      ],
+      "digest": "24dc8d4b480e540431b182b46f2513883d571b10f87d6207df8709db86f6627e"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 143.6
+        }
+      ],
+      "digest": "87dca6d223c52fc5bba0d8ff1cbeeb1e338907641dbb004e85ad07044b1e6a70"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 142.3
+        }
+      ],
+      "digest": "8f89999b4790b25bf9da7ddf9b64e8e2b066e675d402e17b2c606915ed4b981e"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 141
+        }
+      ],
+      "digest": "23ed2d99dee3438d92565b2cf00947ee4a2fd143585cd5d9470a0d6dc95f78f4"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 139.7
+        }
+      ],
+      "digest": "eaf4b9deb7d62c6bd92ea8c0b4a99c0862887224c6ba883d6b87e1e485072b59"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 138.4
+        }
+      ],
+      "digest": "541190d4fc5882fdf0c709e56263820d7e3706c90094b6c5fed554f0faf3c70d"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 137.1
+        }
+      ],
+      "digest": "155cbba3772078d17022caa7c29b8c4dfe6b750dff9ebc7f2201d17ad93740e6"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 135.8,
+          "jump": true
+        }
+      ],
+      "digest": "5c35e30c155846e53df870d4c5dda593a6bbbed17a9e563051b82a5d33e76f50"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 134.5,
+          "jump": true
+        }
+      ],
+      "digest": "1220b4ed6b3a8a44a18511149a29587a2ce1a1de8e7d24fb025f2a10777988a9"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 133.2,
+          "jump": true
+        }
+      ],
+      "digest": "d7b3526e2d127b67fb9eaeeebe8e4ce1b0ef9f529c4216ff044bf189aa80092c"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 131.9,
+          "jump": true
+        }
+      ],
+      "digest": "aaa0d99d70f0d9b84dacfa280ae3408f3dce8bec1a9f01702f1ed86069a49996"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 130.6
+        }
+      ],
+      "digest": "b4c7edf42f11684e34c78dbc5f3123e4decc893f06aa5e7d08ccc13ceb6ad576"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 129.3
+        }
+      ],
+      "digest": "e94a48475d514f742d896ce8d34df167f75d2651c38ade1eadded8cd46d2df17"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 128
+        }
+      ],
+      "digest": "e11489511e9de68bb6d5bb1ef55c71550b12eaa3a64caa2b227dafc0dbe54b32"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 126.7
+        }
+      ],
+      "digest": "4151b5719feaf08c6f5d6f0c9f22f7d2e93c4c9890eb02c2e595dad749c8f02b"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 125.4
+        }
+      ],
+      "digest": "1bda8edb20753b78b6fc732f861233ec0febe86ac87fd681491f2248a3e93ed3"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 124.100006
+        }
+      ],
+      "digest": "0a2c729506e40a978fee78c135b98f29b99737b7ca80d60a737b2c09a759a6e5"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 122.8
+        }
+      ],
+      "digest": "c3e0401b965f4d821a2cc9fb261552a600e14b4b59f7bbeccf21231decb4df5a"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 121.5
+        }
+      ],
+      "digest": "025df8a232c50b5edef7b8ee6c41a268c6325a34740ad6b2262283e8067ba1a2"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 120.2
+        }
+      ],
+      "digest": "d2cd964d54c14ba6ee7a5784f862fc107749f6421a5fbd080edf2c8c1e9eddb6"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 118.9
+        }
+      ],
+      "digest": "adadd3bdec9d911189afd2014b264bb1bc4b282255c42ac5da6df7173a63a41c"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 117.600006
+        }
+      ],
+      "digest": "e0678d122fa27c5eb6b295c3a938e991206ca92f2ab41fc02e5ba207988ef0e9"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 116.3
+        }
+      ],
+      "digest": "4422a295fae978f109cd86d0072892d2394f2e5f64a7810a01cb993672dfba16"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 115
+        }
+      ],
+      "digest": "092b1ed8faeb1dd63a7a3fa71ab3eedf7172d6d475f9ff9863e1191ab701938a"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 113.700005,
+          "jump": true
+        }
+      ],
+      "digest": "42f0bd0dc816570ff12d301964a4ad34586ab071ae8e3b127883645d85d0ff99"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 112.4,
+          "jump": true
+        }
+      ],
+      "digest": "4f1224041e0ebf71e3049a6f44479618bfcc5121839f91049fef36bf0773e4fd"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 111.100006,
+          "jump": true
+        }
+      ],
+      "digest": "eafb9a191910bddd77a1b2fc9cc2dea1850c252345416674844dcc207d317661"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 109.8,
+          "jump": true
+        }
+      ],
+      "digest": "dcf21336356a6c5d8c57bea28b0025dfbade148e73d21a6b1c17eef2b2a3e667"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 108.5
+        }
+      ],
+      "digest": "4ad3eeee125a5567f18525442e5bf4d8289d5d69f0ce37c9f849693c0656ae53"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 107.200005
+        }
+      ],
+      "digest": "5f22326d38cefca204c9adcf0902a742f4228cc9a29850d8d6edd1a381cf5aa9"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 105.9
+        }
+      ],
+      "digest": "6d17083fcded6fd2e7484622b8f4e3987648e9907d568a7b9e58b51a05e1ccff"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 104.600006
+        }
+      ],
+      "digest": "1b809bf54ad41dc49546381e370be295dc53bd527cbd219a93c619be3ca3ef49"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 103.3
+        }
+      ],
+      "digest": "389666d9f21bb9254950ded869d84918697e5dd3f7fdcad05c274eb40406e3df"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 102
+        }
+      ],
+      "digest": "21955214e64f0217a06baa7cdd6cd3c727b1c9e33b70cf4b77a0f83b389f2830"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 100.700005
+        }
+      ],
+      "digest": "c78dae5a002ddbe171f147b669bd8ac8bcae40c01921d10666b980c00dcfff06"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 99.4
+        }
+      ],
+      "digest": "67a3238f7cfe4b9943a89feed212155f45b5fa9d3018c92b2926668f7de4ba57"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 98.100006
+        }
+      ],
+      "digest": "1ffc642e7246591e82b46e8a1d55aad65cdb585a363b7805e4b49c82e9a9bfa6"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 96.8
+        }
+      ],
+      "digest": "c10ef5585a320d1e7c13de4e295fc2bbb55d19d2b1f162ac008c88803a719538"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 95.5
+        }
+      ],
+      "digest": "b612cac366a32c95b33a338a332957b02ec55aed307e811e8dba63ceda74a81b"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 94.200005
+        }
+      ],
+      "digest": "65fc186eaf8e83aa5b39d26e526b5c60697804618f02eb4c5a5ff36d4648ce82"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 92.9
+        }
+      ],
+      "digest": "f5110145f3fb163cd92c5b4a28b5341eabbc51319bde0e24ee2f3d4b215a9dd9"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 91.600006,
+          "jump": true
+        }
+      ],
+      "digest": "af51f697e2fadba54577a53677cdc3dc8023ab3ef26df901e15173f41c24b83c"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 90.3,
+          "jump": true
+        }
+      ],
+      "digest": "aabf2e5e811d98ee29555d444af2891a816b6a243f157faa0e7552334410e31d"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 89,
+          "jump": true
+        }
+      ],
+      "digest": "b4111e242a83591a1980fa8154c1035d3425efd17428f80fb7c98e12a84d6eeb"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 87.700005,
+          "jump": true
+        }
+      ],
+      "digest": "633b4f2896b7d3d3ff92b89748eb6c6aebb5b7191959403571e25e23042fa677"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 86.4
+        }
+      ],
+      "digest": "3a0aa124a8b932bfbe35293212315c570881ab92ba8922b2834e1ac8b4f5e95e"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 85.100006
+        }
+      ],
+      "digest": "40748c2d0a26892331b45dc496ca665a9d3a5bff0dbe793f6739a0463288669d"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 83.8
+        }
+      ],
+      "digest": "f0dd5e3407ff9e8f7ada294f81fe499eb5ea6d979a0cc50cc30c6927ca28fa88"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 82.5
+        }
+      ],
+      "digest": "6bf3fe5a070c2c1e650e99f9922479f28cea445c1c910a4d90e92f077766644f"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 81.200005
+        }
+      ],
+      "digest": "cfe740be29a43e349e37aa36bdf7f5622b6b5c100f033c38612af289dd633594"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 79.9
+        }
+      ],
+      "digest": "94ff140efe8043cf4a170bdcaabd6b2322d6e35b3bd44e4615f29450e4cd24fa"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 78.600006
+        }
+      ],
+      "digest": "b30cc69d302e05c6eeb422550f01bc5a38638cd7a648860f1b88f477afda5589"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 77.3
+        }
+      ],
+      "digest": "5f01dd4d8aa03c7d97449020fa662677a68ff8f8eafa2b2e797503c22c7e69a7"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 76
+        }
+      ],
+      "digest": "3c609c6a1e8a5ce6c43e62eee1a7cec5c34a8cab4d9498a915fd9e768183298a"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 74.700005
+        }
+      ],
+      "digest": "95dab1a8c86954010371b30b319a2063bf81772506b9b6501e8b7e4316bcd865"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 73.4
+        }
+      ],
+      "digest": "e5e2271163722434fb60597004b18123ec2fcd93f105879bb8821f9bea30add8"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 72.100006
+        }
+      ],
+      "digest": "80c96dc407c2e68ab56c3088b55af5b92f2ecbccdd9f93aff451499c60185ec3"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 70.8
+        }
+      ],
+      "digest": "cd41dd6f6512f4cf94b838f33034761c8c8f399138838f395ff04f14c7057898"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 69.50001,
+          "jump": true
+        }
+      ],
+      "digest": "3b0f7e9a1776a43bac21fb7a595c7819c5bef76654c6fb9b8c410656c345ee6a"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 68.200005,
+          "jump": true
+        }
+      ],
+      "digest": "3d7edd10a744bc8167a910097ee76252749147f895d64e0d3428d97440902156"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 66.9,
+          "jump": true
+        }
+      ],
+      "digest": "6d185442d09a983a56ef23977805594daa3c8e803fbc5b2fd6f84f66d5778158"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 65.600006,
+          "jump": true
+        }
+      ],
+      "digest": "7bc85093581b97078446305fc2f619c514556b887dc3b94f9351b75939db6aa8"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 64.3
+        }
+      ],
+      "digest": "bceb1bfa69645513e05fc59a3fa0f9321c9aae0bfe77d17ffe7a5e9e8e60ad16"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 63.000008
+        }
+      ],
+      "digest": "231dfa46e4cc7bb57e22712d0a3c4ec8cb53199a0d3c521df5efa4f01ac56c34"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 61.700005
+        }
+      ],
+      "digest": "f298aaff4f8789e915a164b7e53c61f0e476aaaffbcad559e80238d4da9c198a"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 60.4
+        }
+      ],
+      "digest": "96bdabc88b9405bdd1392881d7e7aa43321a33ae19b3ab0736b91df9a49c236c"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 59.100006
+        }
+      ],
+      "digest": "0048b5761e8fd1b23387c125056ecb2c499ed2fc5daef23c151fc57a6bab3d54"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 57.800003
+        }
+      ],
+      "digest": "35b7f1e5a155923e9bd3cce2f41b47f4ee91bcd88f279ca456ead3a2c3682bf5"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 56.500008
+        }
+      ],
+      "digest": "5276e2a2bde2415ebea7e47625d5f16d1d0313ee95a326420e717485e974377e"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 55.200005
+        }
+      ],
+      "digest": "35af593b41b56a16ed29fa1612afa772b52706697059040b6421177dbd2d938c"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 53.9
+        }
+      ],
+      "digest": "1aab07112b64b5119bdbf75e240e60944a5709b364f6dff3476d5ed067becf68"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 52.600006
+        }
+      ],
+      "digest": "a3e4a479c20b10e81dc03ad993b328b39b878c99ae3f4f0eb2f447562c0a61b1"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 51.300003
+        }
+      ],
+      "digest": "a4ba25ff00e2a91daacd7daae17d9ec2420147504a69e8e317ab46fd85ec9917"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 50
+        }
+      ],
+      "digest": "82ead8dc8dbecc1c8c4ad1e838163fc03f36ad956a758ee466a49e9dab3c6afb"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 48.700012
+        }
+      ],
+      "digest": "412adf49267273fecc4cc2704d56c9ee42de74ff9e50ef608698b19f54bf72d3"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 47.40001,
+          "jump": true
+        }
+      ],
+      "digest": "312242f24c5cf0bd90054d5861bf4052f3fc07b95492cc4bbaba9790d4f19234"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 46.100006,
+          "jump": true
+        }
+      ],
+      "digest": "926fad98b582a1c48771316c2835138c6e594be15d0c7335cb11c39c1de7259e"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 44.800003,
+          "jump": true
+        }
+      ],
+      "digest": "8dd3b5d08500fa03d3f201220bcb953e8b0468aade550be841aea227da69c1fa"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 43.5,
+          "jump": true
+        }
+      ],
+      "digest": "fdc8b11a2464d75be455491883f753294d775930aa48ceec0c0da728095830b9"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 42.200012
+        }
+      ],
+      "digest": "7818a0ead47b9fee18931ffeb0ff8c1020f73d03fce11bbc560c5de8d892267e"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 40.90001
+        }
+      ],
+      "digest": "d3d180602d70dd493b268fea6ec147f48cf749fa6913dc2fbd0aa52bfc1e12ae"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 39.600006
+        }
+      ],
+      "digest": "c6285546234fc77cfc3df14c058665a97a8094a3cfdae470fb617dde618b4ff3"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 38.300003
+        }
+      ],
+      "digest": "34a4e26e6e11340bd143c6a537c862c9c47a61235c01416192e5de304d65ffbe"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 37
+        }
+      ],
+      "digest": "bd530bb1abe9342a2f458bc5b5b20453c0ce8d75702aa887064dbe8b79b3c733"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 35.700012
+        }
+      ],
+      "digest": "3fb3386241e3c8961db8081a9abc81033095ad9f46a8194b616efb0c8c25e14f"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 34.40001
+        }
+      ],
+      "digest": "6c047e2c8663c4d80a4a1e32564fa28afe9338833fa778879715782b7751ef18"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 33.100006
+        }
+      ],
+      "digest": "1e9b81b695190cf8b616037e05529b89ac8a08904eed67c8731aea473d86a67c"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 31.800003
+        }
+      ],
+      "digest": "c68b6252d0706b9d7adb48686c18ceb548511eaed27aca0e1a23883ca64dfe28"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 30.5
+        }
+      ],
+      "digest": "a54098d4531ede225598da603c04dd51fdd06c27736bb0049c2366149833df65"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 29.200012
+        }
+      ],
+      "digest": "e59cb3f4af243ab0fb368b7bfaa3d0ba9d74781530c5549b90bc946d3bad1b11"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 27.90001
+        }
+      ],
+      "digest": "f67d72d16da242e2dd8a8be1ac34072a14c6b9fac558ace5bc7ae796b24168ad"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 26.600006
+        }
+      ],
+      "digest": "eb8466a42d1b2eb51bda7912df3c596ec4896fabba2e379e2f23afb2586e35ae"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 25.300003,
+          "jump": true
+        }
+      ],
+      "digest": "75d89c2bfc67c45ade40c028f96b3b49f03be08061a060d419b141e639a46980"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 24,
+          "jump": true
+        }
+      ],
+      "digest": "470fc7f74ae399b69c97ca3985ae4f33450cc75e9cc083e3c9cdfbae1dc7019e"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 22.700012,
+          "jump": true
+        }
+      ],
+      "digest": "c0863cd4e0be570cb1701f444be687be45cd735b267642c5ddf905c8ee838503"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 21.40001,
+          "jump": true
+        }
+      ],
+      "digest": "4aa7d04a426a81893c7d009ab035b306172cd38c5ef837e89711eb5721e2eb0b"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 20.100006
+        }
+      ],
+      "digest": "4b67d3838dfe49ebbefd536bd63af97398fbd58b4836177517695234b539ed69"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 18.800003
+        }
+      ],
+      "digest": "a3cac88d47476d7a6687524b19a2c67c181cb850056d559f9c2cf80ed3e61c88"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 17.5
+        }
+      ],
+      "digest": "c5de4b85006075618678d1419d4520ff805acd381a21cff3d6c1659fce7e560f"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 16.200012
+        }
+      ],
+      "digest": "e2b2e1af4dc2befc8e6fcdc39af6f33ae5d46f67c5d142978218779538bf3572"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 14.900009
+        }
+      ],
+      "digest": "5c8ed8ceff277270dc4265b25e9850cfbb5decdc1caf2e30cfb9df2dcd9aaf71"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 13.600006
+        }
+      ],
+      "digest": "5629cbfe3314e5238f42f12abdf7a2b6185291a241a84676d2088a04eee75d6b"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 12.300003
+        }
+      ],
+      "digest": "cf01d1a759bce61afb5804d6693855c4f4ed680221ea0b1bf05e73c33daf302e"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 11
+        }
+      ],
+      "digest": "3c5183566ae993607898d37bdae5ac59d74aa5e3665e040ded1609e1533f339e"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 9.700012
+        }
+      ],
+      "digest": "07343979f9dfbc3d63a591304893d3cdd71a3ed7cf6efc055e76d94afcd93903"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 8.400009
+        }
+      ],
+      "digest": "28487450be99eab74cc7f67473896888f8f93242c0fb1a25cb778fc3e80259d0"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 7.100006
+        }
+      ],
+      "digest": "ee64d1dd537722cef80b7870f034fa893bbfbb31e2920999e387c8b75ef9c493"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 5.800003
+        }
+      ],
+      "digest": "f91d021ec12997a4982bb1f9c6004a9b028d8fa48d23310f4af5cdafcc63d05b"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 4.5
+        }
+      ],
+      "digest": "f6d7cb4a2dc45bbb6f0ebb164d024d4f16f1aee29c0f5e23846db7bd4e5761cb"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 3.2000122,
+          "jump": true
+        }
+      ],
+      "digest": "c5c37ab67caa34dbbcd6bcd7a84c31dd81a087afb7d3e1df64174d549c47d2ec"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 1.9000092,
+          "jump": true
+        }
+      ],
+      "digest": "167965480aca1340c1f9b6c4d32a5142b72a2360224ecbd1e5650ae486428cef"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": 0.6000061,
+          "jump": true
+        }
+      ],
+      "digest": "a153f10158695143ee4cc92c9a235e56522491cbfadfd3765e009f061d7138b1"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -0.69999695,
+          "jump": true
+        }
+      ],
+      "digest": "4337c9949dd4a967f6bb03014b6bc65f53fabef6cd0fea76766970e96754fec5"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -2
+        }
+      ],
+      "digest": "4f37cc621ca19c4f5f78bd274c5289ad147bff770ea602b23acbd0a581d2baa6"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -3.2999878
+        }
+      ],
+      "digest": "8ccda32ad533610dd7401188e2428b92236c19a95b27dca4b69f5e78049809d9"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -4.599991
+        }
+      ],
+      "digest": "9bc62b9f9805af8df95b18d0bbbba773e4d467c6a1dc5676b5f7fc74e05c01b2"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -5.899994
+        }
+      ],
+      "digest": "6d2105bd533feacd2619fd798b9dda37a39e95a1d4367ba42052d2d22a567f97"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -7.199997
+        }
+      ],
+      "digest": "ef860dab2a6e75958a0206b84449800755dcd11aff66598cb2a6ab83c2fea76e"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -8.5
+        }
+      ],
+      "digest": "4cf4687032e474fa9ab2669078e387a3ffc44c5ec7cf123cde86186b2785e84e"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -9.799988
+        }
+      ],
+      "digest": "039b7bc9240e7d124b102d79bff21e1d8212dbdd0496b3968b598ae7529b6a7c"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -11.099991
+        }
+      ],
+      "digest": "9a671beb4d954a6f938f47b4dac106fa5ef6d62c7c42de6227e2fd244cffed80"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -12.399994
+        }
+      ],
+      "digest": "96ca787903f6a191d89cb009be8e32137ff763e716f9648426405eea72e0ef0e"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -13.699997
+        }
+      ],
+      "digest": "9f1d84d06174d105759eae364f076877e794d5fbefe728c377ae9808aa99bd6e"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -15
+        }
+      ],
+      "digest": "8231bfaedbe8b5b75bb8df6b621d68d2e8446cf2bf90f93982eae853b34c5a59"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -16.299988
+        }
+      ],
+      "digest": "7e98432d149f693e1c55679b3b3412dc2cd089af7cb85c53da53f1417c60545e"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -17.59999
+        }
+      ],
+      "digest": "d38d560bca696c929a0a2287edec9d70b5eb6528c8ffc8ec5cf13675e6308474"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -18.899994,
+          "jump": true
+        }
+      ],
+      "digest": "453fca24ca7f7531c09ad1cc2e37643e0841eb9551d545b8e2205b5e60e66750"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -20.199997,
+          "jump": true
+        }
+      ],
+      "digest": "0a0c19d9fdde0663d24e2f95e34e82bde3f7d68a8e40c6681950421f66ae0a66"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -21.5,
+          "jump": true
+        }
+      ],
+      "digest": "3a0b6be4602e7fa8b6a137b6f0e29b93596c52ee3452bdaea9b50dbde006628a"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -22.799988,
+          "jump": true
+        }
+      ],
+      "digest": "588ab89526d6fbfa6b55e5f2291e309b12119dc7855b0465ddac81ed3332803d"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -24.09999
+        }
+      ],
+      "digest": "603ab88ad5f6eeb8fbc59c3bd03f4865def4e9e57f718d3e4e3ae1393df9e842"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -25.399994
+        }
+      ],
+      "digest": "97c50fa17f0075625c47e1040e50de3c8a0ac2966d43007c96a4d4a42ffa3a85"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -26.699997
+        }
+      ],
+      "digest": "736b6a20c814d9c7b57239fcefcd1a40ffee56805eee94905e67715f80c1aea1"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -28
+        }
+      ],
+      "digest": "9140b19adb3c07ca4ee30f5f7ff0b39898c1ad15581088d0133898bc0d0df566"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -29.299988
+        }
+      ],
+      "digest": "6e3d9c84d8a6bb0f30c33a57738cc98e735dafedf741dd52ba6139d1a28c0e4a"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -30.59999
+        }
+      ],
+      "digest": "1b197fbbb58b8e3b93a63c9b23b5f4ad70217ad540d69f818709997df858cf31"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -31.899994
+        }
+      ],
+      "digest": "29ab540d12e032d02302946e8ec7ade7d2f420d210ff4c0e733248c9cd5aa7fe"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -33.199997
+        }
+      ],
+      "digest": "b7e9df4ec98980baf3fe75cbb8c34f17aec3bcc1c2a1bdcd68f60d953ce13cd3"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -34.499985
+        }
+      ],
+      "digest": "839eb52f5f82023bcd4582be061eb0f1579e4f0bd707c1ad56c9cf21f07c5591"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -35.799988
+        }
+      ],
+      "digest": "87b1f79576ee626f2c56c134f9897ff71fb71c343b54f0ac19f745d07b87cd99"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -37.09999
+        }
+      ],
+      "digest": "4ed884f6319f62f19084949b0348843b95f868381df346710580d02b44fd4b42"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -38.399994
+        }
+      ],
+      "digest": "a4e9e4196c7826d920acd94872366d5d865f58ffde827adaef978b0657213564"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -39.699997
+        }
+      ],
+      "digest": "1d2d01ba998f83524eb31adda1a7564987d4b93ed6e0495da121f1e8270756ee"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -40.999985,
+          "jump": true
+        }
+      ],
+      "digest": "a50ad4bf5b70960805481fa4a51ab2a972f7911070274ce8b782be75b93af08c"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -42.299988,
+          "jump": true
+        }
+      ],
+      "digest": "cb2204f3c6c6c52461e2e9171f75190d7af2158ad8c2b11655e9e3545c928530"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -43.59999,
+          "jump": true
+        }
+      ],
+      "digest": "4bcbba15b1c5ede13130da65b46a3d05440ea07a448a3e785af073cda638bf39"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -44.899994,
+          "jump": true
+        }
+      ],
+      "digest": "833d1056064f8750a4f8cee1d36be45f9c19cbb6a9c7f5d347e903b0cf7c7717"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -46.199997
+        }
+      ],
+      "digest": "048c96694f90feac967074e9f7f53aa54580485e73a50b3d8c8fd02ada3474d7"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -47.499985
+        }
+      ],
+      "digest": "ec2b47013d54dcca7a9e89873626e7205ab40cf8a1df069fd5f2d32e5c1a29bb"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -48.799988
+        }
+      ],
+      "digest": "a38a786d9248422367514dfff0b5cb32cfd13eb0c337134fae32c4e28ce49bda"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -50.09999
+        }
+      ],
+      "digest": "2f90188104cca32eb9b8c8f176671f090fe8a53e29ee80e90adc17b7186502b7"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -51.399994
+        }
+      ],
+      "digest": "fba4ab7bd7767e4e24a49c7c74498d83fc81d6dc003f62f8675735f3baed9288"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -52.699997
+        }
+      ],
+      "digest": "6ef2e6bc0a2ddcdcddb3d68f9f5e107458eb50bbd24d8429e35285b6db87b3b5"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -53.999985
+        }
+      ],
+      "digest": "8bb9527cf4ed90898f45c3d3dcdb97e90d829e0f5a0813196913f698d8295b58"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -55.299988
+        }
+      ],
+      "digest": "23903abc8062a2b240d20bcec7cc1a6e7350ba0a49d308283a06f2437b3c8b6b"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -56.59999
+        }
+      ],
+      "digest": "03341d30b6920a60c4d33fd3202efa625724b97b8fdc65f31e89e61de5d00f49"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -57.899994
+        }
+      ],
+      "digest": "1bf370d2f4e6af7446b83f7d6ea17a15e084447dfb015d3facf6144272a1053e"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -59.199997
+        }
+      ],
+      "digest": "319d5c4865ec1b35ba287013a8de24c514b1dd889da0518ee00c7643ec5bc4fc"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -60.499985
+        }
+      ],
+      "digest": "8832a4999296a6a06dccfc16fac1a0b289bb4f99dafae450dbeccb9a7b24bffc"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -61.799988
+        }
+      ],
+      "digest": "9086a9fdbf514286b185988427ea6fd7502df522621033b3b099143a31e03bde"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -63.09999,
+          "jump": true
+        }
+      ],
+      "digest": "f4dc7983db7f05a51ea0ae2f9edd858a3acfd1ce89cd793156a8422d436063d6"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -64.399994,
+          "jump": true
+        }
+      ],
+      "digest": "4cc8b9c2f821cfafcb6a189d8c1bf125f2b9743f44a42c3e6dfd3e5dae8113e9"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -65.7,
+          "jump": true
+        }
+      ],
+      "digest": "ec52abed5a231b8559c4c7bffd3e9d7a4b14c3c9435e1395ae2a0ec267386757"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -66.999985,
+          "jump": true
+        }
+      ],
+      "digest": "9caadd9fb349e7f90285c92ed1821f8b1bd734c3acbb407fdb1a83d875d8be7e"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -68.29999
+        }
+      ],
+      "digest": "1430bafcbf9580663f74714d89f350d9a0ae64f6c451fe225d9c883c0cfaf040"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -69.59999
+        }
+      ],
+      "digest": "b476cdf4b55a614134c8d32cac05a122aace91e3842d6a7151fb367d418cdc7d"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -70.899994
+        }
+      ],
+      "digest": "e35ec8c5522d93689abf89eee8195073e5c88aac41e241a3f5cd355e70fdc063"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -72.2
+        }
+      ],
+      "digest": "8e3bf599a03a16e259eb5f97ed0511360eb47621f4e201615d3730edd288ecc2"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -73.499985
+        }
+      ],
+      "digest": "0b32f74ef4ec5e9b89d8bb63b84f9e1891a07afa49fa2ddadd74b2412fd927c4"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -74.79999
+        }
+      ],
+      "digest": "f71e4280b5081d1e190fa38cb70a767b41968e13de210b4d89f8266400649d48"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -76.099976
+        }
+      ],
+      "digest": "72ffb082c94c2625c1abc5572a5f77b3678fc93805857396b7cc23d95bd1af04"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -77.399994
+        }
+      ],
+      "digest": "97f96778d7e8d4c4a488cc0c0f306e3fc7f67f0fe8009bbfd8f92044f216bc9c"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -78.69998
+        }
+      ],
+      "digest": "27b68a816b8f77ce7ab333eedc107ea3906182f9c83d3e1e1b96e027c9b1e82a"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -80
+        }
+      ],
+      "digest": "bde3a6db3d32115df0a36e44fa199b7b20c6a628ed6393df6a466fd4f3072c84"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -81.29999
+        }
+      ],
+      "digest": "08d70cce92612e05b1ccf4bd6581fe1df08b91e37535d67bbbb65ee7d6a8e566"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -82.599976
+        }
+      ],
+      "digest": "b67492bfe05746bdd5e040dcb7b16937c1d094f0ddac32c477c3cba67be34299"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -83.899994
+        }
+      ],
+      "digest": "7e8641b7ab19b0bd9f3bde45a33818f96fc2c91278a5d1fdf6dfd36ee2188757"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -85.19998,
+          "jump": true
+        }
+      ],
+      "digest": "fab391f5c92485eee83db09ed955d0c65ce5ef6b231ac78d389707534f9acac3"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -86.5,
+          "jump": true
+        }
+      ],
+      "digest": "ee0cd00b80ee182f59b423a593e816551d7c55769a550d83eb056886a9d09c72"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -87.79999,
+          "jump": true
+        }
+      ],
+      "digest": "2d21e566c96efcc5c5c1af6a77879a7025c8550d72a5fd567263fdd1388092f7"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -89.099976,
+          "jump": true
+        }
+      ],
+      "digest": "57e021a5c47869c582c9a4b7b4f7dd114f445da5b4b1784b6b12c0e445ed5b9b"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -90.399994
+        }
+      ],
+      "digest": "275d4f6692c55875f99f817a7f198e49850a437c9653731056d9de57a9a50dca"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -91.69998
+        }
+      ],
+      "digest": "b118b9ece3b167ebe89a1c077aa818f774a5b026114ff3bc20e4d7189f8997ca"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -93
+        }
+      ],
+      "digest": "ca0c81badc57b42e1541c2d8984183d75b4253a1c2af2337721f60fa7ab324c0"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -94.29999
+        }
+      ],
+      "digest": "1ddd692f854ce7f810248022d2bfa825623f4a2792d288fa5ea4a097afc677ad"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -95.599976
+        }
+      ],
+      "digest": "224e96ca1ea19c53950cdd4f476f4cb89870ee3121b40653d42248e80685b9d3"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -96.899994
+        }
+      ],
+      "digest": "9425ca33930bacdebd2758812118e3ffd12a15fabfafe99d6f099b88e3f19159"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -98.19998
+        }
+      ],
+      "digest": "492c1c1f7d2c8d638d3a7687887ba1d57986331be436baf4ecd839a2cb400292"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -99.5
+        }
+      ],
+      "digest": "7a9cc946c8cf44fbea65af2009e43860c8d87e29e9f091529a9dc46dbb089942"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -100.79999
+        }
+      ],
+      "digest": "2c8d87ad82dda382104b1b7eb69f8fd5132c9b7b2688e0b4cdf5bf443b97e703"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -102.099976
+        }
+      ],
+      "digest": "6eba799d4c8edeac5c11e25b319e498f6dfd1a517a1b5016a8c81d500f57ee30"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -103.399994
+        }
+      ],
+      "digest": "3873935e0bbc3361bbed65d794cfb6961e0a7ce62f9e192c6138f3f971437ed6"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": -1,
+          "forward": 1,
+          "yaw": -104.69998
+        }
+      ],
+      "digest": "a1f7334c7202ff227712e75ca7cf9978c902e220d1abd61c0722f583601cea6d"
+    }
+  ]
+}

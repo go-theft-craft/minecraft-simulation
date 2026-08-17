@@ -1,0 +1,2992 @@
+{
+  "name": "sprint-diagonal",
+  "note": "Both axes at full input, sprinting, through a full turn of yaw. The densest float32 path in the module: the input normalization, the truncated sine-table index in every quadrant including negative angles, and the single widening in the heading.",
+  "profile": {
+    "Edition": "java",
+    "GameVersion": "1.8.9",
+    "RulesRevision": "1"
+  },
+  "data_digest": "afe786eeca22291215086fcf4e85da48406457c82c00af1c741f2f8f15ef4df5",
+  "world": {
+    "min": {
+      "X": -10,
+      "Y": -1,
+      "Z": -10
+    },
+    "max": {
+      "X": 10,
+      "Y": 8,
+      "Z": 10
+    },
+    "fill": "air",
+    "blocks": [
+      {
+        "pos": {
+          "X": -10,
+          "Y": 0,
+          "Z": -10
+        },
+        "to": {
+          "X": 10,
+          "Y": 0,
+          "Z": 10
+        },
+        "name": "stone"
+      },
+      {
+        "pos": {
+          "X": -9,
+          "Y": 1,
+          "Z": -9
+        },
+        "to": {
+          "X": 9,
+          "Y": 4,
+          "Z": -9
+        },
+        "name": "stone"
+      },
+      {
+        "pos": {
+          "X": -9,
+          "Y": 1,
+          "Z": 9
+        },
+        "to": {
+          "X": 9,
+          "Y": 4,
+          "Z": 9
+        },
+        "name": "stone"
+      },
+      {
+        "pos": {
+          "X": -9,
+          "Y": 1,
+          "Z": -9
+        },
+        "to": {
+          "X": -9,
+          "Y": 4,
+          "Z": 9
+        },
+        "name": "stone"
+      },
+      {
+        "pos": {
+          "X": 9,
+          "Y": 1,
+          "Z": -9
+        },
+        "to": {
+          "X": 9,
+          "Y": 4,
+          "Z": 9
+        },
+        "name": "stone"
+      }
+    ]
+  },
+  "bodies": [
+    {
+      "id": 1,
+      "family": 1,
+      "box": {
+        "MinX": 0.19999998807907104,
+        "MinY": 1,
+        "MinZ": 0.19999998807907104,
+        "MaxX": 0.800000011920929,
+        "MaxY": 2.799999952316284,
+        "MaxZ": 0.800000011920929
+      },
+      "motion": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "on_ground": true,
+      "step_height": 0.6000000238418579,
+      "locomotion": {
+        "JumpTicks": 0,
+        "Yaw": 0,
+        "Pitch": 0,
+        "Sprinting": false,
+        "Sneaking": false,
+        "Jumping": false,
+        "MoveSpeed": 0.13,
+        "JumpFactor": 0.025999999
+      }
+    }
+  ],
+  "limits": {
+    "EntitySteps": 0,
+    "BlockUpdates": 0,
+    "CollisionCandidates": 0,
+    "Events": 0
+  },
+  "random": {
+    "Streams": null
+  },
+  "ticks": [
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -200,
+          "sprint": true
+        }
+      ],
+      "digest": "bdd6299072cba9cd08b56bc832a5e6b4d99b338a9f254a4a751f5d667152e08c"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -198.1,
+          "sprint": true
+        }
+      ],
+      "digest": "8f520bb12f195a9361684847e77befc3a7fb7b9d4baeac0edb739de603acc1b5"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -196.2,
+          "sprint": true
+        }
+      ],
+      "digest": "fc3acf310b5de7e5d5c98365849b3d1f4459d9db6ae23179f14f5fc402f44cb6"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -194.3,
+          "sprint": true
+        }
+      ],
+      "digest": "2b34985f6f9dea536d0da130da1fd9329aac39fcb794ac18d2a8309241a353ec"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -192.4,
+          "sprint": true
+        }
+      ],
+      "digest": "ddcbf7181d642bf3de4aba79dca5ed37b9baac0c95a3a42fb0d458633487d060"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -190.5,
+          "sprint": true
+        }
+      ],
+      "digest": "65cbe0621ded5da9ddb1ceb94df48bfd300f3085e1b0a5afd360b35e02d3ecfe"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -188.6,
+          "sprint": true
+        }
+      ],
+      "digest": "40e8e64ffd5262329489d989cf168c87a3d6404eb7cb23b498f273ac6be67f0d"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -186.7,
+          "sprint": true
+        }
+      ],
+      "digest": "fffd10bd32c76535fa25d7cc251bdeacfd84a0b1327f572e5051784605bc5d7a"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -184.8,
+          "sprint": true
+        }
+      ],
+      "digest": "b5de6855fb7d90b9e4f8236e0f0cefca72952a9f64d0587a4f35ad9017218e8d"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -182.9,
+          "sprint": true
+        }
+      ],
+      "digest": "c1adb3c040a1d69b526be8f5dc84ebbbb63b02c8b8fa201e3e50cf0a30ce8156"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -181,
+          "sprint": true
+        }
+      ],
+      "digest": "c9df7ddf194452c35a56370264a301fc2cdb3ec92b2dba55f135be7f1b6c6572"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -179.1,
+          "sprint": true
+        }
+      ],
+      "digest": "449befd35e8e88e8ee8b080de6626d3067e41387eaae81cfc51b69537ea47112"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -177.2,
+          "sprint": true
+        }
+      ],
+      "digest": "a8783a52c0036ade555ef6019a7c7a83872ef01013e42350356355101734bd72"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -175.3,
+          "sprint": true
+        }
+      ],
+      "digest": "677359c7d16902a7f4a6f40e1ef0c4a02f0e6ace543e74788f54db1bec7c7e7a"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -173.4,
+          "sprint": true
+        }
+      ],
+      "digest": "36bb558d352c44abe4b2fa302687c678ec36062df8b847b9a7d0228bc7d9ec9f"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -171.5,
+          "sprint": true
+        }
+      ],
+      "digest": "4cce0eab60f37c17f2e87296d5729b7b1b88d8940a1b1e46c3a2f5a335c5284c"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -169.6,
+          "sprint": true
+        }
+      ],
+      "digest": "326e439b9791af4ddbb20ca06bde0511bc49f3781ca593cecc2109bd84a8555f"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -167.7,
+          "sprint": true
+        }
+      ],
+      "digest": "233c478ea0dd197c1e201ec48efe1c59c0f16e0c9797465bc1692d6bd65386be"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -165.8,
+          "sprint": true
+        }
+      ],
+      "digest": "6a2ed82f7e07d8d9f3540d629b4b7c0247b30537f40c1b62c07c3fae618e48ae"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -163.9,
+          "sprint": true
+        }
+      ],
+      "digest": "ed01a484347d2d74e0663a5f76e67b426a834fedaf5c6eb4d84db31f470e9163"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -162,
+          "sprint": true
+        }
+      ],
+      "digest": "b52a0c6e0173a4e24f0c0b1c46f0efa4ee37e1de7010a47aac106ae725cda66f"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -160.1,
+          "sprint": true
+        }
+      ],
+      "digest": "733f91314154ea20cf3f1897a8de736760c047f06c173fb08105fa57061a0610"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -158.2,
+          "sprint": true
+        }
+      ],
+      "digest": "8eba03ae475b8b8e6caf6036a34d93a5d3c48ffac206b436baa080e0d59f8d68"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -156.3,
+          "sprint": true
+        }
+      ],
+      "digest": "0df25906184a3624658a0225a06c32bb00c959e7a278d396704d9d958d81ea74"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -154.4,
+          "sprint": true
+        }
+      ],
+      "digest": "f64c6d8a55eb3aa076a8a47b68cfc3eb97736c8e10d0ec57428e70e081ee309e"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -152.5,
+          "sprint": true
+        }
+      ],
+      "digest": "6d88324f0a62c4fe40351dbf10d319698e7b7e8f8d7200d9b73f53fa44f499eb"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -150.6,
+          "sprint": true
+        }
+      ],
+      "digest": "83cd658f3edf1caed2c78ba8004230b02ad87d9046ef88a5257aac2ef68480ff"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -148.7,
+          "sprint": true
+        }
+      ],
+      "digest": "17bab4785c82f72864be5b0addee66788027f7ead96d219b7651b48f224a46e9"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -146.8,
+          "sprint": true
+        }
+      ],
+      "digest": "fc8b7585fcc365df84f55ba811c662b8b44cbba76b0011df203012de71910f92"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -144.9,
+          "sprint": true
+        }
+      ],
+      "digest": "43a90b038e63e48dcf11c012204fe1058f3847abc812bd233b52c7ded28bac03"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -143,
+          "sprint": true
+        }
+      ],
+      "digest": "036de4c42afa720821ca1aa78965a5cf7667933823f07194acc74b79e397849e"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -141.1,
+          "sprint": true
+        }
+      ],
+      "digest": "18ca88c8e0822a04aa43cd83d99d95a007ed44a9acd99593b29a4bed736d61e5"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -139.2,
+          "sprint": true
+        }
+      ],
+      "digest": "40add7e6b5354afce6b6777fa0ba62527e5aba02aca85358830ee6016c4a7099"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -137.3,
+          "sprint": true
+        }
+      ],
+      "digest": "1613bee9bf5eec7eb66fc65c71b804fcaf6ea55d15e23e90cab285d417c56ffc"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -135.4,
+          "sprint": true
+        }
+      ],
+      "digest": "ed129f9df019659c4e61bba2019fe5c8c899161561125fa6b257d9c60911f98e"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -133.5,
+          "sprint": true
+        }
+      ],
+      "digest": "b74f83d0c4383521ded2939deb5d237e58b51aed4e23e924ef75711ad0ce615a"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -131.6,
+          "sprint": true
+        }
+      ],
+      "digest": "122a050d74585bf4e883db350519a8b59a0a19a476c6c8825b74764480f5037a"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -129.70001,
+          "sprint": true
+        }
+      ],
+      "digest": "68451441ab6735c5f1b1f7601faba35d395fdb7dd5ef22819115556ba5735164"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -127.8,
+          "sprint": true
+        }
+      ],
+      "digest": "37ad857572cdad7d421645505d301251e5b1c122989c1b76f4130b60e407105c"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -125.9,
+          "sprint": true
+        }
+      ],
+      "digest": "fb77e49ee46cd4ef65119fb860e99ef27730e5c5b27e3256ac5f50c7fc7d4f44"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -124,
+          "sprint": true
+        }
+      ],
+      "digest": "bcc75149f543d7192bfe10355de687f4bb611bf9b6eeb20fd2434b6117849078"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -122.1,
+          "sprint": true
+        }
+      ],
+      "digest": "e7ac42c40211a9ebd88f6b2a5b4ecc94294b6cc062b78dc11c15ddd6e705affa"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -120.200005,
+          "sprint": true
+        }
+      ],
+      "digest": "91f56273355591402fd495ad3717b35048dd0a7057a047fff5e8aaa42c968e8c"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -118.3,
+          "sprint": true
+        }
+      ],
+      "digest": "477671ae930738fe225c67862e7075dd8fb07e6b30c0994028733f34d0ce34aa"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -116.4,
+          "sprint": true
+        }
+      ],
+      "digest": "1b6e82647228fc4056c7885aef4664d587681e0ae20e393d498a001294be77ba"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -114.5,
+          "sprint": true
+        }
+      ],
+      "digest": "f441a57fc81a185022adca1e884a962a9c45f12ef9f629ae01efb10c1b9e8fc2"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -112.6,
+          "sprint": true
+        }
+      ],
+      "digest": "5aeddfea2f56001024e13858309c0f33c9f81197d515683440e98a3055619065"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -110.700005,
+          "sprint": true
+        }
+      ],
+      "digest": "80bbc5169dac34db818bdbc3b763e92f8f899c99d22005aeac0a351f6b1a2316"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -108.8,
+          "sprint": true
+        }
+      ],
+      "digest": "ee2bbe612dd97ca7fb36b810452f7305be77f4fa6f59e7197e777e84be5e4468"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -106.9,
+          "sprint": true
+        }
+      ],
+      "digest": "efae3352f3315f7293c7f9cfbb5693d3b853adfc18a2541150894eac28240ba2"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -105,
+          "sprint": true
+        }
+      ],
+      "digest": "a095e67b8020ee9990925b7d9dfd20ccd1c89f00fa0b2069994225b9920813ad"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -103.1,
+          "sprint": true
+        }
+      ],
+      "digest": "1fd5b60a06b07e8b7e3e73d2cf76997394927b80a62295866737b5abe9750573"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -101.200005,
+          "sprint": true
+        }
+      ],
+      "digest": "9f769d476fac460e7e5abf57d46cd3fbaa25b17ffbb198c5d2c7032629cdc153"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -99.3,
+          "sprint": true
+        }
+      ],
+      "digest": "eedb03dffe760c6b0af75b3af32eb8384eaf538c2faabb16ac9336fbdd38df7e"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -97.4,
+          "sprint": true
+        }
+      ],
+      "digest": "9f3870c2fc4dee62abed5171ff5847cbb6eb998ae480390ad31ea47c9071db37"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -95.5,
+          "sprint": true
+        }
+      ],
+      "digest": "dde80b918bcf3e36b02aec2102d4b7f0f700723a06be63e24ea085994db3fb63"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -93.6,
+          "sprint": true
+        }
+      ],
+      "digest": "10719482faea272ce364a82c694830726725bce3224fa31b2b8281c396df4690"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -91.700005,
+          "sprint": true
+        }
+      ],
+      "digest": "9a2213da7fb2fe7a641cf53044fa94099147b399d9d2b2eb70a458ae4a8decff"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -89.8,
+          "sprint": true
+        }
+      ],
+      "digest": "6bdb330f927801c0026f5144a1a33a164ad7406d1aca9a3697c23b13be1cecc3"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -87.9,
+          "sprint": true
+        }
+      ],
+      "digest": "f53767f8e773389d3709c0f0850ffa664f89c504f0b292637e601509347ad6d6"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -86,
+          "sprint": true
+        }
+      ],
+      "digest": "03c8923e169141ca492710ee528c56fc91b086c29997fd6afec4ab442c87b17c"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -84.1,
+          "sprint": true
+        }
+      ],
+      "digest": "85ea71c9f69d3de8de51dc2b8331ed0c778ee54f4d4da9b506b241349db0fdf9"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -82.200005,
+          "sprint": true
+        }
+      ],
+      "digest": "273376ee8845c4d8165c86e965db58455b5ebd35d964b8e31965635bbf084fd8"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -80.3,
+          "sprint": true
+        }
+      ],
+      "digest": "10470f766f66f6140fb042a5b862ba63783dca4ba6a096288506dc997bd86e90"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -78.4,
+          "sprint": true
+        }
+      ],
+      "digest": "bea9b3aacdbbdd920a1820ee5934606bcd10150b04b9ccb282890a4eae5d6c0d"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -76.5,
+          "sprint": true
+        }
+      ],
+      "digest": "7f79c43bf98460c651722beccbffba47fa6380a95ac70554018a8007965bffcc"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -74.6,
+          "sprint": true
+        }
+      ],
+      "digest": "e2e31ff261be8a758e9cfc099d1113804e915e65bb0b124f8d6524290f693fa6"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -72.700005,
+          "sprint": true
+        }
+      ],
+      "digest": "75d7a5f32825ef2973c9cd2c7d2e7ecf260f7e7a3e7280dfa582470a8d868ab9"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -70.8,
+          "sprint": true
+        }
+      ],
+      "digest": "fb9504df38bfb1f97433792ffea83d4113e372ff142b5452a5a27c648f2b8186"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -68.90001,
+          "sprint": true
+        }
+      ],
+      "digest": "b7e276963ca26893fdc29b7e5c322211958206d774742952846f2ccb72ddda59"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -67,
+          "sprint": true
+        }
+      ],
+      "digest": "436052f1d8c106b5ae28614fef91521e29698f5c6f31df91559b372e534b8b82"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -65.100006,
+          "sprint": true
+        }
+      ],
+      "digest": "a44ac4d44c9f649ef95a97bd9f58c6419e99187c178cef0453e2b7bb071fce94"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -63.199997,
+          "sprint": true
+        }
+      ],
+      "digest": "cf0a354a681ecd06195c40fa26d816c38dc1cf59ef837992c26fb5712ad44b2a"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -61.300003,
+          "sprint": true
+        }
+      ],
+      "digest": "2fd90d6f840e34e88cd8b1ef93a2f14316a975475be666f36435c9cb3c692ed8"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -59.40001,
+          "sprint": true
+        }
+      ],
+      "digest": "8529704b1c17eb495898a7fb35c56686c2318b6a986dafab1e522988cac50d3e"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -57.5,
+          "sprint": true
+        }
+      ],
+      "digest": "89845aed90fd996d68972ec36a36d044016c6c737eeaa64bed4f7264e19c4bf1"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -55.600006,
+          "sprint": true
+        }
+      ],
+      "digest": "e3295f299e8565cfa0a50ae232fa4f49b80d5240ec6037d3b29d96980f04c86d"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -53.699997,
+          "sprint": true
+        }
+      ],
+      "digest": "4ac09baeef684e1618162b410a303f585b3e21ed7588a7c960189a87586ebae1"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -51.800003,
+          "sprint": true
+        }
+      ],
+      "digest": "fcc8d2b08a85bbdd836521f5f7efb05d8c7b430e09d852c729a7f9c4bd971f0d"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -49.90001,
+          "sprint": true
+        }
+      ],
+      "digest": "09f4056ecdc9069dd91f4879dce6c0b1f71e41a9d789a502b8d86996cd95c2a3"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -48,
+          "sprint": true
+        }
+      ],
+      "digest": "7d9e5bfc626fd6b0fb575e7f0ee3575ea646a263c892a711cbc5a8a9d429d41b"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -46.100006,
+          "sprint": true
+        }
+      ],
+      "digest": "7c3a97f8183830fc4e212c9ba8b9ad08d46391b468032dbe9dd7163af728f1e6"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -44.199997,
+          "sprint": true
+        }
+      ],
+      "digest": "73f15a45d8b0b3ff2973563bd98398c4e997e7d2386c014340e98dfce2567c66"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -42.300003,
+          "sprint": true
+        }
+      ],
+      "digest": "3595c94fd362009f06818ba46f0b95f6a19c77ba478b16d785ddc4a022ffc6bb"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -40.40001,
+          "sprint": true
+        }
+      ],
+      "digest": "32a735ae80e5961e0f55155317e0806cf88ed5b13ba4468c5539957144d160e8"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -38.5,
+          "sprint": true
+        }
+      ],
+      "digest": "7c6636fe6810b23128cdc038d91dcdeff733bcc56a93a2ffb9a10020483618c0"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -36.600006,
+          "sprint": true
+        }
+      ],
+      "digest": "04410588fb316543a26d51ac2a74dc1380f4554e4dd014eb6181c50173749d67"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -34.699997,
+          "sprint": true
+        }
+      ],
+      "digest": "1d48d0e5f37f0aae29722982fe0b4d2251f6497d63ebd5b8d3409efdfa831b45"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -32.800003,
+          "sprint": true
+        }
+      ],
+      "digest": "2949508c3a8b9c797fa69436de1f4aac463b97d3371a52fa28c5669079635dcd"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -30.90001,
+          "sprint": true
+        }
+      ],
+      "digest": "de0316f24f594a7f58146a8c0b14feb9042dd4041fa1f0288d42ed6a58fa7165"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -29,
+          "sprint": true
+        }
+      ],
+      "digest": "9226d76fe9d4df207290643f32480d78170ebb9de62358b861f8326b8e5372aa"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -27.100006,
+          "sprint": true
+        }
+      ],
+      "digest": "558505724c8690e5594fdecf788edbce6c8a1f8fce31db6d3389c208ffee66c5"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -25.199997,
+          "sprint": true
+        }
+      ],
+      "digest": "b84afb03c9b4708b2fcfdfc03ff8c344e76ad7731c2dde06c4937d9aee732189"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -23.300003,
+          "sprint": true
+        }
+      ],
+      "digest": "c824314a4921442a5f7a9fbed9516e4f949438854b29c3f885efbce673ed94a7"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -21.40001,
+          "sprint": true
+        }
+      ],
+      "digest": "84e91898e96d460de15947916be72c9274d6c4a6c06e9fb938158a9d595b6103"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -19.5,
+          "sprint": true
+        }
+      ],
+      "digest": "19d0bb9ceb7994f1df97f4d41c2c6a7f9fa5a86561d2af5abb5772ea028a2a39"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -17.600006,
+          "sprint": true
+        }
+      ],
+      "digest": "1976b576ce3136c1bcbc1eb043eb9df64464ceebf1078c23f6a87d1eb8d0ea00"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -15.699997,
+          "sprint": true
+        }
+      ],
+      "digest": "856930f320d60893cf7ce302afa9960ae19a06d898ffedcfc59c4537f6c950a2"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -13.800003,
+          "sprint": true
+        }
+      ],
+      "digest": "ae477cb3fb215d31512556484af04be5251d0f9ee707fc99f7d522f2cee400d6"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -11.900009,
+          "sprint": true
+        }
+      ],
+      "digest": "8a29b404e259ed87a18d055ad7f97a16cfaad03e497e399459b88396ff0ae5a5"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -10,
+          "sprint": true
+        }
+      ],
+      "digest": "cd5fb1935fc88455575d707ae6dfc8c314a85d4bb7cab73d2ec73fe77b40e588"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -8.100006,
+          "sprint": true
+        }
+      ],
+      "digest": "da2396b0123109309fc84c000281f5a32bfbf08e8920545e587d23681756dbb4"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -6.199997,
+          "sprint": true
+        }
+      ],
+      "digest": "dca838b7f6207a1034ac387cdb9b341d44958a00d39b68656ea8976ab4710eb2"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -4.300003,
+          "sprint": true
+        }
+      ],
+      "digest": "6dd2b5b16b085434baf2e31b80f5d4e154274b86531e6b2665061a248f96237c"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -2.4000092,
+          "sprint": true
+        }
+      ],
+      "digest": "28ae6edd28f6b14c9cb9bd5c559fe54501724c494ef6ab91a38375a4df82ca25"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": -0.5,
+          "sprint": true
+        }
+      ],
+      "digest": "ecb545017b33fcf8d98c315f8d3c2dcd61078a6d913d5399deeed2a300aca831"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 1.3999939,
+          "sprint": true
+        }
+      ],
+      "digest": "5461ed036afda83b89759458935e59dd47dab47fcd53d5b417e4c3ef5031b76d"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 3.300003,
+          "sprint": true
+        }
+      ],
+      "digest": "ad82dd13592676a18a0ef53b08a58be2d334577978c7658914fa1aac2b6e2e55"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 5.199997,
+          "sprint": true
+        }
+      ],
+      "digest": "5b6a8acc2c1c81b4ec9b010acc94faf87bd59ffb10732031ac2d12df49db738b"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 7.099991,
+          "sprint": true
+        }
+      ],
+      "digest": "672e22b6b0b56a7c793c5bbeb010216cf38b380c36e9bc4d7f251e9123925bd6"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 9,
+          "sprint": true
+        }
+      ],
+      "digest": "3c1479f9559a8af9b0db52cd7569f1f038858f30c6102d9c2f17fa8d2e41d32b"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 10.899994,
+          "sprint": true
+        }
+      ],
+      "digest": "da3ec4555c9092c3eed1aee5f36fdbf5e3fecce1b0614121f4ee9a26b814c064"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 12.800003,
+          "sprint": true
+        }
+      ],
+      "digest": "057648ff90712ca1197ed49be77b880650e2ac873fd8c80bd781e76303efc36a"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 14.699997,
+          "sprint": true
+        }
+      ],
+      "digest": "ade5b4ac013ef9236c444a9a7fcf3d66d16fdc503e11d9988b27ebf219d6128b"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 16.59999,
+          "sprint": true
+        }
+      ],
+      "digest": "d4946ef1140b0c3d9a931c3235dbac23a6dbe915d8e1d04fc1259748a3f97a17"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 18.5,
+          "sprint": true
+        }
+      ],
+      "digest": "108467ba7281fa521f32ed582c1f5e3450c4528f5f7973ed8684d4ead3dab60e"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 20.399994,
+          "sprint": true
+        }
+      ],
+      "digest": "a94d55629701945b509da62a996bb42b95f098145fe5ea9ba8809a8b1d3587f2"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 22.300003,
+          "sprint": true
+        }
+      ],
+      "digest": "a136d6183d07f477f3257b1098e60f9dcb28e1de38ba1ec5fc75f2d1c2341354"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 24.199997,
+          "sprint": true
+        }
+      ],
+      "digest": "5f5d8e036fd1911dc351ec6a0c3eb2e724dd91897450d24787abd18b6fa7a66c"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 26.09999,
+          "sprint": true
+        }
+      ],
+      "digest": "c7f05b4a0fa61b730c45ea7550fb27e465868159bd832781a196cdbf7e7330c4"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 28,
+          "sprint": true
+        }
+      ],
+      "digest": "e010137ac1d4a204df01c327f2eb2b92a7bd46aa79ce73029390963497de275d"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 29.899994,
+          "sprint": true
+        }
+      ],
+      "digest": "2494c27c02f8544536f984e142ae3c7991a9784a38c0557678a8ecd6809a4ac0"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 31.800003,
+          "sprint": true
+        }
+      ],
+      "digest": "8f29f712397da6a2fc42deb99a28319d858d6f2f20388ef07b684d55fb4b4d4c"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 33.699997,
+          "sprint": true
+        }
+      ],
+      "digest": "2868dda811ed525878f67022d702a346044dcbe227614ebe2696b8762b4fe9f2"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 35.59999,
+          "sprint": true
+        }
+      ],
+      "digest": "d188810cc47df715e48dc3e8a29c48b876cf48c5f67b52f2b60a28913d8e7b43"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 37.5,
+          "sprint": true
+        }
+      ],
+      "digest": "a1f94ee9268b4e547dd350cda2f103772897b5c3c8f0502c6f0bbba99af10da1"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 39.399994,
+          "sprint": true
+        }
+      ],
+      "digest": "94d88aa9c56bf259bf62e3f68b4305ad6b9d25926d6fd587a2fc07fc87afb28f"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 41.300003,
+          "sprint": true
+        }
+      ],
+      "digest": "8e6f1667f2698170e928dff89cc160cea5016612022041671fe94691d3ed8a29"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 43.199997,
+          "sprint": true
+        }
+      ],
+      "digest": "9fdcd62468976ae082bbe11b2ccfa57f0770d2bdb49be3bdcdce830d45e29be2"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 45.09999,
+          "sprint": true
+        }
+      ],
+      "digest": "d9d3792aec6a13f302e089c2e070379fd5ff09f877a1cdb5490261febc5b33f0"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 47,
+          "sprint": true
+        }
+      ],
+      "digest": "3dbb410a59224b6393a9caacc405482788737dea0f2f40effcce7b51edf51fe0"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 48.899994,
+          "sprint": true
+        }
+      ],
+      "digest": "dd1ce6916bd856f257b6e163dae6af6d8a0facc3316809464c7a43cdfcbad77c"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 50.800003,
+          "sprint": true
+        }
+      ],
+      "digest": "2aed3dbd92b47c9ec46191a78bb39fc8368398197d0718eef19d8613569ec932"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 52.699997,
+          "sprint": true
+        }
+      ],
+      "digest": "08c1c2086eb87a9112c7c014a7fcec62ff3f4f3acd94cf9b7978f6ce5f7ee507"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 54.59999,
+          "sprint": true
+        }
+      ],
+      "digest": "6d33da6f057a6b48fc98dbae3a7c938b74046abaa99a6abc20e66ea318452c3d"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 56.5,
+          "sprint": true
+        }
+      ],
+      "digest": "71dcdb95b2c0d7af64322a0721389d1fad54a1d1a94d7b997a20921b0ab7e230"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 58.399994,
+          "sprint": true
+        }
+      ],
+      "digest": "9ac4a9094f27d71164919089eb954da5555629742997774cc4b4c211ec88ca37"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 60.299988,
+          "sprint": true
+        }
+      ],
+      "digest": "36ed7049cf3080cfefd01d80975be115feef7c368ff2789d35f48b9f5e6e9b2f"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 62.19998,
+          "sprint": true
+        }
+      ],
+      "digest": "8f601076a1b756fd859ea63f686d9facba5878af2d7b84ea12fd84015c44fe65"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 64.100006,
+          "sprint": true
+        }
+      ],
+      "digest": "aba513138aca91cd33106ac3f6d72ef1bcafc169246b991f45b797d5b03d5775"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 66,
+          "sprint": true
+        }
+      ],
+      "digest": "764e94a6245a274d4ca31b906acd9d10906e5b7ae94b6216c8833d6d057d6aed"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 67.899994,
+          "sprint": true
+        }
+      ],
+      "digest": "628e14d4a34aa2bc1d5213794e4d71568e8d53f168f5f88790db7b3fc964014d"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 69.79999,
+          "sprint": true
+        }
+      ],
+      "digest": "05dceeb63133cc08e0775b77650e1a1096f9ba52ae0cb092c196b0ab24c66cd7"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 71.69998,
+          "sprint": true
+        }
+      ],
+      "digest": "880af6bd1862936a4bea1c75015f60c663da5eaa2d23dbea1d9f3a1b621c812b"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 73.600006,
+          "sprint": true
+        }
+      ],
+      "digest": "44f65e81562f38bfed44914923e43d9e1f070aac8e2f93d0f6556835a5829d3c"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 75.5,
+          "sprint": true
+        }
+      ],
+      "digest": "46f22b88a36745fa73f4daccd4973692d45ac920c8b9c2e1780b874e0fe716d4"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 77.399994,
+          "sprint": true
+        }
+      ],
+      "digest": "31f556d7e6b3ca9bcc41c78dcd42b37968bd5a2aad3247119ffebe1606d4db2a"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 79.29999,
+          "sprint": true
+        }
+      ],
+      "digest": "43b9391b6fcbe0ef7fa1250911f20eab8caa0bd4e38efa11838c896c60c6e4e8"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 81.19998,
+          "sprint": true
+        }
+      ],
+      "digest": "ddf46927fc5e324ba8033fa2883885eabe29e1c77c41cdb958c2642abe88bcb7"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 83.100006,
+          "sprint": true
+        }
+      ],
+      "digest": "09fdaa79ea9e4f305f03acbde155f38657177c8208bab6c280f4f383fca80c72"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 85,
+          "sprint": true
+        }
+      ],
+      "digest": "ff168925fa6517a6bb8a566e94ea71092c91279a8c576259702234d67a885ebb"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 86.899994,
+          "sprint": true
+        }
+      ],
+      "digest": "e63da47af3bfd0f2d37985bd60c91af729149224756bbf739d4e459c36ca235d"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 88.79999,
+          "sprint": true
+        }
+      ],
+      "digest": "5abc0fb2479ebefec455d34799a68de7e06db99597b107c13481d6a6b96f9dd5"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 90.69998,
+          "sprint": true
+        }
+      ],
+      "digest": "f5e9be33cbc06ae71c512936a58f2f212d008384ba55f6b300243f832b0824c2"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 92.600006,
+          "sprint": true
+        }
+      ],
+      "digest": "f5622c54e0c986f21de6bdce39ac1db44bea023584122097e6d53e0630d32ad8"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 94.5,
+          "sprint": true
+        }
+      ],
+      "digest": "c27db3e84c1b28b48145eb132b4557e637d542d09270de339ce61855aaf541d2"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 96.399994,
+          "sprint": true
+        }
+      ],
+      "digest": "c559f0a4a6ece9a8f470eda1328827a18bd2f375349f6fd890955e248fd42ce5"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 98.29999,
+          "sprint": true
+        }
+      ],
+      "digest": "979305bbd1eb2139b24217ac82a137ee8eff902d31b2d80c5ac8384192178942"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 100.19998,
+          "sprint": true
+        }
+      ],
+      "digest": "a5e8a9540c781f72565bed08472969f0577054ed2304c488bb3f07e011568cf0"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 102.100006,
+          "sprint": true
+        }
+      ],
+      "digest": "354a628a425b66df22b787c62044bef30d407f144b75819dab4172f948dad5fe"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 104,
+          "sprint": true
+        }
+      ],
+      "digest": "dea03cc7ae3ace8af4c358a365a5fd498735df391096c3ff6e7b7f33ff38547e"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 105.899994,
+          "sprint": true
+        }
+      ],
+      "digest": "714c0492b3450df09fdd877d199c96d121560730245140dfbcad860bc008eb8c"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 107.79999,
+          "sprint": true
+        }
+      ],
+      "digest": "778d186c3a5be08d18b41a29e1a70bd5e0dcc8e6b7b430e937b1d592884daf08"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 109.69998,
+          "sprint": true
+        }
+      ],
+      "digest": "5fa0a939627956ad29b82bf660bf7e5baca6ea9451f79de691ee2f9f1dafe9f2"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 111.600006,
+          "sprint": true
+        }
+      ],
+      "digest": "ec3e82b7a536fec63d0726ac2951f739a7acf7e6061084dd66919f26307801b4"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 113.5,
+          "sprint": true
+        }
+      ],
+      "digest": "3a8bacc34f9c9ea357e8ca05ac0713941aafa40aa227b9014f7e4431b4345575"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 115.399994,
+          "sprint": true
+        }
+      ],
+      "digest": "f887197e3be2f96600e871618ba53d69b9280a158e6f3fa3d15c6534c2180a44"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 117.29999,
+          "sprint": true
+        }
+      ],
+      "digest": "3467158a4a8ec11ea2bb99702a11f6437abe6997261d382a08647ce0d27a153c"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 119.19998,
+          "sprint": true
+        }
+      ],
+      "digest": "c7bee30cc1c2c22d6b8c86dbabdda3352edbdd72599a169764f02dbbf4053ddb"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 121.100006,
+          "sprint": true
+        }
+      ],
+      "digest": "baeb5eb0bcb4b1ad92bd926007c9f29e66ecbe9792c90154a2f806f06e17ea6f"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 123,
+          "sprint": true
+        }
+      ],
+      "digest": "428bb3fa6c03748cdfd4fbed54c42133f4cf2ff015e3bf40f39df66889a4dc5b"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 124.899994,
+          "sprint": true
+        }
+      ],
+      "digest": "ae8a43973e34fbf98cc645c019e36dc0dc14a035e996b89382b0694745599160"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 126.79999,
+          "sprint": true
+        }
+      ],
+      "digest": "e30736dae6665568d181b2f0150a10767f292b3c4392042bd5fccde0aa6c0fbc"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 128.69998,
+          "sprint": true
+        }
+      ],
+      "digest": "53a6fda39eb99ff5a55d60ddfcd817650957d320af4137b7dd2bc0d70efca0cb"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 130.6,
+          "sprint": true
+        }
+      ],
+      "digest": "e7208abe2441b729d890ffee2bffe1bb4684532199b80e03a744085fa2555af2"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 132.5,
+          "sprint": true
+        }
+      ],
+      "digest": "f0cead020a8b8e44703588460360be2b89c7c2fedd11ca757066325115dae7e7"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 134.4,
+          "sprint": true
+        }
+      ],
+      "digest": "6254611d268aa99e37f011541b3ccf2517429100536d30b611174f66eb77e0ea"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 136.29999,
+          "sprint": true
+        }
+      ],
+      "digest": "e7d7b4712b6d80407a3d79e720ac34716e4efdf41b1b18f959f27b82be7f7484"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 138.19998,
+          "sprint": true
+        }
+      ],
+      "digest": "dc3607ecb22bc4ba6b5d9e0735f64338e8c1ce3689a1ba7c6b1e7f27acca6de7"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 140.1,
+          "sprint": true
+        }
+      ],
+      "digest": "6220d2c098bff44ac8f679e06b4aedb17d6da301391cc31923543ce82ba7f2b6"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 142,
+          "sprint": true
+        }
+      ],
+      "digest": "23e9d8db6ccfe4da7c3c024b69c6d97d133ca417204c05e0fbc8b25bdb755f10"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 143.9,
+          "sprint": true
+        }
+      ],
+      "digest": "1a88c5ae8da9bb1c9e7e528370981d617cb431403723277246b36baa7e51f314"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 145.79999,
+          "sprint": true
+        }
+      ],
+      "digest": "2ac7cc00a32b58521ac695a09cbd37fbb7a3eb6b09a2ee275816f5924ce039a9"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 147.69998,
+          "sprint": true
+        }
+      ],
+      "digest": "0018a7ecbb249002259f2c19deec64ae1150e4f40e231b266c03d86845fbd0d5"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 149.6,
+          "sprint": true
+        }
+      ],
+      "digest": "9f09469b7fcb994a9ad328aea9803bb3d99aa2592d7b1cc42901128a9d0f6e19"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 151.5,
+          "sprint": true
+        }
+      ],
+      "digest": "e20086a81d4e6c726968a4bf1d515aec5f568ecc7fc20f5bf711ede181088647"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 153.4,
+          "sprint": true
+        }
+      ],
+      "digest": "ad1bff5bb3557e66fd3c70ebade347d6618bd7840837885a23f276f51e7d138b"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 155.29999,
+          "sprint": true
+        }
+      ],
+      "digest": "1f9972d52e0f48b0b4f248ea7ee79b0961ebe325e7873f51c2e645dab2444f90"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 157.19998,
+          "sprint": true
+        }
+      ],
+      "digest": "03ff9ec8a09b9bd9931d87ff3feb60d9b9d8e61171e9098083c19c7f1a31741d"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 159.1,
+          "sprint": true
+        }
+      ],
+      "digest": "42c3b51530a192b752592a05b43767a2dffa1475c5881eea578bba57a3ff26b5"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 161,
+          "sprint": true
+        }
+      ],
+      "digest": "a5c000c0a353468e44f56bc102ad07e711e6554d23bfff72faf95f7d60500325"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 162.9,
+          "sprint": true
+        }
+      ],
+      "digest": "dd24087dff49e06fe50426b7ee8494086529d0af056724dfb55d0bb3f169af7c"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 164.79999,
+          "sprint": true
+        }
+      ],
+      "digest": "5c16167e7d409d70915a3327a043c81f7d4b8134eb1f128e0fb76fb2baee30c2"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 166.69998,
+          "sprint": true
+        }
+      ],
+      "digest": "1f6baa3a83bc7d1170b564b9cef0a9c1144207d8279ee4bef88542982c55e664"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 168.6,
+          "sprint": true
+        }
+      ],
+      "digest": "ed734c371a02e6f45fba495b11cc21faa0444a3e00640467ade8c6724fa5a607"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 170.5,
+          "sprint": true
+        }
+      ],
+      "digest": "281c22823cba30a6364588faccede09ee70f56aa545dd607b55115bb732a3a3e"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 172.4,
+          "sprint": true
+        }
+      ],
+      "digest": "7fb21302b8d0e0f7f597afd21e9e83f2f485ed6b0452fd876fc9ff2957a27407"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 174.29999,
+          "sprint": true
+        }
+      ],
+      "digest": "39668a912429fa832b0c57fb8b3eb77cefdceee125011666c5cf7542659fc007"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 176.19998,
+          "sprint": true
+        }
+      ],
+      "digest": "fa399fd39a4c1730ba28746f11048a3f3d01a78bd839460e76c74eeb2706f387"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 178.1,
+          "sprint": true
+        }
+      ],
+      "digest": "483f0dd8011e827f07a68dd53307b148bd3a3567f9cfaf7feb9d93181719559c"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 180,
+          "sprint": true
+        }
+      ],
+      "digest": "edc589c00d4788f3d8c28538654b469921499421fcf02370058d84ecaafad278"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 181.9,
+          "sprint": true
+        }
+      ],
+      "digest": "4d4c0d34ca88484106c76a029d2d73781dd10a7052b8f863799ce81f7520f072"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 183.79999,
+          "sprint": true
+        }
+      ],
+      "digest": "e405b570c4bbbb8be9be4ee6a233e1d762f20527e1504b50a93eb60782f791a7"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 185.69998,
+          "sprint": true
+        }
+      ],
+      "digest": "645389d2f9a52e0689e93a6c9d4610851faa290139e75f82e76123071a5fb31f"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 187.6,
+          "sprint": true
+        }
+      ],
+      "digest": "bc08ed092bbe3aa55ef60d11310313d172a8dbe4081c27f4fe5db3a0086d86e2"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 189.5,
+          "sprint": true
+        }
+      ],
+      "digest": "4c729d1a3a8aa4f0baa1952507a3a89570a26e927ded629a6179c81750a37114"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 191.4,
+          "sprint": true
+        }
+      ],
+      "digest": "48b1578a6dc8b61c56b15369c05993eeef6ec5ed28d57f905da5b8c779bd62ff"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 193.29999,
+          "sprint": true
+        }
+      ],
+      "digest": "61098864dd7bd059d021457662de77fe9202bbee298ea1ebd0a4a837387dcc4c"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 195.19998,
+          "sprint": true
+        }
+      ],
+      "digest": "64efa1682ee8b8525620a9c52548962406be8978904d06d66c8a7d334f907335"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 197.1,
+          "sprint": true
+        }
+      ],
+      "digest": "3a5de0adc6b68b22a51bcc0e81f93e5a98b1f93acff8f6d42e90c0b6f6790caa"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 199,
+          "sprint": true
+        }
+      ],
+      "digest": "1effcf547b4ac07f2c3dd3101714bc3923f6f7b08cf42c7963d7302e0241f6e5"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 200.9,
+          "sprint": true
+        }
+      ],
+      "digest": "797aa00ab2dbecef4fe36496e752b297df6ed3a9a602c0c1c681bc0a4bcf0219"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 202.79999,
+          "sprint": true
+        }
+      ],
+      "digest": "385f4ff9d6fd8f347d4fee72da5fd077ed282af0a3df0fc56e0c0a8705060b06"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 204.69998,
+          "sprint": true
+        }
+      ],
+      "digest": "dc3f0170525a46ec07ab594dd32e099abcb7a3fb715d23afcfbda0440eead6a9"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 206.6,
+          "sprint": true
+        }
+      ],
+      "digest": "fac1901f6b8348e9a88a7eba7af6da710fe584e0307354ee5f86be3bd8b2098b"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 208.5,
+          "sprint": true
+        }
+      ],
+      "digest": "f0bbb2c9ad6ea934c3bc4a63e4dac5e93c50ed8781b0e1e7fd10a7bed276c726"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 210.4,
+          "sprint": true
+        }
+      ],
+      "digest": "0e3763375d9d9f46a10bd3599672c753b7d7dcf63c8b8273c2746931c4423ac0"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 212.29999,
+          "sprint": true
+        }
+      ],
+      "digest": "3cf4d7a96b5f52e33afe60b17016343549222ef3e6bfd307a5552743d2c21463"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 214.19998,
+          "sprint": true
+        }
+      ],
+      "digest": "c6f0a2c60112b8f5a6f0a70ce0cf66e66137bea936a062ebb868860926ecf4eb"
+    },
+    {
+      "input": [
+        {
+          "kind": "movement.input",
+          "entity": 1,
+          "strafe": 1,
+          "forward": 1,
+          "yaw": 216.1,
+          "sprint": true
+        }
+      ],
+      "digest": "54156982658236d6e47d734a007d5fe61d4540266d4190bdb6650d397933e8a0"
+    }
+  ]
+}
