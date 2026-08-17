@@ -200,3 +200,117 @@ func TestFindHonoursACancelledContext(t *testing.T) {
 		t.Fatal("Find ignored a cancelled context")
 	}
 }
+
+const refWater world.BlockRef = 9
+
+// waterFacts answers water for one handle and nothing for the rest.
+type waterFacts struct{}
+
+func (waterFacts) Hazard(world.BlockRef) terrain.Hazard { return terrain.HazardNone }
+
+func (waterFacts) Fluid(ref world.BlockRef) terrain.Fluid {
+	if ref == refWater {
+		return terrain.FluidWater
+	}
+
+	return terrain.FluidNone
+}
+
+// pool returns a flat world whose x=2 column is water to head height.
+func pool() *world.Blocks {
+	blocks := flat(-1, -1, 5, 1)
+	for y := int32(0); y <= 1; y++ {
+		blocks.SetBlock(geom.BlockPos{X: 2, Y: y, Z: 0}, refWater, geom.EmptyShape())
+	}
+
+	return blocks
+}
+
+func TestFindCrossesWaterWhenTheBodyCanSwim(t *testing.T) {
+	swimmer := walker
+	swimmer.CanSwim = true
+
+	path, err := Find(
+		context.Background(), pool(), waterFacts{}, swimmer,
+		geom.BlockPos{X: 0, Y: 0, Z: 0}, geom.BlockPos{X: 4, Y: 0, Z: 0}, wideBudget,
+	)
+	if err != nil {
+		t.Fatalf("Find returned an error: %v", err)
+	}
+	if !path.Complete {
+		t.Fatalf("path incomplete, reason %v", path.Reason)
+	}
+
+	var swam bool
+	for _, edge := range path.Edges {
+		if edge.Kind == EdgeSwim {
+			swam = true
+			if edge.Posture != PostureSwim {
+				t.Fatalf("swim edge posture = %v, want PostureSwim", edge.Posture)
+			}
+		}
+	}
+	if !swam {
+		t.Fatal("a route through water contains no swim edge")
+	}
+}
+
+// The same world, the same goal, a body that cannot swim: it must route around
+// rather than through. This is the mob case the design promises.
+func TestFindRoutesAroundWaterWhenTheBodyCannotSwim(t *testing.T) {
+	path, err := Find(
+		context.Background(), pool(), waterFacts{}, walker,
+		geom.BlockPos{X: 0, Y: 0, Z: 0}, geom.BlockPos{X: 4, Y: 0, Z: 0}, wideBudget,
+	)
+	if err != nil {
+		t.Fatalf("Find returned an error: %v", err)
+	}
+	if !path.Complete {
+		t.Fatalf("path incomplete, reason %v", path.Reason)
+	}
+	for _, edge := range path.Edges {
+		if edge.Kind == EdgeSwim {
+			t.Fatal("a body that cannot swim took a swim edge")
+		}
+		if edge.To == (geom.BlockPos{X: 2, Y: 0, Z: 0}) {
+			t.Fatal("a body that cannot swim entered the water")
+		}
+	}
+}
+
+const refFire world.BlockRef = 51
+
+// burningFacts answers HazardBurn for one handle. Fire carries no collision
+// shape and no fluid, so nothing but the hazard lookup can find it.
+type burningFacts struct{}
+
+func (burningFacts) Fluid(world.BlockRef) terrain.Fluid { return terrain.FluidNone }
+
+func (burningFacts) Hazard(ref world.BlockRef) terrain.Hazard {
+	if ref == refFire {
+		return terrain.HazardBurn
+	}
+
+	return terrain.HazardNone
+}
+
+func TestFindRoutesAroundFire(t *testing.T) {
+	blocks := flat(-1, -1, 5, 1)
+	blocks.SetBlock(geom.BlockPos{X: 2, Y: 0, Z: 0}, refFire, geom.EmptyShape())
+
+	path, err := Find(
+		context.Background(), blocks, burningFacts{}, walker,
+		geom.BlockPos{X: 0, Y: 0, Z: 0}, geom.BlockPos{X: 4, Y: 0, Z: 0}, wideBudget,
+	)
+	if err != nil {
+		t.Fatalf("Find returned an error: %v", err)
+	}
+	if !path.Complete {
+		t.Fatalf("path incomplete, reason %v", path.Reason)
+	}
+	for _, edge := range path.Edges {
+		if edge.To == (geom.BlockPos{X: 2, Y: 0, Z: 0}) {
+			t.Fatal("the route walks through fire")
+		}
+	}
+}

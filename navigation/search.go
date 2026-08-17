@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-theft-craft/minecraft-simulation/geom"
 	"github.com/go-theft-craft/minecraft-simulation/terrain"
+	"github.com/go-theft-craft/minecraft-simulation/world"
 )
 
 // ErrNoBody reports a capability whose body has no volume. A zero body fits
@@ -187,10 +188,13 @@ func (c Capability) expand(query terrain.Query, from node) ([]Edge, error) {
 
 		switch passable {
 		case terrain.Clear:
-			edges = append(edges, Edge{
-				Kind: EdgeWalk, From: from.Pos, To: neighbour,
-				Posture: PostureStand, Cost: c.WalkTicks,
-			})
+			edge, ok, err := c.enter(query, from.Pos, neighbour)
+			if err != nil {
+				return nil, err
+			}
+			if ok {
+				edges = append(edges, edge)
+			}
 		case terrain.Steppable:
 			above := geom.BlockPos{X: neighbour.X, Y: neighbour.Y + 1, Z: neighbour.Z}
 			edges = append(edges, Edge{
@@ -212,6 +216,60 @@ func (c Capability) expand(query terrain.Query, from node) ([]Edge, error) {
 	}
 
 	return edges, nil
+}
+
+// enter decides how a body crosses into a cell it geometrically fits in.
+//
+// Neither a fluid nor a fire carries a collision shape, so Passable calls both
+// Clear on geometry alone. Asking Facts here is what stops a body that cannot
+// swim from strolling through a lake, and what stops any body from strolling
+// through fire or lava.
+func (c Capability) enter(query terrain.Query, from, to geom.BlockPos) (Edge, bool, error) {
+	hazard, lookup, err := query.HazardAt(to)
+	if err != nil {
+		return Edge{}, false, err
+	}
+	if lookup == world.LookupUnknown {
+		return Edge{}, false, nil
+	}
+	if hazard != terrain.HazardNone {
+		return Edge{}, false, nil
+	}
+
+	fluid, lookup, err := query.FluidAt(to)
+	if err != nil {
+		return Edge{}, false, err
+	}
+	if lookup == world.LookupUnknown {
+		return Edge{}, false, nil
+	}
+
+	switch fluid {
+	case terrain.FluidNone:
+		return Edge{
+			Kind: EdgeWalk, From: from, To: to,
+			Posture: PostureStand, Cost: c.WalkTicks,
+		}, true, nil
+	case terrain.FluidWater:
+		if !c.CanSwim {
+			return Edge{}, false, nil
+		}
+
+		return Edge{
+			Kind: EdgeSwim, From: from, To: to,
+			Posture: PostureSwim, Cost: c.SwimTicks,
+		}, true, nil
+	case terrain.FluidLava:
+		// Refused by falling through to the return below, same as any fluid a
+		// later version adds. The exhaustive linter wants the arm named; the
+		// empty body matches the switch's no-default, no-fall-through refusal.
+	}
+
+	// Lava, and any fluid a later version adds. Refused rather than costed:
+	// the design leaves fluid traversal beyond water to its own work, and a
+	// body that swam through lava because nothing said not to is worse than
+	// one that took the long way.
+	return Edge{}, false, nil
 }
 
 // fall looks down a neighbouring column for a landing within the safe fall.
