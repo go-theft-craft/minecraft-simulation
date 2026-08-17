@@ -139,23 +139,44 @@ What the new dumper must produce, matching the 1.8.9 schema so the generator nee
 
 The constants must be captured at their real width. The 1.8.9 dumper reached most values reflectively and needed twelve transcribed by hand because they are literals inside method bodies. Expect the same division here, and expect the split to fall differently.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Cover: `Dump` for an unsupported version still fails with a message naming the version; `Dump` for 26.1.2 without a prepared jar fails with a clear error rather than a panic; and with a prepared jar, the output validates against the schema and contains a non-empty slipperiness index and motion constants for the player.
 
-- [ ] **Step 2: Write the dumper and run it**
+- [x] **Step 2: Write the dumper and run it**
 
-- [ ] **Step 3: Verify each transcribed constant twice**
+- [x] **Step 3: Verify each transcribed constant twice**
 
 Any value a reflective dumper cannot reach is transcribed, and M8.1's rule applies: confirm it from two independent readings before committing it. Record both in the reference notes.
 
-- [ ] **Step 4 to 6: Verify, check, commit**
+- [x] **Step 4 to 6: Verify, check, commit**
 
 ```bash
 cd ../minecraft-reference
 git add internal/reference/physics/
 git commit -m "feat(physics): add a 26.1.2 physics dumper"
 ```
+
+**Done.** `minecraft-reference` commits `b7b6003` and `443d99d`. The dumper runs
+against the prepared jar and produces 1,168 blocks, the 65,536-entry
+trigonometry table, and a default slipperiness of 0.6. Constants and findings
+are in that repository's `reference/notes/physics-motion-26.1.2.md`, confirmed
+twice as M8.1 requires — once from decompiled source and once from `javap`.
+
+Three things Task 3 inherits:
+
+- **The trigonometry table is bit for bit identical to 1.8.9's.** The dataset
+  still carries its own copy, because a shared table would be a claim about
+  every future version rather than a measurement of this one, but the profile
+  can expect the same numbers. What changed is the index: a `double` multiplier
+  through a `long` rather than a `float` multiplier through an `int`.
+- **Only five blocks differ from the default slipperiness**, and the one 1.8.9
+  calls `slime` is `slime_block` here.
+- **The workspace has no `compatibility.json` for 26.1.2**, because it was
+  prepared before `mcreference` began writing one. `Dump` reads that report to
+  choose between `named.jar` and `executable.jar`, so generating the dataset
+  needs `task reference:prepare` re-run for this version first. The dumper
+  program itself is verified: it was compiled and run against the jar directly.
 
 ---
 
