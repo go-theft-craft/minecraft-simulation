@@ -69,6 +69,23 @@ type BlockNames interface {
 	Ref(name string) (world.BlockRef, bool)
 }
 
+// DataDigest is a profile that can name the game data it was built from.
+//
+// The profile identity says which rules ran; this says which numbers they ran
+// on. They are different questions, and the second one is the one that goes
+// unnoticed: a corrected dataset changes constants without changing an edition,
+// a version, or a rules revision, and every recording made before the correction
+// then disagrees with the build for a reason nothing in it explains.
+//
+// A profile that cannot answer is not an error. Nothing in a tick reads this,
+// and a hand-built profile in a test has no dataset to hash. What must not
+// happen is a recording quietly losing the pin, so a recorder that had one keeps
+// requiring one.
+type DataDigest interface {
+	// DataDigest hashes the game data the profile was built from.
+	DataDigest() Digest
+}
+
 // Phase is one stage of a tick.
 //
 // A phase reads and writes only through the TickState it is handed. Phases run

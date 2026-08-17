@@ -1,0 +1,92 @@
+package v1_8
+
+import (
+	"crypto/sha256"
+	"encoding/binary"
+	"math"
+
+	"github.com/go-theft-craft/minecraft-simulation/entity"
+	"github.com/go-theft-craft/minecraft-simulation/geom"
+	"github.com/go-theft-craft/minecraft-simulation/sim"
+)
+
+// DataDigest implements sim.DataDigest.
+//
+// It hashes the numbers this profile was built from, not the file they came from:
+// the block table, the motion constants, and the trigonometry table, each at the
+// width the rules use. A recording that pins this can say which dataset it ran
+// against, and a dataset corrected without a version bump — which is exactly what
+// a physics correction looks like — stops being an unexplained digest mismatch
+// and becomes a named one.
+//
+// The digest is computed once, when the profile is built, because a replay asks
+// for it per recording and the sine table is a quarter of a megabyte.
+func (p *profile) DataDigest() sim.Digest { return p.dataDigest }
+
+// computeDataDigest hashes every number the profile holds.
+//
+// Floats are hashed by their bits rather than their decimal text. That is the
+// whole point: the values this milestone cares about differ from their round
+// decimals in the last bits, and a digest over "0.6" would be blind to the
+// difference between 0.6 and float64(float32(0.6)).
+func computeDataDigest(blocks blockTable, table []float32, motion map[entity.Family]sim.MotionConstants) sim.Digest {
+	hash := sha256.New()
+
+	var scratch [8]byte
+	writeUint := func(value uint64) {
+		binary.BigEndian.PutUint64(scratch[:], value)
+		hash.Write(scratch[:])
+	}
+	writeFloat := func(value float64) { writeUint(math.Float64bits(value)) }
+	writeSingle := func(value float32) { writeUint(uint64(math.Float32bits(value))) }
+	writeString := func(value string) {
+		writeUint(uint64(len(value)))
+		hash.Write([]byte(value))
+	}
+	writeBox := func(box geom.AABB) {
+		writeFloat(box.MinX)
+		writeFloat(box.MinY)
+		writeFloat(box.MinZ)
+		writeFloat(box.MaxX)
+		writeFloat(box.MaxY)
+		writeFloat(box.MaxZ)
+	}
+
+	// The block table, in handle order, which is the order it was minted in.
+	writeUint(uint64(len(blocks.names)))
+	for handle, name := range blocks.names {
+		writeString(name)
+		writeSingle(blocks.frictions[handle])
+
+		// BoxesAt at the origin is the shape's own boxes: translating by a zero
+		// vector changes no value, and there is no other accessor.
+		boxes := blocks.shapes[handle].BoxesAt(geom.BlockPos{}, nil)
+		writeUint(uint64(len(boxes)))
+		for _, box := range boxes {
+			writeBox(box)
+		}
+	}
+
+	// The motion constants, walked over the families this profile knows rather
+	// than over the map, because map order is not an order.
+	for _, family := range []entity.Family{entity.FamilyUnknown, entity.FamilyPlayer} {
+		constants := motion[family]
+		writeUint(uint64(family))
+		writeFloat(constants.Gravity)
+		writeFloat(constants.HorizontalDrag)
+		writeFloat(constants.VerticalDrag)
+		writeFloat(constants.StepHeight)
+	}
+
+	// The trigonometry table. It is large and it is data: a dataset that
+	// regenerated it differently would change every trajectory in the module.
+	writeUint(uint64(len(table)))
+	for _, entry := range table {
+		writeSingle(entry)
+	}
+
+	var digest sim.Digest
+	copy(digest[:], hash.Sum(nil))
+
+	return digest
+}

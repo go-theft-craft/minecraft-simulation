@@ -39,6 +39,10 @@ type profile struct {
 	blocks blockTable
 	table  movement.Table
 	motion map[entity.Family]sim.MotionConstants
+	// dataDigest hashes the numbers above. It is computed once, because the
+	// trigonometry table alone is a quarter of a megabyte and a replay asks for
+	// this per recording.
+	dataDigest sim.Digest
 }
 
 // New builds the 1.8.9 profile from a data set.
@@ -75,6 +79,8 @@ func New(set *data.Set) (sim.Profile, error) {
 			},
 		},
 	}
+	built.dataDigest = computeDataDigest(built.blocks, physics.SinTable, built.motion)
+
 	return built, nil
 }
 
