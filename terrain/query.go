@@ -102,3 +102,28 @@ func (q Query) Ground(feet geom.Vec3) (Ground, error) {
 
 	return GroundOpen, nil
 }
+
+// HazardAt reports what a cell would do to a body occupying it.
+//
+// The lookup is returned because "no hazard" and "nobody described this cell"
+// are different answers, and a body that confuses them walks into lava it
+// could not see. Lava carries no collision shape, so geometry alone never
+// finds it.
+func (q Query) HazardAt(cell geom.BlockPos) (Hazard, world.Lookup, error) {
+	ref, lookup := q.View.BlockState(cell)
+	if lookup == world.LookupUnknown || q.Facts == nil {
+		return HazardNone, lookup, nil
+	}
+
+	return q.Facts.Hazard(ref), lookup, nil
+}
+
+// FluidAt reports the fluid filling a cell.
+func (q Query) FluidAt(cell geom.BlockPos) (Fluid, world.Lookup, error) {
+	ref, lookup := q.View.BlockState(cell)
+	if lookup == world.LookupUnknown || q.Facts == nil {
+		return FluidNone, lookup, nil
+	}
+
+	return q.Facts.Fluid(ref), lookup, nil
+}
