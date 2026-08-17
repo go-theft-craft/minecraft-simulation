@@ -4,6 +4,17 @@
 
 **Goal:** Deliver canonical recording and replay on top of the digest M8.3 built, and prove that the same input produces an identical digest on Linux, macOS, and Windows, on amd64 and arm64.
 
+**Status:** Complete. All six targets run and agree. The matrix earned itself on
+its first run with real recordings: all three arm64 targets disagreed with both
+amd64 targets, because Go contracts a multiply and an add into one rounding on
+arm64 unless an explicit conversion intervenes, and the heading rule has two
+such products. Java never contracts, so the fused answer was wrong rather than
+merely different, and the fix left the committed recordings unchanged. Two
+deviations are recorded in the commits: `Record` takes its input from the setup
+rather than a tick count, and `Mismatch` is `MismatchError` because the linter
+requires it. `macos-13` never started on any run and was replaced with
+`macos-15-intel`, which does.
+
 **Architecture:** `replay` records a run as an ordered sequence of tick inputs and result digests, and replays it against a profile, failing at the first tick whose digest differs. The canonical encoding and the digest already exist in `sim`; this milestone adds the recording around them and the continuous integration that makes the cross-platform claim true rather than asserted.
 
 **Tech Stack:** Go 1.26.6, standard library only, Devbox, go-task, GitHub Actions.

@@ -4,6 +4,13 @@ This file records notable user-visible changes. It follows [Keep a Changelog](ht
 
 ## Unreleased
 
+### Fixed
+
+- `movement`: the heading rule and the cosine's table index now narrow each
+  product before adding it, which stops arm64 contracting the multiply and the
+  add into one rounding. Java never contracts, so the fused answer was a
+  position vanilla does not produce; the determinism matrix found it.
+
 ### Added
 
 - `geom`, `world`, and `collision`: swept axis-aligned collision reproducing
@@ -27,6 +34,17 @@ This file records notable user-visible changes. It follows [Keep a Changelog](ht
   simulation.
 - `mctest`: recorded trajectories and a replay that needs no jar, with six
   committed fixtures whose expectations are the game's own answers.
+- `scene`: a world described by name — a filled region and the named blocks in
+  it — which `mctest` fixtures and `replay` recordings both build from.
+- `replay`: recording a run as its input and the digest of every tick, and
+  replaying it against a profile, reporting the first differing tick with the
+  body rendered at full precision.
+- `sim.BlockNames` and `sim.DataDigest`: optional interfaces a profile
+  implements to resolve a block name to a handle and to name the game data it
+  was built from.
+- A `Determinism` workflow that replays the committed recordings on Linux,
+  macOS, and Windows, on amd64 and arm64, and a `determinism` task that runs the
+  same check with only a Go toolchain.
 - `internal/oracle`: differential tests that run the geometry primitives, the
   whole movement path, and a whole movement tick against a real 1.8.9 server jar
   and require bit-identical results. They skip when no prepared jar or JDK is

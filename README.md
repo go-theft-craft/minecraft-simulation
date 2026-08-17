@@ -19,7 +19,9 @@ persistence, rendering, and AI remain outside this repository.
 | `runtime` | The store, its revision check, and a runner that drives one tick after another |
 | `adapter` | The seam a consumer implements to drive one kernel, and the tick assembly they share |
 | `profile/java/v1_8` | Java Edition 1.8.9: the constants, the block table, the widths, and the tick's phase order |
+| `scene` | A world described by name: a filled region and the blocks in it |
 | `mctest` | Recorded trajectories and a replay that needs no jar |
+| `replay` | Recording a run as inputs and per-tick digests, and replaying it |
 
 Packages depend in one direction only:
 
@@ -29,7 +31,8 @@ geom  ->  world  ->  entity  ->  movement  ->  sim  ->  runtime  ->  adapter
                \-> collision -------/
 
 profile/java/v1_8  ->  sim, movement, and one version's game data
-mctest             ->  sim, runtime, movement
+scene              ->  sim, world, geom
+mctest, replay     ->  sim, runtime, movement, scene
 ```
 
 `profile/java/v1_8` is the only package here that imports game data. Everything
@@ -163,6 +166,72 @@ devbox run -- go test ./internal/oracle/ -run TestGenerateFixtures -args -write-
 Without that flag the same test checks the committed fixtures still say what the
 jar says, so a fixture that has drifted from the game is reported where the game
 is present rather than surfacing later as an unexplained replay failure.
+
+## The same answer on six platforms
+
+`replay` records a run as its initial world, its per-tick input, and the digest
+every tick produced, and replays it against a profile. A `Determinism` workflow
+replays the committed recordings on six targets — Linux, macOS, and Windows,
+each on amd64 and arm64 — and every one must produce the same digests. All six
+run, and all six agree.
+
+It found a real bug on its first run with real recordings. All three arm64
+targets disagreed with both amd64 targets, on exactly three of the five
+recordings: the three where strafe and forward are both non-zero. Go permits an
+implementation to contract a multiply and an add into one operation with a
+single rounding unless an explicit conversion rounds the intermediate, and on
+arm64 the compiler takes that permission — so the two products in the heading
+rule fused, and the runs with forward alone agreed because their other product
+is zero.
+
+That is a correctness bug rather than a tie between two defensible answers.
+Java never contracts unless `Math.fma` is called, so the game computes each
+product separately, and `internal/oracle` had already checked this module's
+unfused arithmetic against a real server. An arm64 build was producing positions
+vanilla does not. The fix is the conversion the Go specification names, and the
+committed recordings did not change — which is the evidence that it forces the
+answer amd64 already had rather than choosing a third one.
+
+Two things about that gate are worth stating plainly, because both are easy to
+read the wrong way.
+
+**It tests agreement, not correctness.** These digests are this module's own
+output. Whether they match Java Edition is what `internal/oracle` answers, and
+it is a separate question with a separate gate. What six platforms agreeing
+proves is that a compiler, an architecture, or a fused multiply-add is not
+changing an answer underneath us — and so what the matrix actually exercises is
+the `float32` arithmetic in `movement` and the truncated sine-table index, not
+the canonical encoder. The encoder is integer and byte work and was never
+plausibly platform-dependent. That is why the recordings sprint diagonally,
+walk on ice, fall a hundred and twenty blocks, and climb slabs: a matrix over
+empty ticks would pass everywhere and prove nothing, and a test asserts the
+recordings stay that way.
+
+**A recording is never regenerated to make a red matrix green.** Doing that
+converts the gate into each platform being compared against itself. If a target
+disagrees, the finding is real and the fix is in the code: an intermediate value
+that was not a named `float32` and so was allowed to fuse, a `math` function
+that is not exactly rounded there, or a genuine compiler difference. Regenerating
+is for a deliberate change in behaviour, behind an explicit flag, in a commit
+that says which behaviour changed:
+
+```bash
+devbox run -- go test ./replay/ -run TestGenerateRecordings -args -write-recordings
+```
+
+The determinism job is the only check here that does not run through Devbox.
+Devbox provisions through Nix, Nix does not run natively on Windows, and Windows
+is a third of what this gate claims — so verification keeps Devbox on one
+platform and this job uses `actions/setup-go` on six. Two toolchains are
+affordable; two Go versions are not, because the matrix would then be testing a
+compiler nothing else uses, so `internal/buildcheck` fails if `devbox.json`, the
+workflow, and `go.mod` stop naming the same one.
+
+Locally, the same check with only a Go toolchain:
+
+```bash
+devbox run -- task determinism
+```
 
 Vanilla Java research uses the separate
 [`minecraft-reference`](https://github.com/go-theft-craft/minecraft-reference)
