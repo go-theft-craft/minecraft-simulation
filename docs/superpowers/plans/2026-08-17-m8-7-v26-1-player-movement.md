@@ -193,23 +193,51 @@ M8.1 left this parameterized, so this task is mechanical: commit the extracted J
 
 The notices entry states Mojang provenance rather than inheriting the PrismarineJS attribution, the same way 1.8.9's does.
 
-- [ ] **Step 1: Commit the source, add the manifest entry, regenerate**
+- [x] **Step 1: Commit the source, add the manifest entry, regenerate**
 
-- [ ] **Step 2: Confirm no-JDK generation**
+- [x] **Step 2: Confirm no-JDK generation**
 
 Run the repository's `generate:check` with `java` and `javac` removed from `PATH`. Both versions must render from pinned source.
 
-- [ ] **Step 3: Confirm the widths survived**
+- [x] **Step 3: Confirm the widths survived**
 
 Add a test asserting the player's constants match the extracted file exactly, including any value whose decimal form is not round. A generator that formatted a `float`-derived constant to fewer digits would lose exactly what M8.2 proved matters, and the round-trip test is what catches it.
 
-- [ ] **Step 4 to 5: Verify, commit**
+- [x] **Step 4 to 5: Verify, commit**
 
 ```bash
 cd ../minecraft-protocol
 git add source/java/26.1/physics.json generated/java/v26_1/physics.go manifest.json THIRD_PARTY_NOTICES.md
 git commit -m "feat(data): pin and generate Java 26.1.2 physics constants"
 ```
+
+**Done 2026-08-18**, as `minecraft-protocol` `5700384`. Four things this task
+answered that it was not asked:
+
+- **The blocker this plan recorded was stale.** Task 2 said the workspace has no
+  compatibility report for 26.1.2 and that `task reference:prepare` would have to
+  be re-run before the dataset could be generated. `minecraft-reference`'s own
+  workspace has one, so the dump ran as it stood.
+- **Both extractions reproduce.** The physics dumper produces identical bytes on
+  two runs, and re-extracting the block measurement at the current tool revision
+  reproduces the committed file exactly — which is what makes it honest to move
+  the manifest's single `toolRevision` forward to cover both datasets.
+- **The trigonometry table is byte-identical to 1.8.9's**, checked here rather
+  than taken from the note, and stored again rather than shared. An identical
+  measurement of two versions is a fact about both; one shared table would be a
+  claim about every version after them.
+- **Five blocks differ from the default friction here where three do in 1.8.9**,
+  and `slime` is `slime_block`. Both the count and the names are pinned by a
+  test, because a table carried over by name would have walked the modern block
+  on ordinary friction.
+
+**Task 4 onward is blocked on a release.** `minecraft-simulation` requires
+`minecraft-protocol v0.2.0` as a released module with no `replace` directive, so
+the constants this task generated are not visible here until
+`minecraft-protocol` is tagged and published. That is a decision about a public
+module rather than a step in this plan: the Go module mirror serves an immutable
+snapshot of whatever is tagged, so the tag is owed a maintainer's approval rather
+than an agent's.
 
 ---
 
