@@ -5,6 +5,7 @@ import (
 
 	"github.com/go-theft-craft/minecraft-simulation/entity"
 	"github.com/go-theft-craft/minecraft-simulation/geom"
+	"github.com/go-theft-craft/minecraft-simulation/movement"
 	"github.com/go-theft-craft/minecraft-simulation/sim"
 	"github.com/go-theft-craft/minecraft-simulation/world"
 )
@@ -22,6 +23,7 @@ type Memory struct {
 	revision sim.Revision
 	blocks   *world.Blocks
 	bodies   *entity.Bodies
+	moving   *movement.Bodies
 }
 
 // NewMemory returns an empty store at revision zero.
@@ -34,6 +36,7 @@ func NewMemory(profile sim.Profile) *Memory {
 		profile: profile,
 		blocks:  world.NewBlocks(),
 		bodies:  entity.NewBodies(),
+		moving:  movement.NewBodies(),
 	}
 }
 
@@ -45,6 +48,9 @@ func (m *Memory) Blocks() world.View { return m.blocks }
 
 // Entities implements Store.
 func (m *Memory) Entities() entity.View { return m.bodies }
+
+// Locomotion implements Store.
+func (m *Memory) Locomotion() movement.LocomotionView { return m.moving }
 
 // SetBlock records a block state directly, without a change set and without
 // advancing the revision. It is how a consumer loads observed or generated world
@@ -63,6 +69,13 @@ func (m *Memory) SetBlock(pos geom.BlockPos, ref world.BlockRef) error {
 // the revision. It is how a consumer loads an entity a server told it about.
 func (m *Memory) SetEntity(id entity.ID, state entity.State) {
 	m.bodies.Set(id, state)
+}
+
+// SetLocomotion records a body's movement state directly, without a change set
+// and without advancing the revision. It is how a consumer spawns the body it
+// intends to simulate.
+func (m *Memory) SetLocomotion(id entity.ID, state movement.Locomotion) {
+	m.moving.Set(id, state)
 }
 
 // Apply implements Store.
@@ -95,6 +108,9 @@ func (m *Memory) Apply(changes sim.ChangeSet) error {
 			m.bodies.Set(op.Entity, op.State)
 		case sim.OpRemoveEntity:
 			m.bodies.Remove(op.Entity)
+			m.moving.Remove(op.Entity)
+		case sim.OpSetLocomotion:
+			m.moving.Set(op.Entity, op.Locomotion)
 		case sim.OpSetBlock:
 			m.blocks.SetBlock(op.Block, op.Ref, shapes[op.Ref])
 		default:
@@ -122,5 +138,6 @@ func (m *Memory) Snapshot() *Memory {
 		revision: m.revision,
 		blocks:   m.blocks.Clone(),
 		bodies:   m.bodies.Clone(),
+		moving:   m.moving.Clone(),
 	}
 }

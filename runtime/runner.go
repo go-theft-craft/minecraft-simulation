@@ -55,15 +55,16 @@ func (r *Runner) SetRandom(state sim.RandomState) { r.random = state }
 // again.
 func (r *Runner) Step(ctx context.Context, commands []sim.Command) (sim.TickResult, error) {
 	input := sim.TickInput{
-		Profile:  r.kernel.Profile(),
-		Revision: r.store.Revision(),
-		Tick:     r.tick,
-		Blocks:   r.store.Blocks(),
-		Entities: r.store.Entities(),
-		Scope:    r.scope,
-		Commands: commands,
-		Random:   r.random,
-		Limits:   r.limits,
+		Profile:    r.kernel.Profile(),
+		Revision:   r.store.Revision(),
+		Tick:       r.tick,
+		Blocks:     r.store.Blocks(),
+		Entities:   r.store.Entities(),
+		Locomotion: r.store.Locomotion(),
+		Scope:      r.scope,
+		Commands:   commands,
+		Random:     r.random,
+		Limits:     r.limits,
 	}
 
 	result, err := r.kernel.Step(ctx, input)

@@ -13,6 +13,7 @@ import (
 	"errors"
 
 	"github.com/go-theft-craft/minecraft-simulation/entity"
+	"github.com/go-theft-craft/minecraft-simulation/movement"
 	"github.com/go-theft-craft/minecraft-simulation/sim"
 	"github.com/go-theft-craft/minecraft-simulation/world"
 )
@@ -40,6 +41,8 @@ type Store interface {
 	Blocks() world.View
 	// Entities returns the entity view a tick reads.
 	Entities() entity.View
+	// Locomotion returns the movement state a tick reads.
+	Locomotion() movement.LocomotionView
 	// Apply writes a change set, or reports why it wrote nothing.
 	Apply(changes sim.ChangeSet) error
 }

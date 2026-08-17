@@ -57,6 +57,15 @@ func (r TickResult) computeDigest(id ProfileID) Digest {
 		e.float64(op.State.StepHeight)
 		e.blockPos(op.Block)
 		e.uint32(uint32(op.Ref))
+		e.tag(tagLocomotion)
+		e.int32(op.Locomotion.JumpTicks)
+		e.float32(op.Locomotion.Yaw)
+		e.float32(op.Locomotion.Pitch)
+		e.bool(op.Locomotion.Sprinting)
+		e.bool(op.Locomotion.Sneaking)
+		e.bool(op.Locomotion.Jumping)
+		e.float32(op.Locomotion.MoveSpeed)
+		e.float32(op.Locomotion.JumpFactor)
 	}
 
 	e.count(len(r.Domain))

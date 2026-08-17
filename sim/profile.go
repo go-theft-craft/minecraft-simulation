@@ -5,6 +5,7 @@ import (
 
 	"github.com/go-theft-craft/minecraft-simulation/entity"
 	"github.com/go-theft-craft/minecraft-simulation/geom"
+	"github.com/go-theft-craft/minecraft-simulation/movement"
 	"github.com/go-theft-craft/minecraft-simulation/world"
 )
 
@@ -71,13 +72,14 @@ type Phase interface {
 //
 // TickState is not safe for concurrent use. Phases run on one goroutine.
 type TickState struct {
-	profile  Profile
-	tick     Tick
-	limits   Limits
-	scope    Scope
-	blocks   world.View
-	entities entity.View
-	commands []Command
+	profile    Profile
+	tick       Tick
+	limits     Limits
+	scope      Scope
+	blocks     world.View
+	entities   entity.View
+	locomotion movement.LocomotionView
+	commands   []Command
 
 	ops          []Op
 	domain       []DomainEvent
@@ -119,6 +121,32 @@ func (t *TickState) SetRandom(state RandomState) { t.random = state }
 // kernel cannot see inside it: a phase that swept unknown cells and said nothing
 // would produce a complete result built on state nobody described.
 func (t *TickState) Blocks() world.View { return t.blocks }
+
+// Locomotion returns a body's movement state and records the dependency.
+//
+// It reports false both when the view holds no state for the body and when the
+// tick was given no locomotion view at all. A phase that needs one treats the
+// absence as a body it does not simulate, not as a zero state.
+func (t *TickState) Locomotion(id entity.ID) (movement.Locomotion, bool) {
+	t.read = append(t.read, Dependency{Kind: DependencyEntity, Entity: id})
+	if t.locomotion == nil {
+		return movement.Locomotion{}, false
+	}
+
+	return t.locomotion.Locomotion(id)
+}
+
+// SetLocomotion writes a body's movement state.
+//
+// It spends the same budget a body write does. A tick that writes both for one
+// entity spends two, which is what the budget is for: it bounds the work, not
+// the entities.
+func (t *TickState) SetLocomotion(id entity.ID, state movement.Locomotion) {
+	if !t.spend(&t.entitySteps, t.limits.EntitySteps) {
+		return
+	}
+	t.ops = append(t.ops, Op{Kind: OpSetLocomotion, Entity: id, Locomotion: state})
+}
 
 // Entity returns a body and records the dependency.
 //

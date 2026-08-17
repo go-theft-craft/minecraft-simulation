@@ -33,12 +33,19 @@ const (
 	tagVec
 	tagBox
 	tagBlockPos
+	// tagLocomotion arrived with M8.4 and is appended rather than inserted. A
+	// tag's value is part of every digest ever recorded, so the list grows at
+	// the end and never in the middle.
+	tagLocomotion
 )
 
 // canonicalNaN is the single pattern every NaN encodes as. NaN payloads are not
 // portable across platforms, and M8.6 gates on digests matching across six of
 // them.
 const canonicalNaN uint64 = 0x7FF8000000000000
+
+// canonicalNaN32 is the same fold at single width.
+const canonicalNaN32 uint32 = 0x7FC00000
 
 // encoder builds a canonical byte string. It never fails: every value this
 // package holds has an encoding, and a value that did not would be a compile
@@ -94,6 +101,23 @@ func (e *encoder) float64(value float64) {
 		e.uint64(0)
 	default:
 		e.uint64(math.Float64bits(value))
+	}
+}
+
+// float32 writes a float at the width the game computed it, folding negative
+// zero and NaN by the same rules float64 uses.
+//
+// A float32 is written as four bytes rather than widened to eight, so that the
+// encoding records the width the value actually has. Widening here would let two
+// different float32 values that share a float64 rounding encode alike.
+func (e *encoder) float32(value float32) {
+	switch {
+	case value != value: // NaN, without importing math for one comparison.
+		e.uint32(canonicalNaN32)
+	case value == 0:
+		e.uint32(0)
+	default:
+		e.uint32(math.Float32bits(value))
 	}
 }
 

@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-theft-craft/minecraft-simulation/entity"
 	"github.com/go-theft-craft/minecraft-simulation/geom"
+	"github.com/go-theft-craft/minecraft-simulation/movement"
 	"github.com/go-theft-craft/minecraft-simulation/sim"
 	"github.com/go-theft-craft/minecraft-simulation/world"
 )
@@ -186,3 +187,54 @@ func TestSnapshotDoesNotFollowItsOrigin(t *testing.T) {
 }
 
 var _ Store = (*Memory)(nil)
+
+func TestApplyWritesLocomotion(t *testing.T) {
+	store := NewMemory(testProfile())
+	want := movement.Locomotion{JumpTicks: 10, Yaw: 90, MoveSpeed: 0.1, JumpFactor: 0.02}
+
+	changes := sim.ChangeSet{Ops: []sim.Op{
+		{Kind: sim.OpSetLocomotion, Entity: 1, Locomotion: want},
+	}}
+	if err := store.Apply(changes); err != nil {
+		t.Fatalf("Apply: %v", err)
+	}
+
+	got, ok := store.Locomotion().Locomotion(1)
+	if !ok || got != want {
+		t.Fatalf("Locomotion = (%+v, %v), want %+v", got, ok, want)
+	}
+}
+
+func TestRemovingABodyRemovesItsLocomotion(t *testing.T) {
+	// The two are one body. Leaving movement state behind for a removed entity
+	// would let a later spawn inherit a dead body's jump counter.
+	store := NewMemory(testProfile())
+	store.SetEntity(1, player())
+	store.SetLocomotion(1, movement.Locomotion{JumpTicks: 4})
+
+	changes := sim.ChangeSet{Ops: []sim.Op{{Kind: sim.OpRemoveEntity, Entity: 1}}}
+	if err := store.Apply(changes); err != nil {
+		t.Fatalf("Apply: %v", err)
+	}
+	if _, ok := store.Locomotion().Locomotion(1); ok {
+		t.Fatal("the locomotion state survived the body being removed")
+	}
+}
+
+func TestSnapshotForksLocomotionToo(t *testing.T) {
+	store := NewMemory(testProfile())
+	original := movement.Locomotion{JumpTicks: 7, Yaw: 45}
+	store.SetLocomotion(1, original)
+
+	fork := store.Snapshot()
+	changes := sim.ChangeSet{Ops: []sim.Op{
+		{Kind: sim.OpSetLocomotion, Entity: 1, Locomotion: movement.Locomotion{}},
+	}}
+	if err := store.Apply(changes); err != nil {
+		t.Fatalf("Apply: %v", err)
+	}
+
+	if got, _ := fork.Locomotion().Locomotion(1); got != original {
+		t.Fatalf("the fork followed its origin: %+v", got)
+	}
+}

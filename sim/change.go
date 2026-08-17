@@ -5,6 +5,7 @@ import (
 
 	"github.com/go-theft-craft/minecraft-simulation/entity"
 	"github.com/go-theft-craft/minecraft-simulation/geom"
+	"github.com/go-theft-craft/minecraft-simulation/movement"
 	"github.com/go-theft-craft/minecraft-simulation/world"
 )
 
@@ -18,6 +19,8 @@ const (
 	OpRemoveEntity
 	// OpSetBlock writes a block state.
 	OpSetBlock
+	// OpSetLocomotion writes a body's movement state.
+	OpSetLocomotion
 )
 
 // String returns the kind's name.
@@ -29,6 +32,8 @@ func (o OpKind) String() string {
 		return "remove-entity"
 	case OpSetBlock:
 		return "set-block"
+	case OpSetLocomotion:
+		return "set-locomotion"
 	default:
 		return fmt.Sprintf("OpKind(%d)", uint8(o))
 	}
@@ -47,6 +52,10 @@ type Op struct {
 	State  entity.State
 	Block  geom.BlockPos
 	Ref    world.BlockRef
+	// Locomotion is the movement state OpSetLocomotion writes. It is a separate
+	// field rather than part of State because entity.State is geometry and
+	// motion, and because a tick may change one without the other.
+	Locomotion movement.Locomotion
 }
 
 // ChangeSet is every state change one tick produced.

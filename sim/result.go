@@ -2,6 +2,7 @@ package sim
 
 import (
 	"github.com/go-theft-craft/minecraft-simulation/entity"
+	"github.com/go-theft-craft/minecraft-simulation/movement"
 	"github.com/go-theft-craft/minecraft-simulation/world"
 )
 
@@ -38,6 +39,11 @@ type TickInput struct {
 	Blocks world.View
 	// Entities are the bodies the tick reads.
 	Entities entity.View
+	// Locomotion is the movement state the tick reads. It may be nil: a consumer
+	// that holds bodies without movement state, or a profile whose rules do not
+	// read one, is not required to supply a view. A phase then finds every body
+	// absent rather than finding a zero state that would stand still forever.
+	Locomotion movement.LocomotionView
 	// Scope names what the tick simulates.
 	Scope Scope
 	// Commands are the intents this tick was asked to apply, in order.

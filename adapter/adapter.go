@@ -102,14 +102,15 @@ func Drive(
 	}
 
 	input := sim.TickInput{
-		Profile:  kernel.Profile(),
-		Revision: store.Revision(),
-		Tick:     source.Tick(),
-		Blocks:   store.Blocks(),
-		Entities: store.Entities(),
-		Scope:    source.Scope(),
-		Commands: source.Commands(),
-		Limits:   source.Limits(),
+		Profile:    kernel.Profile(),
+		Revision:   store.Revision(),
+		Tick:       source.Tick(),
+		Blocks:     store.Blocks(),
+		Entities:   store.Entities(),
+		Locomotion: store.Locomotion(),
+		Scope:      source.Scope(),
+		Commands:   source.Commands(),
+		Limits:     source.Limits(),
 	}
 
 	result, err := kernel.Step(ctx, input)

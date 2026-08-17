@@ -86,14 +86,15 @@ func (k *kernel) Step(ctx context.Context, input TickInput) (TickResult, error) 
 	}
 
 	state := &TickState{
-		profile:  k.profile,
-		tick:     input.Tick,
-		limits:   input.Limits.withDefaults(),
-		scope:    input.Scope,
-		blocks:   input.Blocks,
-		entities: input.Entities,
-		commands: input.Commands,
-		random:   input.Random.Clone(),
+		profile:    k.profile,
+		tick:       input.Tick,
+		limits:     input.Limits.withDefaults(),
+		scope:      input.Scope,
+		blocks:     input.Blocks,
+		entities:   input.Entities,
+		locomotion: input.Locomotion,
+		commands:   input.Commands,
+		random:     input.Random.Clone(),
 	}
 
 	for _, phase := range k.phases {
@@ -183,6 +184,23 @@ func assertNoNaN(result TickResult) error {
 		}
 		if boxHasNaN(op.State.Box) {
 			return fmt.Errorf("%w: operation %d entity %d box", ErrNaNInResult, index, op.Entity)
+		}
+		// The locomotion fields are float32, and a NaN yaw is as fatal as a NaN
+		// motion: it indexes the sine table, so it would move the body somewhere
+		// arbitrary rather than nowhere.
+		for _, field := range []struct {
+			name  string
+			value float32
+		}{
+			{"yaw", op.Locomotion.Yaw},
+			{"pitch", op.Locomotion.Pitch},
+			{"move speed", op.Locomotion.MoveSpeed},
+			{"jump factor", op.Locomotion.JumpFactor},
+		} {
+			if field.value != field.value {
+				return fmt.Errorf("%w: operation %d entity %d %s",
+					ErrNaNInResult, index, op.Entity, field.name)
+			}
 		}
 	}
 

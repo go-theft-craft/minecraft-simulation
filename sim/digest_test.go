@@ -5,6 +5,7 @@ import (
 
 	"github.com/go-theft-craft/minecraft-simulation/entity"
 	"github.com/go-theft-craft/minecraft-simulation/geom"
+	"github.com/go-theft-craft/minecraft-simulation/movement"
 )
 
 func sampleResult() TickResult {
@@ -18,6 +19,9 @@ func sampleResult() TickResult {
 				Motion: geom.Vec3{Y: -0.0784000015258789},
 			}},
 			{Kind: OpSetBlock, Block: geom.BlockPos{X: 1, Y: 2, Z: 3}, Ref: 9},
+			{Kind: OpSetLocomotion, Entity: 1, Locomotion: movement.Locomotion{
+				JumpTicks: 10, Yaw: 90, MoveSpeed: 0.10000000149011612, JumpFactor: 0.02,
+			}},
 		}},
 		Domain:       []DomainEvent{{Kind: "movement.collided", Entity: 1}},
 		Presentation: []PresentationEvent{{Kind: "movement.step", Entity: 1}},
@@ -78,7 +82,15 @@ func TestDigestNoticesEveryField(t *testing.T) {
 		"an outcome":           func(r *TickResult) { r.Outcomes[0].Accepted = false },
 		"random state":         func(r *TickResult) { r.Random = r.Random.WithStream("world", 8) },
 		"a read dependency":    func(r *TickResult) { r.Read[0].Block.X = 2 },
-		"completeness":         func(r *TickResult) { r.Completeness = Completeness{} },
+		"locomotion": func(r *TickResult) {
+			r.Changes.Ops[2].Locomotion.JumpTicks++
+		},
+		"a locomotion float": func(r *TickResult) {
+			// One float32 step away, which a float64 encoding of the same field
+			// would also notice; the width is pinned by the encoder's own test.
+			r.Changes.Ops[2].Locomotion.Yaw = 90.00001
+		},
+		"completeness": func(r *TickResult) { r.Completeness = Completeness{} },
 	} {
 		t.Run(name, func(t *testing.T) {
 			result := sampleResult()
