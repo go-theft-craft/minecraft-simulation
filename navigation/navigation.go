@@ -85,3 +85,8 @@ func (c Capability) cheapest() float64 {
 
 	return lowest
 }
+
+// query returns the terrain query this capability asks with.
+func (c Capability) query(view terrainView, facts terrain.Facts) terrain.Query {
+	return terrain.Query{View: view, Facts: facts, Body: c.Body, Limit: c.CandidateLimit}
+}

@@ -4,7 +4,13 @@ import (
 	"fmt"
 
 	"github.com/go-theft-craft/minecraft-simulation/geom"
+	"github.com/go-theft-craft/minecraft-simulation/world"
 )
+
+// terrainView is the view a search reads. It is world.View under another name
+// so that this package's signatures say what they need rather than repeating
+// the composite everywhere.
+type terrainView = world.View
 
 // EdgeKind names one way of getting from one cell to the next.
 //
