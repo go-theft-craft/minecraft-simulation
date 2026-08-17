@@ -49,7 +49,7 @@ func radians(yaw float32) float32 { return yaw * pi / 180 }
 // Widening earlier than step four changes the result in its last bits, and a
 // hundred ticks of that is a position a server corrects.
 func ApplyHeading(table Table, motion geom.Vec3, strafe, forward, speed, yaw float32) geom.Vec3 {
-	magnitude := strafe*strafe + forward*forward
+	magnitude := float32(strafe*strafe) + float32(forward*forward)
 	if magnitude < inputThreshold {
 		return motion
 	}
@@ -67,8 +67,25 @@ func ApplyHeading(table Table, motion geom.Vec3, strafe, forward, speed, yaw flo
 	sin := table.Sin(angle)
 	cos := table.Cos(angle)
 
-	motion.X += float64(strafe*cos - forward*sin)
-	motion.Z += float64(forward*cos + strafe*sin)
+	// Every product is converted to float32 before it is added or subtracted,
+	// and the conversions are load-bearing rather than decorative.
+	//
+	// Go permits an implementation to fuse a multiply and an add into one
+	// operation with a single rounding, unless an explicit conversion rounds the
+	// intermediate. On arm64 it takes that permission: the determinism matrix
+	// found linux-arm64, macos-arm64, and windows-arm64 disagreeing with both
+	// amd64 targets on exactly the three recordings where strafe and forward are
+	// both non-zero — the runs where these expressions have two products to fuse.
+	// The runs with forward alone agreed, because the other product is zero and
+	// fusing it changes nothing.
+	//
+	// The unfused answer is the correct one, not merely the majority one: Java
+	// never contracts a multiply and an add unless Math.fma is called, so the
+	// game computes each product separately, and the oracle checked this
+	// module's unfused arithmetic against the game over 4,800 ticks. An arm64
+	// build without these conversions was producing positions vanilla does not.
+	motion.X += float64(float32(strafe*cos) - float32(forward*sin))
+	motion.Z += float64(float32(forward*cos) + float32(strafe*sin))
 
 	return motion
 }

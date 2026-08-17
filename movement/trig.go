@@ -62,5 +62,8 @@ func (t Table) Sin(angle float32) float32 {
 // negative one, because truncation toward zero rounds the sum differently than
 // it rounds the product.
 func (t Table) Cos(angle float32) float32 {
-	return t.entries[int32(angle*tableScale+float32(cosineOffset))&(TableSize-1)]
+	// The product is converted before the quarter turn is added, for the reason
+	// ApplyHeading spells out: a multiply feeding an add is fusable, arm64 fuses
+	// it, and a fused index is a different table entry.
+	return t.entries[int32(float32(angle*tableScale)+float32(cosineOffset))&(TableSize-1)]
 }
