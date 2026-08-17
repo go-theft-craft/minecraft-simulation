@@ -15,16 +15,27 @@ persistence, rendering, and AI remain outside this repository.
 | `collision` | Swept candidate gathering and vanilla-order axis resolution with step-up |
 | `entity` | Entity identity, physics families, and the body state a tick moves |
 | `sim` | The tick contract: input, result, canonical digest, profile, phases, kernel |
+| `movement` | The movement rules a profile's phases call: friction, heading, jump, gravity, drags |
 | `runtime` | The store, its revision check, and a runner that drives one tick after another |
 | `adapter` | The seam a consumer implements to drive one kernel, and the tick assembly they share |
+| `profile/java/v1_8` | Java Edition 1.8.9: the constants, the block table, the widths, and the tick's phase order |
+| `mctest` | Recorded trajectories and a replay that needs no jar |
 
 Packages depend in one direction only:
 
 ```text
-geom  ->  world  ->  entity  ->  sim  ->  runtime
-              \                   ^
-               \-> collision -----/
+geom  ->  world  ->  entity  ->  movement  ->  sim  ->  runtime  ->  adapter
+              \                     ^
+               \-> collision -------/
+
+profile/java/v1_8  ->  sim, movement, and one version's game data
+mctest             ->  sim, runtime, movement
 ```
+
+`profile/java/v1_8` is the only package here that imports game data. Everything
+below it is version neutral: a rule that needs a 1.8.9 number receives it as an
+argument, which is what lets 26.1.2 reuse the same rules while disagreeing about
+almost every constant.
 
 The `Profile` interface lives in `sim` rather than in a `profile` package of its
 own. A profile supplies the kernel's tick phases and a phase is written against
@@ -49,22 +60,54 @@ swept region, motion resolves along Y then X then Z with the body translated
 after each axis, and a blocked horizontal move retries with a step-up whose
 winner is the outcome that travels further in the horizontal plane.
 
+## Float widths are part of the rules
+
+Java Edition computes some quantities as `float` and others as `double`, and the
+difference is visible: a product formed at single width and one formed at double
+width disagree in their last bits, and a hundred ticks of that is a position a
+server corrects.
+
+So a `float32` in a signature here is a statement about the game, not an
+optimization, and it is never widened early. The rule is:
+
+- Every value the game holds as a `float` is a `float32` here, and every product
+  whose operands are all `float` in the game is formed at single width.
+- A product that mixes the two — a `float` constant against a `double` motion —
+  is formed at double width, because that is what Java does when it widens the
+  constant to meet the motion. Both drags are this shape.
+- The widening happens once, where the game widens it, and nowhere else.
+- `float32` is confined to `profile/java/v1_8` and to the rules in `movement`
+  that the profile hands single-width constants to. `geom`, `world`, `collision`,
+  `entity`, `sim`, and `runtime` see `float64` only.
+
+Four of the six things the movement oracle caught were width or expression
+mistakes that every test written from prose had passed. A later contributor who
+sees a `float32` and assumes it is a slip will reintroduce them.
+
 ## Checking against the game
 
 `internal/oracle` compares this module against a real Java Edition 1.8.9
 server. It compiles a small harness against the locally prepared, deobfuscated
-server jar and runs the game's own `AxisAlignedBB` methods and its own
-`Entity.moveEntity` — including the candidate gathering, the axis passes, the
-two step-up attempts, and the settle — then requires the resulting box to be
-bit-identical to what `collision.Resolve` produces, and the collision flags to
-agree.
+server jar and runs the game's own code: the `AxisAlignedBB` methods, the whole
+of `Entity.moveEntity` — candidate gathering, axis passes, the two step-up
+attempts, and the settle — and a whole movement tick through
+`EntityLivingBase.onLivingUpdate`, which is the jump counter, the motion
+threshold, the input decay, the friction lookup, the heading, the move, gravity,
+and the two drags. The results must be bit-identical to ours, every tick.
+
+The movement gate runs six scenarios — walk, sprint, jump, sneak, fall, and
+collide — over eight randomly obstructed rooms each, a hundred ticks apiece,
+and compares position, motion, and the collision flags at every tick rather
+than at the end: the first differing tick names the rule that drifted, where a
+final position names only the scenario.
 
 The harness supplies a block lookup and a minimal entity. It reimplements no
 game logic, and no game source is committed. The jar is not committed either,
 so these tests skip when the workspace, `javac`, or `java` is absent; run
 `task reference:prepare` to make them run.
 
-Two behaviours were found this way rather than by reading:
+Six behaviours were found this way rather than by reading. Each had passed
+every test written from a careful reading of the game:
 
 - A step-up records the settle as its Y motion, not the climb plus the settle,
   which is why a step leaves the vertical collision flag describing the descent
@@ -73,6 +116,51 @@ Two behaviours were found this way rather than by reading:
 - `stepHeight` is a `float` widened where it is applied, so a player steps with
   `float64(float32(0.6))`. Passing the round `0.6` moves the resulting box in
   its last bits.
+- A player's box is not 0.6 wide and 1.8 tall. The game halves a `float` width
+  and adds a `float` height to a `double` position, so the body reaches
+  `0.30000001192092896` from its centre and stands `1.7999999523162842` tall.
+- Both drags are `double` products. The constants are `float` and the motion is
+  a `double`, so Java widens the constant to meet it. Narrowing the motion
+  first is a different number, and it is wrong for a body doing nothing but
+  standing on a floor.
+- The heading converts degrees in two `float` steps — multiply by a `float` pi,
+  then divide by 180 — while the jump impulse three rules away multiplies by a
+  single pre-divided constant. They are different expressions in the game and
+  they disagree, and at some yaws they read neighbouring entries of the sine
+  table.
+- The tick discards any component of motion whose magnitude is below `0.005`,
+  before the jump. Nothing had described this rule, and without it a body
+  walking at any angle other than square on diverges within four ticks.
+
+Two divergences are known and recorded rather than fixed. The vertical clamp is
+not a rule of the tick at all: the game calls the landing behaviour of the block
+under the body's feet, whose default zeroes the vertical motion and whose slime
+override negates it, bouncing the body. This module implements the default and
+has no per-block landing hook, so slime is kept out of the differential worlds
+and its slipperiness is unchecked against the game. And the sneak scale is a
+transform the 1.8.9 client applies to its own input before it sends it, so the
+server entity the harness drives never sees it; it is folded into the profile at
+the width the client computes it, and it is indistinguishable from the
+single-width product for the axes a keyboard actually produces.
+
+## Replaying without a jar
+
+`mctest` replays recorded trajectories against a profile, with no JDK, no jar,
+and no prepared workspace. The fixtures in `mctest/testdata` are the six
+scenarios above, and every expectation in them is the game's own answer,
+recorded by the oracle rather than by us: a fixture and the differential test
+cannot disagree about what vanilla does, only about whether this module still
+matches it.
+
+Regenerating them is deliberate and leaves a diff:
+
+```bash
+devbox run -- go test ./internal/oracle/ -run TestGenerateFixtures -args -write-fixtures
+```
+
+Without that flag the same test checks the committed fixtures still say what the
+jar says, so a fixture that has drifted from the game is reported where the game
+is present rather than surfacing later as an unexplained replay failure.
 
 Vanilla Java research uses the separate
 [`minecraft-reference`](https://github.com/go-theft-craft/minecraft-reference)

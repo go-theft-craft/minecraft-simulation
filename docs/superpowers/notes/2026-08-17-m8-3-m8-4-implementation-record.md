@@ -1,9 +1,10 @@
 # M8.3 and M8.4: what was implemented, what diverged, what the data said
 
-Written 2026-08-17, at the point M8.4 Task 7 landed and Task 8 had not started.
-It records the state of the work, every deviation from the two plans, and the
-findings that came out of measurement rather than reading. It is not a plan: the
-plans are `2026-08-17-m8-3-kernel-contracts.md` and
+Written 2026-08-17 at the point M8.4 Task 7 landed, and extended the same day
+when Tasks 8, 9, and 10 completed the milestone. It records the state of the
+work, every deviation from the two plans, and the findings that came out of
+measurement rather than reading. It is not a plan: the plans are
+`2026-08-17-m8-3-kernel-contracts.md` and
 `2026-08-17-m8-4-v1-8-player-movement.md`, and this note says where the code
 differs from them and why.
 
@@ -15,16 +16,18 @@ runs and is pinned in `sim/kernel_test.go`, and a change set based at revision N
 is refused by a store at revision N+1 with nothing written
 (`runtime/runner_test.go`).
 
-**M8.4 is at Task 7 of 10.** `movement` holds the eleven rules of the 1.8.9 land
-tick and `profile/java/v1_8` supplies the constants, the sine table, the block
-table, and the phase order. Commits `d7add26`, `286349a`, `16ffc19`, `e8b96ff`,
-`d8af4c0`, `844557e`, `3029754`.
+**M8.4 is complete.** `movement` holds the rules of the 1.8.9 land tick,
+`profile/java/v1_8` supplies the constants, the sine table, the block table, and
+the phase order, and both are checked against the game rather than asserted.
+Commits `d7add26`, `286349a`, `16ffc19`, `e8b96ff`, `d8af4c0`, `844557e`,
+`3029754`, `525b381`, `28963f4`.
 
-Not started: **Task 8**, the movement oracle, which is the milestone's real gate;
-**Task 9**, fixtures generated from the game plus the `mctest` replay runner; and
-**Task 10**, the milestone record. Until Task 8 runs, every constant and every
-order in the tick is *asserted* rather than checked against the game. That is the
-gap this note exists to keep visible.
+Both gates pass. The differential test runs six scenarios over eight randomly
+obstructed rooms each, a hundred ticks apiece — 4,800 ticks — and compares
+position, motion, and the collision flags against
+`EntityLivingBase.onLivingUpdate` bit for bit at every tick. The committed
+fixtures replay the same six scenarios with no JDK, no jar, and no prepared
+workspace, and every expectation in them is the jar's answer rather than ours.
 
 `devbox run -- task verify` passes, M8.2's oracle included.
 
@@ -146,24 +149,88 @@ the code. Each is in a commit message too.
    does not implement. The test asserts the default and says why.
 6. **The input-decay phase applies the sneak factor before the 0.98 decay**, and
    the jump-countdown phase also adopts the tick's input flags and facing, because
-   every phase after it reads them. Both orderings are Task 8's to confirm.
+   every phase after it reads them. Task 8 confirmed both orderings.
+7. **The tick has twelve phases, not eleven.** `v1_8.motion-threshold` runs
+   between the countdown and the jump. The plan's tick had eleven steps and did
+   not describe this one; the oracle did.
+8. **`sim` gained `BlockNames`**, an optional interface for resolving a block
+   name to a handle. Task 9 needed it: a fixture describes its world by name,
+   because a handle is meaningless outside the profile that minted it, and no
+   rule ever looks a block up by name so the lookup does not belong on
+   `sim.Profile`.
+9. **A fixture describes its world as a filled region plus named boxes**, not the
+   plan's list of named cells. A floor written cell by cell is four hundred
+   entries of stone, and the plan asks for a regeneration to leave a diff
+   somebody can read.
 
-## What Task 8 has to settle
+## What Task 8 settled
 
-The three places where the implementation is a considered reading rather than a
-measurement:
+The three readings it was pointed at all held. Gravity and the two drags do run
+after the move, in that order; sneak scaling does precede the per-tick input
+decay; and `Cos` does add its quarter turn as a float before the truncation —
+2,400 ticks of walking, turning past zero and through negative yaws, agree.
 
-- **Gravity and the two drags run after the move**, in that order.
-- **Sneak scaling precedes the per-tick input decay.**
-- **`Cos` adds its quarter turn as a float before the truncation**, not to the
-  truncated index. The two agree for a positive angle and disagree for a negative
-  one, so only a negative-yaw case separates them.
+The Java risk did not materialise. A minimal `EntityLivingBase` subclass works
+and `EntityPlayerMP` was not needed: `getAIMoveSpeed` on a non-player living
+entity returns a plain field, `setAIMoveSpeed` sets it, and the only abstract
+methods left are the four equipment accessors. Nearby-entity pushing and the
+fall-state callback are overridden away, because the stub world has no chunk
+provider to find a second entity with and fall damage is not movement.
 
-The known risk on the Java side: M8.2's harness subclasses `Entity`, and a whole
-movement tick needs `EntityLivingBase`, which is abstract and reads its movement
-speed from an attribute map rather than a field. The plan's fallback is
-`EntityPlayerMP`, which is concrete but needs more setup. Try the subclass first
-and record which worked.
+Driving `onLivingUpdate` rather than assembling the tick from `jump` and
+`moveEntityWithHeading` was the decision that made the gate worth having: the
+jump counter is private to `EntityLivingBase`, so the only honest way to check a
+counter is to let the game keep it, and the motion threshold below would not have
+been found by a harness that only called the two methods the plan named.
+
+### What it found
+
+Four rules were wrong, and each had passed every test written from prose:
+
+1. **The player's box is not 0.6 by 1.8.** The game halves a float width and adds
+   a float height to a double position, so the body reaches
+   `0.30000001192092896` from its centre and stands `1.7999999523162842` tall.
+   Caught on the tick the body was created, before a rule had run.
+2. **Both drags are double products.** The constants are floats and the motion is
+   a double, so Java widens the constant to meet it. Our rules narrowed the
+   motion first, which is a different number, and it was wrong for a body doing
+   nothing but standing on a floor.
+3. **The heading converts degrees in two float steps.** `yaw * pi_f / 180`, not
+   `yaw * (pi/180)_f`. The jump impulse three rules away really does use the
+   pre-divided constant, so both forms are in the game and they disagree: at some
+   yaws they read neighbouring entries of the sine table. Found as a body that
+   drifted four millionths of a block per tick along one axis while matching
+   exactly along the other.
+4. **The tick discards any component of motion below `0.005`, before the jump.**
+   No plan described this rule. Without it a body walking at any angle other than
+   square on diverges within four ticks. It is a twelfth phase,
+   `v1_8.motion-threshold`.
+
+### What it could not reach
+
+Two things, both recorded rather than fixed:
+
+- **The vertical clamp is not a rule of the tick.** The game calls the landing
+  behaviour of the block under the body's feet, whose default zeroes the vertical
+  motion — which is what we implement — and whose slime override negates it,
+  bouncing the body. There is no per-block landing hook here, so slime is kept
+  out of the differential worlds and its slipperiness is unchecked against the
+  game. The hook belongs with M9's block behaviours.
+- **The sneak scale is a client transform.** The 1.8.9 client scales its own
+  input on the way out, as `(float)(axis * 0.3)`, and the server entity the
+  harness drives never sees an unscaled axis. It is folded into the profile at
+  that width and pinned by a unit test with an axis searched for because it
+  separates the two widths — for the -1, 0, and 1 a keyboard produces they are
+  identical, so nothing measurable could have decided it either way.
+
+Two smaller things worth carrying forward. Sprinting is not a rule of the tick
+either: it raises the movement-speed attribute by 30% and the air factor by the
+same fraction, both in `EntityPlayer.onLivingUpdate` and both *after* the
+movement runs, so the values a tick multiplies by are the previous tick's.
+Whatever fills `Locomotion` owns that. And the sneak edge-guard that stops a
+crouching player walking off a ledge is gated on `instanceof EntityPlayer`, so
+neither the harness's stub nor our collision applies it; a real player at a real
+server will, which is M8.8's problem to notice.
 
 ## What needs a person
 
