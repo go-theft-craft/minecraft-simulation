@@ -1,0 +1,315 @@
+# M8.8 Consumer Integration Implementation Plan
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+
+**Goal:** Run one kernel from both consumers — the headless client predicting locally, the server deciding authoritatively — and prove it by connecting to a real vanilla Java Edition 1.8.9 server and executing scripted input that draws zero correction packets.
+
+**Architecture:** `minecraft-simulation` gains a small adapter contract and nothing else; the simulation does not learn about packets. `headless-minecraft` gains an outbound action path, a prediction loop that forks a snapshot, and correction handling that discards the fork and replays retained commands. `server` drives the same kernel through `runtime.Runner` and treats its result as authoritative.
+
+**Tech Stack:** Go 1.26.6, `minecraft-protocol`, a pinned vanilla 1.8.9 server jar, Devbox, go-task.
+
+## What this milestone closes, and what it discovers
+
+This is the milestone the whole subproject is arranged around. It is the first point where the simulation faces something that disagrees with it for reasons of its own, and the first check that survives being wrong in the fifteenth decimal place: a vanilla server accumulates our error tick after tick and eventually teleports us back.
+
+Two prerequisites are in place. M6.3 delivered a headless client that reaches play on protocol 47, and M7 delivered observed world state with immutable snapshots and wire-ordered reducers, including a player domain that already models the server's relative-position updates. M8.4 delivered movement checked against the game's own bytecode, so a correction here is unlikely to mean a wrong constant.
+
+Two prerequisites are missing, and finding that out is why this plan starts where it does.
+
+**The client cannot send gameplay packets.** Its send path is unexported and M7's scope was observation. There is no public way to tell the server where the player went. That is the first task, it belongs to `headless-minecraft`, and it is a genuine API addition rather than plumbing.
+
+**Only offline mode is available.** M6.4, Microsoft device-code authentication, is postponed by deliberate decision, and the master plan already records the cost: "every check from here runs against offline mode, including M8's and M9's vanilla lanes." A local vanilla server in offline mode is a complete oracle for movement, so this milestone is not blocked — but the gate must state that it ran offline, and nothing here should be read as evidence about online-mode behaviour.
+
+## Global Constraints
+
+- Repositories touched: `minecraft-simulation` (the adapter contract), `headless-minecraft` (prediction), `server` (authority).
+- **The simulation learns nothing about packets.** No package in `minecraft-simulation` gains a protocol import in this milestone. Commands and events cross the boundary; wire types do not.
+- **One kernel, two drivers.** If the client and the server need different rules to agree with vanilla, that is a finding about the rules and it is fixed in the profile, not by giving each consumer its own variant. Two variants would make the milestone's claim untrue while appearing to pass.
+- The live check needs a pinned server jar, runs in offline mode, and is opt-in: an ordinary `task verify` must not download or start a server. It skips when the jar is absent, the way the M8.2 oracle skips without a JDK.
+- No decompiled Java, no Mojang asset, and no game jar committed, in any repository.
+- Formatting and commit conventions as in the other plans. No `Co-Authored-By` or `Claude-Session` trailer.
+
+## Design decisions this plan settles
+
+### A correction is defined before it is counted
+
+The exit criterion is "zero corrections", and a vanilla 1.8.9 server sends the player a position-and-look packet during login as a matter of course. Counting that as a correction would make the gate impossible to pass; ignoring position packets generally would make it impossible to fail.
+
+A correction is therefore defined as a clientbound player position-and-look packet received **after** the client has acknowledged the login sequence and begun sending its own positions. The acknowledgement boundary is explicit state in the prediction loop, not a timeout, because a timeout would make the gate flaky on a slow machine and flaky gates get deleted.
+
+Two further signals are counted alongside it, because a server can disagree without teleporting: the server's "moved wrongly" and "moved too quickly" log lines, and any velocity packet the scripted input should not have provoked. The gate reports all three and requires all three to be zero. Reading the server log is what catches the case where the server tolerates our drift for a while — a check that watched only for teleports would call that a pass.
+
+### Prediction forks a snapshot; a correction throws the fork away
+
+This is the parent design's rule and it is adopted unchanged: "The client can apply predicted change sets to a forked snapshot. After a server correction, the client discards the affected fork and replays retained commands from the new authoritative snapshot."
+
+`runtime.Memory.Snapshot` from M8.3 is the fork. The revision check is what makes discarding safe: a predicted change set is computed against the fork's revision, so it can never be applied to the authoritative store by accident. That is the property M8.3's second gate proved, and this milestone is where it earns its place.
+
+Retained commands are kept in a bounded ring. Unbounded retention is a memory leak that only appears under a server that stops responding, which is precisely when a client is least able to afford one.
+
+### The server is authoritative and does not predict
+
+`server` drives `runtime.Runner` directly: build input from its store, step, apply. It keeps no fork, because it has nothing to reconcile against. That asymmetry is the whole point of the two adapters — they share the kernel and differ in what they do with a result — and a shared "adapter" abstraction that hid it would be a worse design than two small drivers.
+
+### The adapter contract is small enough to be obviously correct
+
+`minecraft-simulation` gains one package, `adapter`, holding the seam both consumers implement: how a tick's input is assembled, and what a consumer does with a result. It holds no networking, no packet types, and no goroutines. If it grows past a couple of hundred lines, the wrong thing is being pushed into it.
+
+## File structure
+
+```text
+minecraft-simulation/
+  adapter/adapter.go          The seam: Source, Sink, and a Drive helper
+  adapter/adapter_test.go
+
+headless-minecraft/
+  client/action.go            The outbound action path
+  client/action_test.go
+  predict/predict.go          The prediction loop, forks, and reconciliation
+  predict/reconcile.go
+  predict/*_test.go
+  internal/vanilla/server.go  Launching a pinned vanilla server for tests
+  client/vanilla_e2e_test.go  The zero-corrections gate
+  Taskfile.yml                A test:vanilla task, opt-in
+
+server/
+  internal/sim/driver.go      Driving the kernel authoritatively
+  internal/sim/driver_test.go
+```
+
+---
+
+## Task 1: An outbound action path for the client
+
+**Repository:** `headless-minecraft`
+
+**Files:**
+- Create: `client/action.go`
+- Test: `client/action_test.go`
+
+**Interfaces:**
+- Produces:
+  - `type Action interface { ... }` — a version-neutral outbound intent
+  - `func (c *Client) Do(ctx context.Context, action Action) error`
+  - `ActionMove`, `ActionLook`, `ActionMoveLook`, and `ActionGround` as the concrete intents this milestone needs
+  - `version.Adapter` gains the encoding of an action for its protocol
+
+M7 stopped at observation, so this is where the client learns to act. The intents are version-neutral for the same reason the rest of the module is: protocol 47 and protocol 775 encode player movement differently, and the profile-selected adapter is where that difference belongs. `version.Adapter` already carries `Handshake` for the same reason, so the pattern exists.
+
+`Do` is the only public entry point, it is serialized against the loop's writer, and it returns an error rather than swallowing one, because a caller predicting locally needs to know its intent never left.
+
+**Movement packets are stateful in protocol 47** in a way the encoding must respect: the client sends position, look, position-and-look, or a bare ground flag depending on what changed, and a server that receives the wrong one for the wrong reason will disagree. Establish which packet a tick should send from the same reference workspace the rest of M8 used, and record the rule in the doc comment.
+
+- [ ] **Step 1: Write the failing test**
+
+Cover: each action encodes to the expected packet on protocol 47 and on protocol 775, asserted against the generated codecs rather than against bytes typed by hand; `Do` before the client reaches play returns an error naming the state; `Do` after close returns an error rather than blocking; and concurrent `Do` calls are serialized, which a test with two goroutines and a recording writer can establish.
+
+- [ ] **Step 2 to 6: Fail, implement, verify, check, commit**
+
+```bash
+cd ../headless-minecraft
+git add client/action.go client/action_test.go
+git commit -m "feat(client): add a version-neutral outbound action path"
+```
+
+---
+
+## Task 2: The adapter seam
+
+**Repository:** `minecraft-simulation`
+
+**Files:**
+- Create: `adapter/adapter.go`
+- Test: `adapter/adapter_test.go`
+
+**Interfaces:**
+- Produces:
+  - `type Source interface { Tick() sim.Tick; Commands() []sim.Command; Limits() sim.Limits; Scope() sim.Scope }`
+  - `type Sink interface { Apply(sim.ChangeSet) error; Observe(sim.TickResult) }`
+  - `func Drive(ctx context.Context, kernel sim.Kernel, store runtime.Store, source Source, sink Sink) (sim.TickResult, error)`
+
+`Drive` is the one piece of logic both consumers share: assemble a `sim.TickInput` from the store and the source, step the kernel, hand the result to the sink, and apply the change set only when the result is complete. Everything version-specific, network-specific, or policy-specific is on the far side of `Source` and `Sink`.
+
+`Observe` receives every result, complete or not, because a client needs to know a tick was incomplete in order to stop predicting until its chunks arrive, and a server needs to log it.
+
+- [ ] **Step 1: Write the failing test**
+
+Cover: `Drive` applies a complete result and does not apply an incomplete one; the store's revision reaches the input as the base revision; `Observe` sees both kinds; a sink error propagates and the store is unchanged; and a cancelled context returns without stepping.
+
+- [ ] **Step 2 to 6: Fail, implement, verify, check, commit**
+
+```bash
+git add adapter/
+git commit -m "feat(adapter): add the consumer seam over one kernel"
+```
+
+---
+
+## Task 3: The server driver
+
+**Repository:** `server`
+
+**Files:**
+- Create: `internal/sim/driver.go`
+- Test: `internal/sim/driver_test.go`
+
+The authoritative side is the simpler of the two and it goes first, because a bug here is a bug in the shared path and finding it without a network in the way is cheaper.
+
+The driver owns a `runtime.Memory`, a kernel built from the v1_8 profile, and a per-connection command queue that a player's movement packets feed. It steps once per game tick and turns the result's domain events into outbound packets.
+
+`server` is the harness M9 and M10 both need, so this driver must not become the only way to run it: a server with no simulation attached must still accept connections, exactly as it does today.
+
+- [ ] **Step 1: Write the failing test**
+
+Cover: a connected player's movement command moves the body in the store; an unknown command produces a rejected outcome without aborting the tick; a tick that reads an unloaded region is not applied and is logged; and the driver can be absent entirely without breaking the existing connection tests.
+
+- [ ] **Step 2 to 6: Fail, implement, verify, check, commit**
+
+```bash
+cd ../server
+git add internal/sim/
+git commit -m "feat(sim): drive the shared kernel authoritatively"
+```
+
+---
+
+## Task 4: The prediction loop
+
+**Repository:** `headless-minecraft`
+
+**Files:**
+- Create: `predict/predict.go`, `predict/reconcile.go`
+- Test: `predict/*_test.go`
+
+**Interfaces:**
+- Produces:
+  - `type Loop struct { ... }` with `New`, `Start`, `Close`
+  - `func (l *Loop) Input(movement.Input)` — the caller's intent for the next tick
+  - `func (l *Loop) Predicted() world.PlayerView` — what the client currently believes
+  - `type Correction struct { Tick sim.Tick; From, To geom.Vec3 }` published as an event
+
+The loop, once per tick: take the caller's input, build a command, `Drive` against the forked store, send the resulting position through `client.Do`, and retain the command.
+
+On a correction: replace the fork with a store built from the authoritative observed snapshot, drop retained commands the server has acknowledged, replay the rest, and publish a `Correction` event. Publishing it matters beyond diagnostics — the gate counts these, and a consumer wants to know its prediction was wrong.
+
+Reconciliation is where the subtle bugs live, so the tests are the deliverable as much as the code:
+
+- A correction that agrees with the prediction to within the wire's precision must still reset the fork, because 1.8.9 transmits positions as fixed point in units of one thirty-second of a block and a client that treated a rounding difference as a disagreement would fight the server forever.
+- A correction arriving while a tick is in flight must not be applied to a half-built state.
+- Retained commands must be bounded, and the bound must be reached in a test rather than reasoned about.
+
+- [ ] **Step 1: Write the failing tests against a scripted server**
+
+The client's existing end-to-end lane already stands up a stub upstream; reuse it. A stub server that teleports on demand is what makes correction handling testable without a jar.
+
+- [ ] **Step 2 to 6: Fail, implement, verify, check, commit**
+
+```bash
+git add predict/
+git commit -m "feat(predict): predict locally and reconcile against corrections"
+```
+
+---
+
+## Task 5: The vanilla gate
+
+**Repository:** `headless-minecraft`
+
+**Files:**
+- Create: `internal/vanilla/server.go`, `client/vanilla_e2e_test.go`
+- Modify: `Taskfile.yml`
+
+**Interfaces:**
+- Produces: `vanilla.Start(t *testing.T, opts vanilla.Options) *vanilla.Server`, with `Addr()`, `LogLines()`, and cleanup registered on the test.
+
+This is the exit criterion. It starts a pinned vanilla 1.8.9 server in offline mode with a fixed seed and a flat or otherwise deterministic world, connects the headless client, runs scripted input, and requires zero corrections.
+
+The harness must:
+
+- **Pin the jar by digest**, and skip with a clear message when it is absent. `task verify` must not download it. The M8.2 oracle's skip behaviour is the model: meaningful where the artifact exists, green where it does not.
+- **Write `eula.txt` and a `server.properties`** with `online-mode=false`, a fixed `level-seed`, `level-type=flat` for the first scenarios, spawn protection off, and view distance small enough to keep chunk loading quick.
+- **Wait for readiness by reading the log**, not by sleeping, and fail with the captured log if the server never becomes ready.
+- **Capture the whole log** so the assertions can search it, and print it on failure. A failing gate whose output is "1 correction" and nothing else will not be diagnosable by whoever sees it next.
+
+Scenarios, matching M8.4's suite: walk a straight line, sprint, jump repeatedly, sneak, fall from height, and walk into a wall. Each runs for at least 200 ticks after the login boundary.
+
+Assertions per scenario:
+
+1. Zero corrections after the acknowledgement boundary.
+2. No "moved wrongly" or "moved too quickly" in the server log.
+3. The client's predicted position and the server's last acknowledged position agree to within the wire's fixed-point precision.
+
+- [ ] **Step 1: Build the harness and confirm it starts and stops cleanly**
+
+Confirm no orphaned process survives a failed test, on a timeout as well as on a normal failure. A test suite that leaks server processes will be disabled by the next person who runs it.
+
+- [ ] **Step 2: Add the opt-in task**
+
+```yaml
+  test:vanilla:
+    desc: Run the vanilla 1.8.9 conformance lane; requires a pinned server jar
+    deps: [deps]
+    cmds:
+      - go test ./client/ -run TestVanilla -tags vanilla -timeout 20m {{.CLI_ARGS}}
+```
+
+- [ ] **Step 3: Run it, and expect to find something**
+
+Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/headless-minecraft && devbox run -- task test:vanilla`
+
+This is the first time the simulation meets a real server, and something will be wrong. The likely causes, in the order they are worth checking:
+
+- **The packet cadence.** Which movement packet, how often, and whether the ground flag matches. This is the most likely cause and has nothing to do with physics.
+- **The tick alignment.** Our tick boundary against the server's twenty per second.
+- **The acknowledgement boundary.** Corrections counted that are not corrections.
+- **A constant.** Least likely, because M8.4 checked them against the game's own bytecode, and the most important reason that milestone was built the way it was.
+
+Record what it actually was. That is the milestone's most valuable output, and if it turns out to be a constant after all, then M8.4's oracle missed something and that fact belongs in the master plan.
+
+- [ ] **Step 4 to 6: Verify, check, commit**
+
+```bash
+git add internal/vanilla/ client/vanilla_e2e_test.go Taskfile.yml
+git commit -m "test(client): gate movement on zero corrections from vanilla 1.8.9"
+```
+
+---
+
+## Task 6: Both profiles, and the milestone record
+
+**Files:** the vanilla harness, `MASTER_PLAN.md`, `README.md`, `CHANGELOG.md` in each repository
+
+- [ ] **Step 1: Run the 26.1.2 lane**
+
+Repeat Task 5 against a pinned 26.1.2 server with the v26_1 profile. If M8.7 found no jar-backed oracle for that version, this is the first real verification of its constants, and a failure here is expected to be a physics problem rather than a cadence problem — the reverse of the 1.8.9 lane's likely causes.
+
+- [ ] **Step 2: Record the milestone honestly**
+
+State in the master plan: that both adapters run one kernel; that the gate passed in **offline mode** and says nothing about online mode until M6.4 is picked up; which scenarios ran on which version; and what the first run found.
+
+- [ ] **Step 3: Changelog, verify, commit**
+
+```bash
+git commit -m "docs(plan): close M8, and what the vanilla gate found"
+```
+
+---
+
+## Definition of done
+
+- One kernel, built from one profile, is driven by both consumers through `adapter.Drive`. Neither consumer has its own movement rules.
+- `minecraft-simulation` gained no protocol import.
+- The client can send version-neutral actions on protocol 47 and protocol 775, serialized against its writer, with errors surfaced.
+- Prediction forks the store, a correction discards the fork and replays retained commands from the authoritative snapshot, retention is bounded, and a difference within the wire's fixed-point precision does not cause the client to fight the server.
+- **Scripted walk, sprint, jump, sneak, fall, and collide draw zero corrections from a real vanilla 1.8.9 server**, with no "moved wrongly" or "moved too quickly" in its log, over at least 200 ticks per scenario after the login boundary.
+- The same suite runs against 26.1.2 with the v26_1 profile.
+- The vanilla lane is opt-in, pins its jar by digest, skips cleanly when it is absent, leaks no server process, and prints the server log on failure.
+- `server` still accepts connections with no simulation attached.
+- `devbox run -- task verify` passes in all three repositories.
+- The master plan records that the gate ran offline, and what the first run found.
+
+## Follow-on
+
+M8 is closed by this milestone. M9 begins, and its first stage is already built: M9.1's capture consumer landed on `relay` and its live check is pending, which is now cheaper to run because this milestone produced a working vanilla harness that M9.1's check can reuse rather than reinvent.
+
+M6.4 remains postponed, and this milestone is the reason to reconsider it: every gate from here is offline-mode only, and the first mechanic whose behaviour differs under authentication will have no check at all until it is picked up.
