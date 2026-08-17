@@ -314,3 +314,123 @@ func TestFindRoutesAroundFire(t *testing.T) {
 		}
 	}
 }
+
+// wellDrop is the fixture the fall-hazard tests share: a start platform whose
+// only way forward is to fall down the x=1 column onto whatever fills the
+// landing cell at (1,-2,0). The caller marks that cell.
+func wellDrop() *world.Blocks {
+	blocks := world.NewBlocks()
+	blocks.Fill(geom.BlockPos{X: -1, Y: -1, Z: -1}, geom.BlockPos{X: 0, Y: -1, Z: 1}, geom.FullCube())
+	blocks.Fill(geom.BlockPos{X: -1, Y: 0, Z: -1}, geom.BlockPos{X: 3, Y: 3, Z: 1}, geom.EmptyShape())
+	blocks.Fill(geom.BlockPos{X: 1, Y: -3, Z: -1}, geom.BlockPos{X: 3, Y: -3, Z: 1}, geom.FullCube())
+	blocks.Fill(geom.BlockPos{X: 1, Y: -2, Z: -1}, geom.BlockPos{X: 3, Y: -1, Z: 1}, geom.EmptyShape())
+
+	return blocks
+}
+
+// The mirror of TestFindRoutesAroundFire, one level down: the only landing a
+// fall can reach is on fire. The body must never take that fall.
+func TestFindRefusesAFallOntoFire(t *testing.T) {
+	blocks := wellDrop()
+	fire := geom.BlockPos{X: 1, Y: -2, Z: 0}
+	blocks.SetBlock(fire, refFire, geom.EmptyShape())
+
+	path, err := Find(
+		context.Background(), blocks, burningFacts{}, walker,
+		geom.BlockPos{X: 0, Y: 0, Z: 0}, geom.BlockPos{X: 3, Y: -2, Z: 0}, wideBudget,
+	)
+	if err != nil {
+		t.Fatalf("Find returned an error: %v", err)
+	}
+	for _, edge := range path.Edges {
+		if edge.To == fire {
+			t.Fatal("the route falls onto fire")
+		}
+	}
+}
+
+// A step whose only arrival cell is fire. The step arm must consult the same
+// gate the walk arm does, so the body never climbs into the flame.
+func TestFindRefusesAStepIntoFire(t *testing.T) {
+	// A one-wide corridor along x at z=0, so the body cannot route around the
+	// rise at x=2. Off-corridor cells are undescribed, and so refused.
+	blocks := world.NewBlocks()
+	blocks.Fill(geom.BlockPos{X: 0, Y: -1, Z: 0}, geom.BlockPos{X: 4, Y: -1, Z: 0}, geom.FullCube())
+	blocks.Fill(geom.BlockPos{X: 0, Y: 0, Z: 0}, geom.BlockPos{X: 4, Y: 3, Z: 0}, geom.EmptyShape())
+	blocks.Set(geom.BlockPos{X: 2, Y: 0, Z: 0}, geom.FullCube())
+	fire := geom.BlockPos{X: 2, Y: 1, Z: 0}
+	blocks.SetBlock(fire, refFire, geom.EmptyShape())
+
+	path, err := Find(
+		context.Background(), blocks, burningFacts{}, walker,
+		geom.BlockPos{X: 0, Y: 0, Z: 0}, geom.BlockPos{X: 4, Y: 0, Z: 0}, wideBudget,
+	)
+	if err != nil {
+		t.Fatalf("Find returned an error: %v", err)
+	}
+	for _, edge := range path.Edges {
+		if edge.To == fire {
+			t.Fatal("the route steps into fire")
+		}
+	}
+}
+
+// The mirror of TestFindRoutesAroundWaterWhenTheBodyCannotSwim, one level down:
+// the only landing a fall can reach is water, and the body cannot swim. It must
+// never fall into water it could never walk into.
+func TestFindRefusesAFallIntoWaterWhenTheBodyCannotSwim(t *testing.T) {
+	blocks := wellDrop()
+	water := geom.BlockPos{X: 1, Y: -2, Z: 0}
+	blocks.SetBlock(water, refWater, geom.EmptyShape())
+
+	path, err := Find(
+		context.Background(), blocks, waterFacts{}, walker,
+		geom.BlockPos{X: 0, Y: 0, Z: 0}, geom.BlockPos{X: 3, Y: -2, Z: 0}, wideBudget,
+	)
+	if err != nil {
+		t.Fatalf("Find returned an error: %v", err)
+	}
+	for _, edge := range path.Edges {
+		if edge.Kind == EdgeSwim {
+			t.Fatal("a body that cannot swim took a swim edge")
+		}
+		if edge.To == water {
+			t.Fatal("a body that cannot swim fell into water")
+		}
+	}
+}
+
+// A capability whose safe fall exceeds the column-walk floor must still reach a
+// legal landing below that floor. maxFallSearch is 32; this drop is 34.
+func TestFindFallsBeyondTheColumnWalkFloor(t *testing.T) {
+	deepFaller := walker
+	deepFaller.SafeFall = 40
+
+	blocks := world.NewBlocks()
+	blocks.Fill(geom.BlockPos{X: -1, Y: -1, Z: -1}, geom.BlockPos{X: 0, Y: -1, Z: 1}, geom.FullCube())
+	blocks.Fill(geom.BlockPos{X: -1, Y: 0, Z: -1}, geom.BlockPos{X: 3, Y: 3, Z: 1}, geom.EmptyShape())
+	blocks.Fill(geom.BlockPos{X: 1, Y: -35, Z: -1}, geom.BlockPos{X: 3, Y: -35, Z: 1}, geom.FullCube())
+	blocks.Fill(geom.BlockPos{X: 1, Y: -34, Z: -1}, geom.BlockPos{X: 3, Y: -1, Z: 1}, geom.EmptyShape())
+
+	landing := geom.BlockPos{X: 1, Y: -34, Z: 0}
+	path, err := Find(
+		context.Background(), blocks, nil, deepFaller,
+		geom.BlockPos{X: 0, Y: 0, Z: 0}, landing, wideBudget,
+	)
+	if err != nil {
+		t.Fatalf("Find returned an error: %v", err)
+	}
+	if !path.Complete {
+		t.Fatalf("path incomplete, reason %v", path.Reason)
+	}
+
+	var fell bool
+	for _, edge := range path.Edges {
+		if edge.Kind == EdgeFall && edge.To == landing {
+			fell = true
+		}
+	}
+	if !fell {
+		t.Fatal("a safe fall past the column-walk floor was refused")
+	}
+}

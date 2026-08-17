@@ -35,9 +35,12 @@ var steps = [4]geom.BlockPos{
 	{X: 1}, {X: -1}, {Z: 1}, {Z: -1},
 }
 
-// maxFallSearch is how far below a neighbour the search looks for a landing.
-// It bounds the column walk; a fall further than the capability allows is
-// refused anyway.
+// maxFallSearch is the floor on how far below a neighbour the column walk looks
+// for a landing. The walk runs to max(maxFallSearch, ceil(SafeFall)), so a
+// capability whose safe fall is deeper than this floor can still reach a legal
+// landing below it; the per-drop SafeFall check is what refuses a drop the body
+// could not survive. The bound is finite so a malformed capability cannot walk
+// the world.
 const maxFallSearch = 32
 
 // Find searches a route from one cell to another.
@@ -197,10 +200,16 @@ func (c Capability) expand(query terrain.Query, from node) ([]Edge, error) {
 			}
 		case terrain.Steppable:
 			above := geom.BlockPos{X: neighbour.X, Y: neighbour.Y + 1, Z: neighbour.Z}
-			edges = append(edges, Edge{
-				Kind: EdgeStep, From: from.Pos, To: above,
-				Posture: PostureStand, Cost: c.StepTicks,
-			})
+			arr, err := c.arriveAt(query, above)
+			if err != nil {
+				return nil, err
+			}
+			if arr.ok {
+				edges = append(edges, Edge{
+					Kind: EdgeStep, From: from.Pos, To: above,
+					Posture: arr.posture, Cost: c.StepTicks,
+				})
+			}
 		case terrain.Blocked:
 			fall, ok, err := c.fall(query, from.Pos, neighbour)
 			if err != nil {
@@ -218,57 +227,94 @@ func (c Capability) expand(query terrain.Query, from node) ([]Edge, error) {
 	return edges, nil
 }
 
-// enter decides how a body crosses into a cell it geometrically fits in.
+// arrival is what arriveAt decides: whether a body may come to rest in a cell,
+// and if so in what posture. A refusal carries no posture. The type exists so
+// there is one answer to "may this body arrive here, and how," rather than one
+// per builder.
+type arrival struct {
+	ok      bool
+	posture Posture
+}
+
+// refused is the empty arrival every rejection returns.
+var refused = arrival{}
+
+// arriveAt is the one gate on a body coming to rest in a cell.
 //
-// Neither a fluid nor a fire carries a collision shape, so Passable calls both
-// Clear on geometry alone. Asking Facts here is what stops a body that cannot
-// swim from strolling through a lake, and what stops any body from strolling
-// through fire or lava.
-func (c Capability) enter(query terrain.Query, from, to geom.BlockPos) (Edge, bool, error) {
-	hazard, lookup, err := query.HazardAt(to)
+// Neither a fluid nor a fire carries a collision shape, so Passable calls all
+// of them Clear on geometry alone. This is the only place Facts is consulted,
+// which is what stops a body from walking, stepping, or falling into fire, into
+// lava, or into water it cannot swim. Every builder that lands a body in a cell
+// goes through here so that all three agree.
+//
+// An unknown lookup from either fact refuses the arrival: unknown is never
+// guessed safe. Any hazard refuses it. Water is accepted only for a swimmer,
+// and then in PostureSwim; open air is accepted in PostureStand.
+func (c Capability) arriveAt(query terrain.Query, cell geom.BlockPos) (arrival, error) {
+	hazard, lookup, err := query.HazardAt(cell)
 	if err != nil {
-		return Edge{}, false, err
+		return refused, err
 	}
 	if lookup == world.LookupUnknown {
-		return Edge{}, false, nil
+		return refused, nil
 	}
 	if hazard != terrain.HazardNone {
-		return Edge{}, false, nil
+		return refused, nil
 	}
 
-	fluid, lookup, err := query.FluidAt(to)
+	fluid, lookup, err := query.FluidAt(cell)
 	if err != nil {
-		return Edge{}, false, err
+		return refused, err
 	}
 	if lookup == world.LookupUnknown {
-		return Edge{}, false, nil
+		return refused, nil
 	}
 
 	switch fluid {
 	case terrain.FluidNone:
+		return arrival{ok: true, posture: PostureStand}, nil
+	case terrain.FluidWater:
+		if !c.CanSwim {
+			return refused, nil
+		}
+
+		return arrival{ok: true, posture: PostureSwim}, nil
+	case terrain.FluidLava:
+		// Lava is refused, and so is any fluid a later version adds: fluid
+		// traversal beyond water is its own work, and a body that swam through
+		// lava because nothing said not to is worse than one that took the long
+		// way. This arm names lava for the exhaustive linter; a Go case exits
+		// the switch rather than falling through, so it lands on the refusal
+		// below, which is also where an unnamed future fluid arrives.
+	}
+
+	return refused, nil
+}
+
+// enter decides how a body crosses into an adjacent cell it geometrically fits
+// in: a walk on the level, or a swim through water.
+func (c Capability) enter(query terrain.Query, from, to geom.BlockPos) (Edge, bool, error) {
+	arr, err := c.arriveAt(query, to)
+	if err != nil {
+		return Edge{}, false, err
+	}
+	if !arr.ok {
+		return Edge{}, false, nil
+	}
+
+	switch arr.posture {
+	case PostureStand:
 		return Edge{
 			Kind: EdgeWalk, From: from, To: to,
 			Posture: PostureStand, Cost: c.WalkTicks,
 		}, true, nil
-	case terrain.FluidWater:
-		if !c.CanSwim {
-			return Edge{}, false, nil
-		}
-
+	case PostureSwim:
 		return Edge{
 			Kind: EdgeSwim, From: from, To: to,
 			Posture: PostureSwim, Cost: c.SwimTicks,
 		}, true, nil
-	case terrain.FluidLava:
-		// Refused by falling through to the return below, same as any fluid a
-		// later version adds. The exhaustive linter wants the arm named; the
-		// empty body matches the switch's no-default, no-fall-through refusal.
 	}
 
-	// Lava, and any fluid a later version adds. Refused rather than costed:
-	// the design leaves fluid traversal beyond water to its own work, and a
-	// body that swam through lava because nothing said not to is worse than
-	// one that took the long way.
 	return Edge{}, false, nil
 }
 
@@ -279,7 +325,12 @@ func (c Capability) enter(query terrain.Query, from, to geom.BlockPos) (Edge, bo
 // landing, which is why the column walk stops at the first cell the body does
 // not fit through.
 func (c Capability) fall(query terrain.Query, from, neighbour geom.BlockPos) (Edge, bool, error) {
-	for drop := int32(1); drop <= maxFallSearch; drop++ {
+	bound := int32(math.Ceil(c.SafeFall))
+	if bound < maxFallSearch {
+		bound = maxFallSearch
+	}
+
+	for drop := int32(1); drop <= bound; drop++ {
 		if float64(drop) > c.SafeFall {
 			return Edge{}, false, nil
 		}
@@ -292,9 +343,22 @@ func (c Capability) fall(query terrain.Query, from, neighbour geom.BlockPos) (Ed
 		}
 		switch passable {
 		case terrain.Clear:
+			// The first Clear cell is where the body stops, because Clear means
+			// solid ground holds it there. If it is fire, lava, or unswimmable
+			// water, the fall is refused rather than deferred: nothing below
+			// this cell is reachable, so there is no safer landing to descend
+			// to.
+			arr, err := c.arriveAt(query, landing)
+			if err != nil {
+				return Edge{}, false, err
+			}
+			if !arr.ok {
+				return Edge{}, false, nil
+			}
+
 			return Edge{
 				Kind: EdgeFall, From: from, To: landing,
-				Posture: PostureStand, Cost: c.FallTicks * float64(drop),
+				Posture: arr.posture, Cost: c.FallTicks * float64(drop),
 			}, true, nil
 		case terrain.Unknown, terrain.Steppable:
 			return Edge{}, false, nil
