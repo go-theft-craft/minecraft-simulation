@@ -50,6 +50,25 @@ type Profile interface {
 	Phases() []Phase
 }
 
+// BlockNames is a profile that can resolve a block's name to the handle it
+// minted for it.
+//
+// It is separate from Profile because resolving a name is not something a tick
+// ever does: handles are opaque by design, and a rule that looked one up by name
+// would be naming a version fact from a version-neutral package. What needs it
+// is everything that arrives from outside the simulation — a fixture, a world
+// loader, a test — because a handle means nothing outside the profile that
+// minted it, and a name survives the table being renumbered.
+//
+// A profile that does not implement this cannot be handed a world described by
+// name. That is a reportable condition rather than a silent default: the caller
+// is holding a description nothing can resolve.
+type BlockNames interface {
+	// Ref returns the handle a name resolves to, or false when the profile does
+	// not know the name.
+	Ref(name string) (world.BlockRef, bool)
+}
+
 // Phase is one stage of a tick.
 //
 // A phase reads and writes only through the TickState it is handed. Phases run

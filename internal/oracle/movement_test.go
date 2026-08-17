@@ -18,18 +18,46 @@ import (
 	"github.com/go-theft-craft/minecraft-simulation/sim"
 )
 
-// The room every trajectory runs in. It is described to the walls and enclosed
-// by them, so a hundred ticks of sprinting cannot reach a cell nobody described:
-// an incomplete tick here would be a bug in this test rather than a finding
-// about the tick.
-const (
-	roomRadius     = 12
-	wallRadius     = 11
-	roomFloor      = -2
-	roomCeiling    = 10
-	movementTicks  = 100
-	movementEntity = entity.ID(1)
-)
+// movementEntity is the body every trajectory here simulates.
+const movementEntity = entity.ID(1)
+
+// movementRoom is the world a set of trajectories runs in.
+//
+// A room is described to its edges and enclosed by walls, so that a run of
+// sprinting cannot reach a cell nobody described: an incomplete tick is then a
+// bug in the test that built the room rather than a finding about the tick.
+type movementRoom struct {
+	// radius is how far the described region reaches horizontally, and wall is
+	// where the walls stand. The gap between them is what keeps a sweep that
+	// touches a wall inside the description.
+	radius int32
+	wall   int32
+	// floor and ceiling bound the described region vertically.
+	floor   int32
+	ceiling int32
+	// surfaces and obstacles are how many of each the room scatters.
+	surfaces  int
+	obstacles int
+	// ticks is how long each trajectory runs.
+	ticks int
+}
+
+// wideRoom is what the differential gate runs in: large enough that a hundred
+// ticks of sprinting stays interesting, and cheap because nothing is written
+// down.
+var wideRoom = movementRoom{
+	radius: 12, wall: 11, floor: -2, ceiling: 10,
+	surfaces: 60, obstacles: 40, ticks: 100,
+}
+
+// compactRoom is what the committed fixtures record. It is smaller and shorter
+// on purpose: a fixture is a conformance check that has to live in the
+// repository and be read in a diff, and the exhaustive coverage is the
+// differential test's job.
+var compactRoom = movementRoom{
+	radius: 6, wall: 5, floor: -2, ceiling: 10,
+	surfaces: 12, obstacles: 10, ticks: 40,
+}
 
 // movementSeeds are the worlds and facings each scenario is run against.
 var movementSeeds = []uint64{1, 2, 3, 5, 8, 13, 21, 34}
@@ -177,48 +205,66 @@ func movementScenarios() []movementScenario {
 // movementRun is one scenario against one random world.
 type movementRun struct {
 	scenario movementScenario
+	room     movementRoom
 	seed     uint64
 	yaw      float32
-	// placed is every non-air block, in placement order, so that the harness and
-	// the store are built from one list.
+	// placed is every non-air block, in placement order, so that the harness,
+	// the store, and any fixture written from this run are built from one list.
 	placed []movementPlacement
 	inputs []movement.Input
 }
 
+// movementPlacement is a run of identical blocks, from min to max inclusive.
+//
+// A floor and a wall are each one placement rather than a hundred, which keeps
+// a fixture written from a run small enough to read.
 type movementPlacement struct {
-	pos  geom.BlockPos
+	min  geom.BlockPos
+	max  geom.BlockPos
 	name string
 }
 
-// buildMovementRun generates one world and the hundred intents run against it.
-func buildMovementRun(scenario movementScenario, seed uint64) movementRun {
+// cells walks every block a placement covers.
+func (p movementPlacement) cells(visit func(geom.BlockPos)) {
+	for x := p.min.X; x <= p.max.X; x++ {
+		for y := p.min.Y; y <= p.max.Y; y++ {
+			for z := p.min.Z; z <= p.max.Z; z++ {
+				visit(geom.BlockPos{X: x, Y: y, Z: z})
+			}
+		}
+	}
+}
+
+// buildMovementRun generates one world and the intents run against it.
+func buildMovementRun(scenario movementScenario, room movementRoom, seed uint64) movementRun {
 	random := rand.New(rand.NewPCG(seed, 0))
 
-	run := movementRun{scenario: scenario, seed: seed}
+	run := movementRun{scenario: scenario, room: room, seed: seed}
 	// Facings spread over a full turn including negative ones.
 	run.yaw = float32(random.Float64()*720 - 360)
 
+	span := func(from, to geom.BlockPos, name string) {
+		run.placed = append(run.placed, movementPlacement{min: from, max: to, name: name})
+	}
 	place := func(pos geom.BlockPos, name string) {
-		run.placed = append(run.placed, movementPlacement{pos: pos, name: name})
+		span(pos, pos, name)
 	}
 
-	// The floor, and a second layer under it so the friction lookup below a body
-	// standing at the floor's own level still lands on a described cell.
-	for x := int32(-roomRadius); x <= roomRadius; x++ {
-		for z := int32(-roomRadius); z <= roomRadius; z++ {
-			place(geom.BlockPos{X: x, Y: 0, Z: z}, "stone")
-			place(geom.BlockPos{X: x, Y: -1, Z: z}, "stone")
-		}
-	}
+	// The floor.
+	span(
+		geom.BlockPos{X: -room.radius, Y: 0, Z: -room.radius},
+		geom.BlockPos{X: room.radius, Y: 0, Z: room.radius},
+		"stone",
+	)
 
-	// Walls, so a hundred ticks of sprinting stays inside the described region.
-	for x := int32(-wallRadius); x <= wallRadius; x++ {
-		for y := int32(1); y <= 6; y++ {
-			place(geom.BlockPos{X: x, Y: y, Z: -wallRadius}, "stone")
-			place(geom.BlockPos{X: x, Y: y, Z: wallRadius}, "stone")
-			place(geom.BlockPos{X: -wallRadius, Y: y, Z: x}, "stone")
-			place(geom.BlockPos{X: wallRadius, Y: y, Z: x}, "stone")
-		}
+	// Walls, so that a run of sprinting stays inside the described region.
+	for _, wall := range []struct{ min, max geom.BlockPos }{
+		{geom.BlockPos{X: -room.wall, Y: 1, Z: -room.wall}, geom.BlockPos{X: room.wall, Y: 6, Z: -room.wall}},
+		{geom.BlockPos{X: -room.wall, Y: 1, Z: room.wall}, geom.BlockPos{X: room.wall, Y: 6, Z: room.wall}},
+		{geom.BlockPos{X: -room.wall, Y: 1, Z: -room.wall}, geom.BlockPos{X: -room.wall, Y: 6, Z: room.wall}},
+		{geom.BlockPos{X: room.wall, Y: 1, Z: -room.wall}, geom.BlockPos{X: room.wall, Y: 6, Z: room.wall}},
+	} {
+		span(wall.min, wall.max, "stone")
 	}
 
 	// Surfaces with different frictions, which is what makes the friction phase's
@@ -233,23 +279,17 @@ func buildMovementRun(scenario movementScenario, seed uint64) movementRun {
 	// oracle found the bounce within two ticks; the divergence is recorded, and
 	// slime's slipperiness is consequently unchecked against the game.
 	surfaces := []string{"ice", "packed_ice", "soul_sand"}
-	for range 60 {
-		pos := geom.BlockPos{
-			X: int32(random.IntN(2*wallRadius-1)) - wallRadius + 1,
-			Y: 0,
-			Z: int32(random.IntN(2*wallRadius-1)) - wallRadius + 1,
-		}
-		place(pos, surfaces[random.IntN(len(surfaces))])
+	inside := func() int32 {
+		return int32(random.IntN(int(2*room.wall-1))) - room.wall + 1
+	}
+	for range room.surfaces {
+		place(geom.BlockPos{X: inside(), Y: 0, Z: inside()}, surfaces[random.IntN(len(surfaces))])
 	}
 
 	// Obstacles to walk into and to step onto. A slab is half a block, which the
 	// step height clears, and a cube is not.
-	for range 40 {
-		pos := geom.BlockPos{
-			X: int32(random.IntN(2*wallRadius-1)) - wallRadius + 1,
-			Y: int32(random.IntN(2)) + 1,
-			Z: int32(random.IntN(2*wallRadius-1)) - wallRadius + 1,
-		}
+	for range room.obstacles {
+		pos := geom.BlockPos{X: inside(), Y: int32(random.IntN(2)) + 1, Z: inside()}
 		// The spawn column stays clear, so that a body never starts inside a
 		// block: what the game does then is a separate question from movement.
 		if pos.X >= -1 && pos.X <= 1 && pos.Z >= -1 && pos.Z <= 1 {
@@ -266,7 +306,7 @@ func buildMovementRun(scenario movementScenario, seed uint64) movementRun {
 		scenario.obstacles(place)
 	}
 
-	for tick := range movementTicks {
+	for tick := range room.ticks {
 		run.inputs = append(run.inputs, scenario.input(tick, run.yaw))
 	}
 
@@ -278,8 +318,10 @@ func buildMovementRun(scenario movementScenario, seed uint64) movementRun {
 func (r movementRun) commands() []string {
 	commands := []string{"C"}
 	for _, block := range r.placed {
-		commands = append(commands, fmt.Sprintf("B %d %d %d %s",
-			block.pos.X, block.pos.Y, block.pos.Z, block.name))
+		block.cells(func(pos geom.BlockPos) {
+			commands = append(commands, fmt.Sprintf("B %d %d %d %s",
+				pos.X, pos.Y, pos.Z, block.name))
+		})
 	}
 
 	commands = append(commands, fmt.Sprintf("S %s %s %s %s %s %t %s %s",
@@ -346,6 +388,7 @@ func TestOneTickOfStandingMatchesTheGame(t *testing.T) {
 	profile := movementProfile(t)
 
 	run := movementRun{
+		room: movementRoom{radius: 2, wall: 2, floor: -1, ceiling: 4, ticks: 5},
 		scenario: movementScenario{
 			name:  "stand",
 			spawn: geom.Vec3{X: 0.5, Y: 1, Z: 0.5},
@@ -355,13 +398,11 @@ func TestOneTickOfStandingMatchesTheGame(t *testing.T) {
 			moveSpeed: walkMoveSpeed, jumpFactor: walkJumpFactor,
 		},
 	}
-	for x := int32(-2); x <= 2; x++ {
-		for z := int32(-2); z <= 2; z++ {
-			run.placed = append(run.placed,
-				movementPlacement{pos: geom.BlockPos{X: x, Y: 0, Z: z}, name: "stone"},
-				movementPlacement{pos: geom.BlockPos{X: x, Y: -1, Z: z}, name: "stone"})
-		}
-	}
+	run.placed = append(run.placed, movementPlacement{
+		min:  geom.BlockPos{X: -2, Y: 0, Z: -2},
+		max:  geom.BlockPos{X: 2, Y: 0, Z: 2},
+		name: "stone",
+	})
 	for tick := range 5 {
 		run.inputs = append(run.inputs, run.scenario.input(tick, 0))
 	}
@@ -384,7 +425,7 @@ func TestMovementMatchesTheGame(t *testing.T) {
 	want := 0
 	for _, scenario := range movementScenarios() {
 		for _, seed := range movementSeeds {
-			run := buildMovementRun(scenario, seed)
+			run := buildMovementRun(scenario, wideRoom, seed)
 			runs = append(runs, run)
 			commands = append(commands, run.commands()...)
 			want += run.answers()
@@ -544,9 +585,9 @@ func movementStore(t *testing.T, profile sim.Profile, run movementRun) *runtime.
 	}
 
 	store := runtime.NewMemory(profile)
-	for x := int32(-roomRadius); x <= roomRadius; x++ {
-		for y := int32(roomFloor); y <= roomCeiling; y++ {
-			for z := int32(-roomRadius); z <= roomRadius; z++ {
+	for x := -run.room.radius; x <= run.room.radius; x++ {
+		for y := run.room.floor; y <= run.room.ceiling; y++ {
+			for z := -run.room.radius; z <= run.room.radius; z++ {
 				if err := store.SetBlock(geom.BlockPos{X: x, Y: y, Z: z}, air); err != nil {
 					t.Fatalf("SetBlock: %v", err)
 				}
@@ -559,8 +600,14 @@ func movementStore(t *testing.T, profile sim.Profile, run movementRun) *runtime.
 		if !ok {
 			t.Fatalf("the profile does not know %q", block.name)
 		}
-		if err := store.SetBlock(block.pos, ref); err != nil {
-			t.Fatalf("SetBlock: %v", err)
+		var failure error
+		block.cells(func(pos geom.BlockPos) {
+			if err := store.SetBlock(pos, ref); err != nil {
+				failure = err
+			}
+		})
+		if failure != nil {
+			t.Fatalf("SetBlock: %v", failure)
 		}
 	}
 

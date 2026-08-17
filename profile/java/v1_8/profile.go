@@ -115,17 +115,26 @@ func (p *profile) Shape(ref world.BlockRef) (geom.Shape, bool) {
 // stepping them concurrently is safe.
 func (p *profile) Phases() []sim.Phase { return p.buildPhases() }
 
-// Ref resolves a block name to the handle this profile minted for it.
+// Ref implements sim.BlockNames.
 //
-// It is exported because a caller loading a world names blocks: a handle is
-// meaningless outside the profile that minted it, so there has to be a way in.
+// A caller loading a world names blocks: a handle is meaningless outside the
+// profile that minted it, so there has to be a way in.
+func (p *profile) Ref(name string) (world.BlockRef, bool) {
+	return p.blocks.ref(name)
+}
+
+// Ref resolves a block name against a profile this package built.
+//
+// It is the same lookup as the method, for callers holding a sim.Profile that
+// they know came from here. Callers that do not know should assert
+// sim.BlockNames instead.
 func Ref(built sim.Profile, name string) (world.BlockRef, bool) {
-	owner, ok := built.(*profile)
+	owner, ok := built.(sim.BlockNames)
 	if !ok {
 		return 0, false
 	}
 
-	return owner.blocks.ref(name)
+	return owner.Ref(name)
 }
 
 // Spawn returns the body and locomotion state of a player standing at a
