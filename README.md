@@ -101,10 +101,12 @@ and compares position, motion, and the collision flags at every tick rather
 than at the end: the first differing tick names the rule that drifted, where a
 final position names only the scenario.
 
-The harness supplies a block lookup and a minimal entity. It reimplements no
-game logic, and no game source is committed. The jar is not committed either,
-so these tests skip when the workspace, `javac`, or `java` is absent; run
-`task reference:prepare` to make them run.
+The harness supplies a block lookup, a minimal entity, and a text protocol, and
+it reimplements no game logic. It lives in `internal/oracle/java` and is
+committed, so anyone with a prepared workspace can re-run these gates rather
+than take their results on trust. What is not committed is the game: no jar, no
+mappings, and no decompiled source. The tests therefore skip when the workspace,
+`javac`, or `java` is absent; run `task reference:prepare` to make them run.
 
 Six behaviours were found this way rather than by reading. Each had passed
 every test written from a careful reading of the game:

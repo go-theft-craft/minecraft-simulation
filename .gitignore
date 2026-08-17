@@ -7,6 +7,12 @@
 *.jar
 *.class
 *.java
+# The oracle harnesses are ours: they supply a block lookup, a minimal entity,
+# and a text protocol, and they reimplement no game logic. They are committed so
+# that anyone with a prepared workspace can re-run the differential gates, which
+# is what makes those gates a check rather than a claim. Decompiled sources and
+# jars stay ignored above and below.
+!internal/oracle/java/*.java
 *.tiny
 *.tsrg
 *.srg
