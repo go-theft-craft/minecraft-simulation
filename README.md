@@ -13,6 +13,31 @@ persistence, rendering, and AI remain outside this repository.
 | `geom` | Vectors, block positions, axis-aligned boxes, and per-block voxel shapes |
 | `world` | The tri-state block view and a deterministic in-memory implementation |
 | `collision` | Swept candidate gathering and vanilla-order axis resolution with step-up |
+| `entity` | Entity identity, physics families, and the body state a tick moves |
+| `sim` | The tick contract: input, result, canonical digest, profile, phases, kernel |
+| `runtime` | The store, its revision check, and a runner that drives one tick after another |
+
+Packages depend in one direction only:
+
+```text
+geom  ->  world  ->  entity  ->  sim  ->  runtime
+              \                   ^
+               \-> collision -----/
+```
+
+The `Profile` interface lives in `sim` rather than in a `profile` package of its
+own. A profile supplies the kernel's tick phases and a phase is written against
+the kernel's own tick state, so a separate package holding the interface would
+have to import `sim` while `sim` needs the interface — a cycle. Concrete
+profiles are separate packages and may import whatever their version's data
+needs.
+
+A tick reads only what its input carries: no clock, no global random state, no
+mutable application object. Its result carries a canonical digest over every
+field, and the change set it produces names the store revision it was computed
+against, so a store that has moved on refuses it whole. That is what lets a
+client apply a prediction to a forked snapshot and discard the fork when the
+server disagrees.
 
 `geom`, `world`, and `collision` import nothing outside the standard library.
 They know nothing about entities, profiles, or the protocol: a caller supplies
