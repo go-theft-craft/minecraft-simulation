@@ -169,6 +169,12 @@ func TestResolveZeroMotionIsAFixedPoint(t *testing.T) {
 	}
 }
 
+// playerStepHeight is the value a 1.8.9 player actually steps with. Java
+// stores stepHeight as a float and widens it where the step-up applies it, so
+// the round 0.6 is not the number the game uses. Writing it this way keeps
+// every expectation below comparable with the game's own output.
+var playerStepHeight = float64(float32(0.6))
+
 // slab is a half-height block. A 0.6 step height clears one of these and
 // cannot clear a full cube, which is exactly vanilla's behaviour: a player
 // walks onto a slab and has to jump onto a full block.
@@ -185,7 +191,7 @@ func TestResolveStepsOntoASlab(t *testing.T) {
 		Body:       player(),
 		Motion:     geom.Vec3{X: 1},
 		OnGround:   true,
-		StepHeight: 0.6,
+		StepHeight: playerStepHeight,
 	})
 	if err != nil {
 		t.Fatalf("Resolve: %v", err)
@@ -199,8 +205,48 @@ func TestResolveStepsOntoASlab(t *testing.T) {
 	if got.Applied.X != 1 {
 		t.Fatalf("Applied.X = %v, want the full motion after stepping", got.Applied.X)
 	}
+	// The reported Y motion is the settle onto the slab, not the climb: the body
+	// rose by the step height and came back down onto the surface at y=0.5. The
+	// value carries the step height's float32 origin, which is why it is not a
+	// round tenth.
+	if got.Applied.Y != -0.10000002384185791 {
+		t.Fatalf("Applied.Y = %v, want the settle onto the slab", got.Applied.Y)
+	}
+	// OnGround stays false here, and that is the game's answer rather than a
+	// shortcoming of ours: vanilla sets it from the vertical clamp only when
+	// the tick's original Y motion was downward, and this move supplied none.
+	// A walking entity always carries gravity, which is why this reads as a
+	// contradiction only in a test that leaves it out. The descending case
+	// below is the one that matches play.
+	if got.OnGround {
+		t.Error("OnGround is true after a step whose tick had no downward motion")
+	}
+}
+
+func TestResolveStepsOntoASlabWhileDescending(t *testing.T) {
+	blocks := worldWithFloor()
+	blocks.Set(geom.BlockPos{X: 1, Y: 0, Z: 0}, slab())
+	blocks.Set(geom.BlockPos{X: 1, Y: 0, Z: -1}, slab())
+
+	// A tick of walking carries gravity, so the original Y motion is negative
+	// and the vertical clamp reports ground on arrival.
+	got, err := Resolve(blocks, Move{
+		Body:       player(),
+		Motion:     geom.Vec3{X: 1, Y: -0.0784000015258789},
+		OnGround:   true,
+		StepHeight: playerStepHeight,
+	})
+	if err != nil {
+		t.Fatalf("Resolve: %v", err)
+	}
+	if !got.Stepped {
+		t.Fatalf("Resolve did not step: %+v", got)
+	}
+	if got.Body.MinY != 0.5 {
+		t.Fatalf("Body.MinY = %v, want 0.5", got.Body.MinY)
+	}
 	if !got.OnGround {
-		t.Error("OnGround is false after stepping onto a surface")
+		t.Error("OnGround is false after stepping onto a surface while descending")
 	}
 }
 
@@ -213,7 +259,7 @@ func TestResolveCannotStepOntoAFullBlock(t *testing.T) {
 		Body:       player(),
 		Motion:     geom.Vec3{X: 1},
 		OnGround:   true,
-		StepHeight: 0.6,
+		StepHeight: playerStepHeight,
 	})
 	if err != nil {
 		t.Fatalf("Resolve: %v", err)
@@ -235,7 +281,7 @@ func TestResolveDoesNotStepAboveTheStepHeight(t *testing.T) {
 		Body:       player(),
 		Motion:     geom.Vec3{X: 1},
 		OnGround:   true,
-		StepHeight: 0.6,
+		StepHeight: playerStepHeight,
 	})
 	if err != nil {
 		t.Fatalf("Resolve: %v", err)
@@ -260,7 +306,7 @@ func TestResolveDoesNotStepWhileAirborne(t *testing.T) {
 		Body:       player().Offset(geom.Vec3{Y: 1}),
 		Motion:     geom.Vec3{X: 1, Y: 0.2},
 		OnGround:   false,
-		StepHeight: 0.6,
+		StepHeight: playerStepHeight,
 	})
 	if err != nil {
 		t.Fatalf("Resolve: %v", err)
@@ -275,7 +321,7 @@ func TestResolveDoesNotStepWithoutAHorizontalCollision(t *testing.T) {
 		Body:       player(),
 		Motion:     geom.Vec3{X: 0.2},
 		OnGround:   true,
-		StepHeight: 0.6,
+		StepHeight: playerStepHeight,
 	})
 	if err != nil {
 		t.Fatalf("Resolve: %v", err)

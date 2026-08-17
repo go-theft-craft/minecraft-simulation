@@ -23,6 +23,31 @@ swept region, motion resolves along Y then X then Z with the body translated
 after each axis, and a blocked horizontal move retries with a step-up whose
 winner is the outcome that travels further in the horizontal plane.
 
+## Checking against the game
+
+`internal/oracle` compares this module against a real Java Edition 1.8.9
+server. It compiles a small harness against the locally prepared, deobfuscated
+server jar and runs the game's own `AxisAlignedBB` methods and its own
+`Entity.moveEntity` — including the candidate gathering, the axis passes, the
+two step-up attempts, and the settle — then requires the resulting box to be
+bit-identical to what `collision.Resolve` produces, and the collision flags to
+agree.
+
+The harness supplies a block lookup and a minimal entity. It reimplements no
+game logic, and no game source is committed. The jar is not committed either,
+so these tests skip when the workspace, `javac`, or `java` is absent; run
+`task reference:prepare` to make them run.
+
+Two behaviours were found this way rather than by reading:
+
+- A step-up records the settle as its Y motion, not the climb plus the settle,
+  which is why a step leaves the vertical collision flag describing the descent
+  onto the surface. `onGround` follows from that flag and the tick's original
+  downward motion, so stepping does not by itself put an entity on the ground.
+- `stepHeight` is a `float` widened where it is applied, so a player steps with
+  `float64(float32(0.6))`. Passing the round `0.6` moves the resulting box in
+  its last bits.
+
 Vanilla Java research uses the separate
 [`minecraft-reference`](https://github.com/go-theft-craft/minecraft-reference)
 command. This repository pins the command version through the

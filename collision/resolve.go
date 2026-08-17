@@ -16,6 +16,15 @@ type Move struct {
 	OnGround bool
 	// StepHeight is how far the entity may rise to clear an obstacle. Zero
 	// disables stepping.
+	//
+	// Java Edition stores this as a float and widens it to double where the
+	// step-up applies it, so the game's player value is not 0.6 but
+	// float64(float32(0.6)), which is 0.60000002384185791015625. Passing the
+	// round decimal instead moves the resulting box by about two parts in
+	// 10^16, which is enough to make a digest differ and, over many ticks, to
+	// draw a correction from a real server. A profile owns this conversion and
+	// hands collision the widened value; collision does no float32 arithmetic
+	// of its own.
 	StepHeight float64
 	// CandidateLimit bounds how many cells the sweep may visit. Zero means no
 	// limit.
@@ -80,7 +89,7 @@ func Resolve(view world.BlockView, move Move) (Result, error) {
 			return Result{Body: move.Body, Unknown: stepBoxes.Unknown}, nil
 		}
 
-		body, applied, stepped = stepUp(stepBoxes.Boxes, move.Body, move.Motion, move.StepHeight, applied)
+		body, applied, stepped = stepUp(stepBoxes.Boxes, move.Body, body, move.Motion, applied, move.StepHeight)
 	}
 
 	return Result{
@@ -89,7 +98,7 @@ func Resolve(view world.BlockView, move Move) (Result, error) {
 		CollidedX: applied.X != move.Motion.X,
 		CollidedY: applied.Y != move.Motion.Y,
 		CollidedZ: applied.Z != move.Motion.Z,
-		OnGround:  move.Motion.Y < 0 && applied.Y != move.Motion.Y || stepped,
+		OnGround:  applied.Y != move.Motion.Y && move.Motion.Y < 0,
 		Stepped:   stepped,
 	}, nil
 }
@@ -129,8 +138,24 @@ func applyAxes(boxes []geom.AABB, body, yProbe geom.AABB, motion geom.Vec3) (geo
 // keeps the one that travels further horizontally. A tie goes to the second.
 //
 // The winner settles downward onto whatever it climbed, and only then is it
-// weighed against the unstepped result. The bool reports whether it won.
-func stepUp(boxes []geom.AABB, body geom.AABB, motion geom.Vec3, height float64, unstepped geom.Vec3) (geom.AABB, geom.Vec3, bool) {
+// weighed against the unstepped result: if the unstepped move travels at least
+// as far horizontally, the whole retry is discarded.
+//
+// The reported Y motion of a successful step is the settle alone, not the rise
+// plus the settle. That is not an approximation of vanilla; it is what vanilla
+// records. It resets the Y motion to the negated rise before the settle clamp
+// and keeps only that value, which is why a step leaves the vertical collision
+// flag describing the descent onto the climbed surface rather than the climb.
+//
+// unsteppedBody is the body the plain move produced, returned unchanged when
+// the retry loses, so that the losing path cannot introduce an arithmetic
+// difference of its own.
+func stepUp(
+	boxes []geom.AABB,
+	body, unsteppedBody geom.AABB,
+	motion, unstepped geom.Vec3,
+	height float64,
+) (geom.AABB, geom.Vec3, bool) {
 	horizontal := geom.Vec3{X: motion.X, Z: motion.Z}
 
 	rise := geom.Vec3{X: motion.X, Y: height, Z: motion.Z}
@@ -149,10 +174,10 @@ func stepUp(boxes []geom.AABB, body geom.AABB, motion geom.Vec3, height float64,
 		settle = box.ClampY(winnerBody, settle)
 	}
 	winnerBody = winnerBody.Offset(geom.Vec3{Y: settle})
-	winnerMotion.Y += settle
+	winnerMotion.Y = settle
 
 	if unstepped.HorizontalLengthSquared() >= winnerMotion.HorizontalLengthSquared() {
-		return body.Offset(unstepped), unstepped, false
+		return unsteppedBody, unstepped, false
 	}
 
 	return winnerBody, winnerMotion, true

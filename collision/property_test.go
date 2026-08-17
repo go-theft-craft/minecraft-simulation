@@ -40,7 +40,7 @@ func TestSweptMotionNeverTunnels(t *testing.T) {
 				Z: (random.Float64() - 0.5) * 8,
 			}
 
-			got, err := Resolve(blocks, Move{Body: body, Motion: motion, StepHeight: 0.6})
+			got, err := Resolve(blocks, Move{Body: body, Motion: motion, StepHeight: playerStepHeight})
 			if err != nil {
 				t.Fatalf("seed %d step %d: Resolve: %v", seed, step, err)
 			}
@@ -65,7 +65,7 @@ func TestSweptMotionNeverTunnels(t *testing.T) {
 // TestStepUpRespectsItsBound is the second exit property: a body never rises
 // by more than its step height in a single resolve.
 func TestStepUpRespectsItsBound(t *testing.T) {
-	const stepHeight = 0.6
+	stepHeight := playerStepHeight
 
 	blocks := world.NewBlocks()
 	blocks.Fill(geom.BlockPos{X: -6, Y: -1, Z: -6}, geom.BlockPos{X: 6, Y: -1, Z: 6}, geom.FullCube())
@@ -121,7 +121,7 @@ func TestZeroMotionIsAFixedPoint(t *testing.T) {
 			body := geom.AABB{MinX: -0.3, MinY: 0, MinZ: -0.3, MaxX: 0.3, MaxY: 1.8, MaxZ: 0.3}.
 				Offset(origin)
 
-			got, err := Resolve(blocks, Move{Body: body, OnGround: true, StepHeight: 0.6})
+			got, err := Resolve(blocks, Move{Body: body, OnGround: true, StepHeight: playerStepHeight})
 			if err != nil {
 				t.Fatalf("seed %d step %d: Resolve: %v", seed, step, err)
 			}
@@ -147,7 +147,7 @@ func TestZeroMotionIsAFixedPoint(t *testing.T) {
 func TestResolveIsDeterministic(t *testing.T) {
 	blocks := solidWorld()
 	body := geom.AABB{MinX: -0.3, MinY: 0, MinZ: -0.3, MaxX: 0.3, MaxY: 1.8, MaxZ: 0.3}
-	move := Move{Body: body, Motion: geom.Vec3{X: 3.5, Y: -2.25, Z: 1.75}, StepHeight: 0.6}
+	move := Move{Body: body, Motion: geom.Vec3{X: 3.5, Y: -2.25, Z: 1.75}, StepHeight: playerStepHeight}
 
 	first, err := Resolve(blocks, move)
 	if err != nil {
