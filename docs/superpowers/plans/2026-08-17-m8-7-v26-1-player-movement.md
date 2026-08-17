@@ -360,11 +360,103 @@ The known structural differences to expect, from the parent design: the 1.13 col
 
 Determine this early — it is cheap to check and expensive to discover late — and if a variant is needed, add it as its own task before the phases, with the 1.8.9 recordings proving the original path unchanged.
 
-- [ ] **Step 1: Establish the tick order and record it in the plan's own terms**
+- [x] **Step 1: Establish the tick order and record it in the plan's own terms**
 
 Write the numbered behavioural statements for this version, the way M8.4's plan did, into the profile package's doc comment. Prose in a doc comment is the artifact that survives; prose in a session does not.
 
-- [ ] **Step 2: Check whether collision differs, and branch**
+**Done 2026-08-18**, read from the version's own land-movement path rather than
+from M8.4's list. It is recorded here rather than in the package doc comment
+because the package cannot exist until the constants reach a release, and the
+statements are what the package will be written from. They move into
+`profile/java/v26_1/profile.go` when it lands, unchanged unless the game
+disagrees with one.
+
+Scope is the player on land: no fluid, no elytra, no climbing, no levitation, no
+riding. Each statement says what 1.8.9 does where the two differ, because the
+differences are what a profile written by analogy would get wrong.
+
+1. **The jump delay counts down**, if it is above zero. The same rule and the
+   same counter as 1.8.9's.
+2. **The motion threshold is a player rule in this version, and a vector one.**
+   For a player, the two horizontal components are zeroed *together* when the
+   horizontal motion's squared length is below `9.0E-6` — that is, when the
+   motion is shorter than 0.003 as a vector. Every other entity tests each
+   horizontal axis separately against 0.003. The vertical is tested on its own
+   against 0.003 either way. 1.8.9 tests all three axes separately against 0.005,
+   so this version discards a smaller motion and discards it as a vector.
+3. **Both input axes decay by `0.98F`, before the jump rather than after it.**
+   1.8.9 decays after. The jump reads neither axis, so the two orders produce the
+   same numbers; the order is recorded because a phase list should follow the
+   version rather than the analogy, and because a later mechanic that reads an
+   input axis during the jump would make the difference real.
+4. **The jump, when the body is standing and the delay is zero.** Its power is
+   the jump-strength attribute — `0.42` for a player with no modifiers — times
+   the block jump factor, plus the jump-boost bonus. A power of `1.0E-5F` or
+   less does nothing at all. Otherwise the vertical motion becomes **the larger
+   of** the jump power and the motion it already had, where 1.8.9 assigns
+   `0.42` over whatever was there; a sprinting body then gains `0.2` along its
+   facing from the float sine and cosine; and the delay is set to 10 ticks.
+5. **The friction of the block below gives two different numbers, and this is
+   the formula difference that matters most.** The block friction is the block's
+   own when the body is on the ground and `1.0F` when it is not. The tick's
+   horizontal drag is `blockFriction * 0.91F` at single width, as in 1.8.9. The
+   acceleration is the movement speed times `0.21600002F / blockFriction³` — the
+   **raw block friction**, cubed. 1.8.9 divides `0.16277136F` by the cube of the
+   *product*. On stone the two denominators differ by a factor of `0.91³`, and
+   the numerator changed to match, so a profile that ported the 1.8.9 rule and
+   swapped the constant would be wrong on every surface that is not stone.
+6. **"The block below" is the block the body is standing on, not the block under
+   its feet.** It comes from the supporting block the last collision recorded,
+   read half a block down, with fences, walls, and fence gates answering with the
+   supporting position itself rather than the offset one. 1.8.9 takes the cell at
+   `floor(x)`, `floor(box.minY) - 1`, `floor(z)` and keeps no such record. A body
+   standing on the edge of a block can therefore disagree between the versions
+   about which block it is standing on.
+7. **The input becomes motion at double width.** The two input axes and the
+   vertical axis form a vector; a squared length below `1.0E-7` contributes
+   nothing; a squared length above `1` is normalized. The result scales by the
+   acceleration from (5) and rotates by the body's yaw. Only the sine and cosine
+   are single width, taken from the table by an index this version computes with
+   a `double` multiplier through a `long`. 1.8.9's counterpart is float
+   throughout, thresholds at `1.0E-4F`, and indexes the same table with a float
+   multiplier through an `int`. The table itself is byte-identical between the
+   two versions, which is measured rather than assumed.
+8. **The move** resolves the motion against the world through this version's
+   shape-based collision — Task 4a's `collision.ResolveVoxel` — which reports the
+   applied motion and the collision flags.
+9. **A block speed factor multiplies the two horizontal components after the
+   move.** It comes from the block at the body's position, falls back to the
+   block below when that one is neutral, and is interpolated toward `1` by the
+   movement-efficiency attribute. Soul sand and honey are what it exists for.
+   1.8.9 has no such step in the tick: it slows a body from inside the block's
+   own collision callback instead, which is a different place in the order and a
+   different set of blocks.
+10. **Gravity is subtracted from the vertical motion as a double**: the gravity
+    attribute, `0.08` for a player, or at most `0.01` while falling with slow
+    falling. 1.8.9 subtracts a literal.
+11. **The drags apply after gravity**, as in 1.8.9: the vertical motion times
+    `0.98F` and each horizontal times the tick's friction from (5). Both
+    constants are floats widened against a double motion, so the products form at
+    double width.
+
+Two further facts that are not steps in the order:
+
+- **The movement speed a tick moves with is the one the previous tick left.**
+  The player's tick reads the movement-speed attribute into the field that
+  drives (5) *after* the travel that used it. 1.8.9 does the same thing in the
+  same place, so this is a shared fact rather than a difference — but it decides
+  what a sprint scenario looks like on the tick sprinting starts, and both
+  profiles take the speed as an input rather than reading an attribute.
+- **What is deliberately not in this list**: swimming, elytra, climbing,
+  levitation, powder snow, and riding all branch before or inside the land path
+  and are out of this milestone's scope. The phase list must leave room for them
+  rather than pretend the branch is not there.
+
+- [x] **Step 2: Check whether collision differs, and branch**
+
+Answered ahead of this task by Task 4a: it differs, the variant landed as
+`collision.ResolveVoxel`, and the whole of it — including the step-up assembly —
+is checked against a real 26.1.2 server.
 
 - [ ] **Step 3 to 7: Test, implement, verify, commit**
 
