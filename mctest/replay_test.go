@@ -11,6 +11,7 @@ import (
 	"github.com/go-theft-craft/minecraft-simulation/geom"
 	"github.com/go-theft-craft/minecraft-simulation/mctest"
 	v1_8 "github.com/go-theft-craft/minecraft-simulation/profile/java/v1_8"
+	"github.com/go-theft-craft/minecraft-simulation/scene"
 	"github.com/go-theft-craft/minecraft-simulation/sim"
 )
 
@@ -80,7 +81,7 @@ func TestAFixtureRecordedUnderAnotherProfileIsRefused(t *testing.T) {
 
 func TestAFixtureNamingAnUnknownBlockSaysWhich(t *testing.T) {
 	fixture := sample()
-	fixture.World.Blocks = append(fixture.World.Blocks, mctest.Block{
+	fixture.World.Blocks = append(fixture.World.Blocks, scene.Block{
 		Pos: geom.BlockPos{X: 0, Y: 2, Z: 0}, Name: "unobtainium",
 	})
 

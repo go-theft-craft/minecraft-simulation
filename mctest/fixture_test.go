@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-theft-craft/minecraft-simulation/geom"
 	"github.com/go-theft-craft/minecraft-simulation/mctest"
+	"github.com/go-theft-craft/minecraft-simulation/scene"
 	"github.com/go-theft-craft/minecraft-simulation/sim"
 )
 
@@ -19,11 +20,11 @@ func sample() mctest.Fixture {
 		Name:    "sample",
 		Profile: sim.ProfileID{Edition: "java", GameVersion: "1.8.9", RulesRevision: "1"},
 		Source:  "written by hand for a round-trip test",
-		World: mctest.World{
+		World: scene.World{
 			Min:  geom.BlockPos{X: -2, Y: -1, Z: -2},
 			Max:  geom.BlockPos{X: 2, Y: 4, Z: 2},
 			Fill: "air",
-			Blocks: []mctest.Block{
+			Blocks: []scene.Block{
 				{Pos: geom.BlockPos{X: -2, Y: 0, Z: -2}, To: &to, Name: "stone"},
 				{Pos: geom.BlockPos{X: 1, Y: 1, Z: 1}, Name: "ice"},
 			},

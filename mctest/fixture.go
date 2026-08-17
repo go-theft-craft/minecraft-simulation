@@ -20,6 +20,7 @@ import (
 	"os"
 
 	"github.com/go-theft-craft/minecraft-simulation/geom"
+	"github.com/go-theft-craft/minecraft-simulation/scene"
 	"github.com/go-theft-craft/minecraft-simulation/sim"
 )
 
@@ -37,61 +38,15 @@ type Fixture struct {
 	// Source says where the expectations came from, so that a reader can tell a
 	// recording of the game from a recording of ourselves.
 	Source string `json:"source"`
-	// World is the blocks the trajectory ran over.
-	World World `json:"world"`
+	// World is the blocks the trajectory ran over. It is a scene rather than a
+	// type of this package's own, because a recorded trajectory and a recorded
+	// determinism run describe a world for exactly the same reason and a second
+	// description would be a second thing to keep right.
+	World scene.World `json:"world"`
 	// Body is the state the body started in.
 	Body Body `json:"body"`
 	// Ticks are the inputs and the results, in order.
 	Ticks []Tick `json:"ticks"`
-}
-
-// World is a described region with blocks in it.
-//
-// The region is filled with one named block and the exceptions are listed,
-// because the alternative — naming every cell — is thousands of lines of air for
-// a trajectory that touches a dozen of them. Every cell in the region is
-// described, so a sweep that leaves it is an incomplete tick rather than a
-// silent guess.
-type World struct {
-	// Min and Max bound the described region, inclusive.
-	Min geom.BlockPos `json:"min"`
-	Max geom.BlockPos `json:"max"`
-	// Fill is the block every cell in the region holds unless Blocks says
-	// otherwise.
-	Fill string `json:"fill"`
-	// Blocks are the exceptions, in placement order.
-	Blocks []Block `json:"blocks"`
-}
-
-// Block is a named cell, or a named box of them.
-//
-// Blocks are named rather than carrying handles because a handle is an index
-// into the table of the profile that minted it: it means nothing to another
-// profile, and it means the wrong thing if the table is ever renumbered.
-//
-// A floor and a wall are each one entry rather than a few hundred, which is
-// what keeps a recorded world small enough to read in a diff.
-type Block struct {
-	// Pos is the cell, or the low corner when To is set.
-	Pos geom.BlockPos `json:"pos"`
-	// To is the high corner of an inclusive box. It is absent for a single cell.
-	To   *geom.BlockPos `json:"to,omitempty"`
-	Name string         `json:"name"`
-}
-
-// cells walks every cell this entry names.
-func (b Block) cells(visit func(geom.BlockPos)) {
-	far := b.Pos
-	if b.To != nil {
-		far = *b.To
-	}
-	for x := b.Pos.X; x <= far.X; x++ {
-		for y := b.Pos.Y; y <= far.Y; y++ {
-			for z := b.Pos.Z; z <= far.Z; z++ {
-				visit(geom.BlockPos{X: x, Y: y, Z: z})
-			}
-		}
-	}
 }
 
 // Body is the state a trajectory starts from.

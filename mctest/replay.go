@@ -6,9 +6,9 @@ import (
 	"fmt"
 
 	"github.com/go-theft-craft/minecraft-simulation/entity"
-	"github.com/go-theft-craft/minecraft-simulation/geom"
 	"github.com/go-theft-craft/minecraft-simulation/movement"
 	"github.com/go-theft-craft/minecraft-simulation/runtime"
+	"github.com/go-theft-craft/minecraft-simulation/scene"
 	"github.com/go-theft-craft/minecraft-simulation/sim"
 )
 
@@ -106,48 +106,13 @@ func Replay(profile sim.Profile, fixture Fixture) error {
 }
 
 // buildWorld describes a fixture's region to a store.
-func buildWorld(profile sim.Profile, described World) (*runtime.Memory, error) {
-	names, ok := profile.(sim.BlockNames)
-	if !ok {
-		return nil, fmt.Errorf(
-			"%w: profile %s cannot resolve block names, and a fixture describes its world by name",
-			ErrFixture, profile.ID(),
-		)
-	}
-
-	fill, ok := names.Ref(described.Fill)
-	if !ok {
-		return nil, fmt.Errorf("%w: the profile does not know the fill block %q",
-			ErrFixture, described.Fill)
-	}
-
+//
+// A scene failure is wrapped as a fixture failure, because from a caller's side
+// a world that will not build is a fixture that will not replay.
+func buildWorld(profile sim.Profile, described scene.World) (*runtime.Memory, error) {
 	store := runtime.NewMemory(profile)
-	for x := described.Min.X; x <= described.Max.X; x++ {
-		for y := described.Min.Y; y <= described.Max.Y; y++ {
-			for z := described.Min.Z; z <= described.Max.Z; z++ {
-				if err := store.SetBlock(geom.BlockPos{X: x, Y: y, Z: z}, fill); err != nil {
-					return nil, fmt.Errorf("mctest: fill the region: %w", err)
-				}
-			}
-		}
-	}
-
-	for _, block := range described.Blocks {
-		ref, ok := names.Ref(block.Name)
-		if !ok {
-			return nil, fmt.Errorf("%w: the profile does not know the block %q at %+v",
-				ErrFixture, block.Name, block.Pos)
-		}
-
-		var failure error
-		block.cells(func(pos geom.BlockPos) {
-			if err := store.SetBlock(pos, ref); err != nil {
-				failure = err
-			}
-		})
-		if failure != nil {
-			return nil, fmt.Errorf("mctest: place %q: %w", block.Name, failure)
-		}
+	if err := described.Describe(profile, store.SetBlock); err != nil {
+		return nil, fmt.Errorf("%w: %w", ErrFixture, err)
 	}
 
 	return store, nil

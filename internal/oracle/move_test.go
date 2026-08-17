@@ -38,8 +38,12 @@ func (k blockKind) shape() geom.Shape {
 	return geom.FullCube()
 }
 
-// scene is one random world plus the moves tried against it.
-type scene struct {
+// moveScene is one random world plus the moves tried against it.
+//
+// It is not a scene.World: this harness places shapes directly, because M8.2
+// predates the block table and checks collision against geometry rather than
+// against a profile.
+type moveScene struct {
 	blocks *world.Blocks
 	placed []placement
 	moves  []collision.Move
@@ -52,7 +56,7 @@ type placement struct {
 
 // buildScene generates a world with a floor, a scattering of stone and slabs,
 // and a batch of moves starting from air.
-func buildScene(random *rand.Rand, moves int) scene {
+func buildScene(random *rand.Rand, moves int) moveScene {
 	blocks := world.NewBlocks()
 	blocks.Fill(
 		geom.BlockPos{X: -describedRadius, Y: -describedRadius, Z: -describedRadius},
@@ -148,7 +152,7 @@ func buildScene(random *rand.Rand, moves int) scene {
 		}
 	}
 
-	return scene{blocks: blocks, placed: placed, moves: list}
+	return moveScene{blocks: blocks, placed: placed, moves: list}
 }
 
 // stepHeights covers the disabled case, the vanilla player value, and a value
@@ -198,7 +202,7 @@ func TestMoveMatchesTheGame(t *testing.T) {
 
 	var (
 		input  []string
-		built  []scene
+		built  []moveScene
 		wanted int
 	)
 	for seed := range uint64(scenes) {

@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-theft-craft/minecraft-simulation/geom"
 	"github.com/go-theft-craft/minecraft-simulation/mctest"
+	"github.com/go-theft-craft/minecraft-simulation/scene"
 )
 
 // writeFixtures makes the generator write. Without it the generator only checks
@@ -73,7 +74,7 @@ func recordFixture(t *testing.T, run movementRun, answers []string) mctest.Fixtu
 	fixture := mctest.Fixture{
 		Name:   run.scenario.name,
 		Source: "generated from a Java Edition 1.8.9 server jar by internal/oracle",
-		World: mctest.World{
+		World: scene.World{
 			Min:  geom.BlockPos{X: -run.room.radius, Y: run.room.floor, Z: -run.room.radius},
 			Max:  geom.BlockPos{X: run.room.radius, Y: run.room.ceiling, Z: run.room.radius},
 			Fill: "air",
@@ -93,7 +94,7 @@ func recordFixture(t *testing.T, run movementRun, answers []string) mctest.Fixtu
 	}
 
 	for _, block := range run.placed {
-		entry := mctest.Block{Pos: block.min, Name: block.name}
+		entry := scene.Block{Pos: block.min, Name: block.name}
 		if block.max != block.min {
 			to := block.max
 			entry.To = &to
