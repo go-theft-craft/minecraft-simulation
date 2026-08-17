@@ -145,7 +145,8 @@ func Spawn(built sim.Profile, pos geom.Vec3, yaw, pitch float32) (entity.State, 
 			Family: entity.FamilyPlayer,
 			Box: geom.AABB{
 				MinX: pos.X - playerHalfWidth, MinY: pos.Y, MinZ: pos.Z - playerHalfWidth,
-				MaxX: pos.X + playerHalfWidth, MaxY: pos.Y + playerHeight, MaxZ: pos.Z + playerHalfWidth,
+				MaxX: pos.X + playerHalfWidth, MaxY: pos.Y + float64(playerHeight),
+				MaxZ: pos.Z + playerHalfWidth,
 			},
 			OnGround:   true,
 			StepHeight: constants.StepHeight,
@@ -159,10 +160,21 @@ func Spawn(built sim.Profile, pos geom.Vec3, yaw, pitch float32) (entity.State, 
 
 // The player's collision box in 1.8.9: 0.6 wide and 1.8 tall, centred on the
 // position, with the position at its feet.
+//
+// The game holds both as floats and builds the box by halving the width in
+// float arithmetic and adding the height to a double position. So the box a
+// vanilla player stands in is not 0.6 by 1.8 of a block: it is a sixteenth of a
+// millionth wider and a tenth of that shorter, and every collision the body has
+// is decided by those edges. The oracle caught this on the first tick it
+// compared, before any rule had run.
 const (
-	playerHalfWidth = 0.3
-	playerHeight    = 1.8
+	playerWidth  float32 = 0.6
+	playerHeight float32 = 1.8
 )
+
+// playerHalfWidth is the horizontal offset from the position to a face, at the
+// width the game computes it: a float halving, widened once.
+const playerHalfWidth = float64(playerWidth / 2)
 
 // defaultMoveSpeed is the player's movement-speed attribute with no modifiers.
 // The game holds it as a float and reads it through the attribute map.

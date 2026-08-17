@@ -11,9 +11,20 @@ import (
 	"github.com/go-theft-craft/minecraft-simulation/world"
 )
 
-// sneakScale multiplies both input axes while a body is sneaking. The game
-// applies it to the input before the per-tick decay.
-const sneakScale float32 = 0.3
+// sneakScale multiplies both input axes while a body is sneaking.
+//
+// The scale belongs to the client's movement input rather than to the entity
+// tick — the 1.8.9 client scales what it sends, and a server never sees an
+// unscaled axis — so it is folded into the input-decay phase here and applied
+// before the per-tick decay, which is the order the two happen in.
+//
+// It is a double literal in the game, multiplied into a float axis and narrowed
+// back, so the scaling is written that way below rather than as a float product.
+const sneakScale = 0.3
+
+// motionThreshold is the magnitude below which the game discards a component of
+// a body's motion. It is a double literal.
+const motionThreshold = 0.005
 
 // body is the per-tick working state for one entity.
 //
@@ -64,6 +75,9 @@ func (p *profile) buildPhases() []sim.Phase {
 	return []sim.Phase{
 		phase{id: "v1_8.jump-countdown", run: func(tick *sim.TickState) error {
 			return p.adoptInput(tick, shared)
+		}},
+		phase{id: "v1_8.motion-threshold", run: func(*sim.TickState) error {
+			return p.motionThreshold(shared)
 		}},
 		phase{id: "v1_8.jump", run: func(*sim.TickState) error {
 			return p.jump(shared)
@@ -170,6 +184,26 @@ func latestInputs(commands []sim.Command) map[entity.ID]movement.Input {
 	return inputs
 }
 
+// motionThreshold discards each component of a body's motion that is too small
+// to matter.
+//
+// It runs after the countdown and before the jump, which is where the game runs
+// it. The oracle found it: the tick this milestone was planned from did not
+// describe it, and without it a body walking at any angle other than square on
+// disagrees with the game within a handful of ticks.
+func (p *profile) motionThreshold(shared *scratch) error {
+	for index := range shared.bodies {
+		working := &shared.bodies[index]
+		if !working.present {
+			continue
+		}
+
+		working.state.Motion = movement.ClampSmallMotion(working.state.Motion, motionThreshold)
+	}
+
+	return nil
+}
+
 // jump applies the jump impulse to every body whose state permits one.
 func (p *profile) jump(shared *scratch) error {
 	for index := range shared.bodies {
@@ -198,8 +232,8 @@ func (p *profile) decayInput(shared *scratch) error {
 		}
 
 		if working.loco.Sneaking {
-			working.strafe *= sneakScale
-			working.forward *= sneakScale
+			working.strafe = float32(float64(working.strafe) * sneakScale)
+			working.forward = float32(float64(working.forward) * sneakScale)
 		}
 		working.strafe *= inputDecay
 		working.forward *= inputDecay

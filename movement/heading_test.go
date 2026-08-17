@@ -117,8 +117,8 @@ func TestTheWideningHappensOnce(t *testing.T) {
 	scale := speed / magnitude
 	scaledStrafe := strafe * scale
 	scaledForward := forward * scale
-	radians := yaw * degreesToRadians
-	sin, cos := table.Sin(radians), table.Cos(radians)
+	angle := radians(yaw)
+	sin, cos := table.Sin(angle), table.Cos(angle)
 
 	wantX := float64(scaledStrafe*cos - scaledForward*sin)
 	wantZ := float64(scaledForward*cos + scaledStrafe*sin)
@@ -134,6 +134,47 @@ func TestTheWideningHappensOnce(t *testing.T) {
 	wideX := (float64(scaledStrafe) * float64(cos)) - (float64(scaledForward) * float64(sin))
 	if wideX == wantX {
 		t.Skip("this input does not separate the two widths; choose another")
+	}
+}
+
+func TestTheHeadingConvertsDegreesInTwoFloatSteps(t *testing.T) {
+	table := gameTable(t)
+
+	// The heading multiplies the yaw by a float pi and then divides by 180. The
+	// jump impulse, three rules away, multiplies by a single pre-divided
+	// constant. They are different expressions in the game and they disagree: at
+	// this yaw they read entries 61440 and 61439 of the table.
+	//
+	// The oracle found it. A walking body drifted four millionths of a block per
+	// tick along one axis while matching exactly along the other, which is what
+	// reading a neighbouring sine entry looks like.
+	const yaw float32 = 337.5
+
+	if radians(yaw) == yaw*degreesToRadians {
+		t.Fatal("this yaw does not separate the two conversions; the test proves nothing")
+	}
+
+	got := ApplyHeading(table, geom.Vec3{}, 0, 1, 0.1, yaw)
+
+	want := headingWith(table, radians(yaw))
+	if got.X != want.X || got.Z != want.Z {
+		t.Fatalf("ApplyHeading = %+v, want the two-step conversion's answer %+v", got, want)
+	}
+	if other := headingWith(table, yaw*degreesToRadians); got.X == other.X && got.Z == other.Z {
+		t.Fatal("the pre-divided conversion gives the same answer; the assertion above is vacuous")
+	}
+}
+
+// headingWith applies the heading of a full forward stride at a given angle,
+// with everything but the angle held fixed.
+func headingWith(table Table, angle float32) geom.Vec3 {
+	const speed float32 = 0.1
+
+	sin, cos := table.Sin(angle), table.Cos(angle)
+
+	return geom.Vec3{
+		X: float64(-speed * sin),
+		Z: float64(speed * cos),
 	}
 }
 

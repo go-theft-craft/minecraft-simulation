@@ -33,6 +33,7 @@ func TestThePhaseListIsTheTickInOrder(t *testing.T) {
 	// of change that breaks a trajectory without breaking anything else.
 	want := []string{
 		"v1_8.jump-countdown",
+		"v1_8.motion-threshold",
 		"v1_8.jump",
 		"v1_8.input-decay",
 		"v1_8.friction",
@@ -219,7 +220,7 @@ func TestAStandingPlayerStaysOnTheFloor(t *testing.T) {
 			t.Fatalf("tick %d left the feet at %v, want 1: the body sank into the floor",
 				tick, state.Box.MinY)
 		}
-		if state.Box.MinX != 0.2 || state.Box.MaxX != 0.8 {
+		if state.Box.MinX != 0.5-playerHalfWidth || state.Box.MaxX != 0.5+playerHalfWidth {
 			t.Fatalf("tick %d drifted horizontally: %+v", tick, state.Box)
 		}
 		last = state

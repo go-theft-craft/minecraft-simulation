@@ -62,7 +62,7 @@ func newOracle(t *testing.T) *oracle {
 
 	classes := t.TempDir()
 	build := exec.Command(javac, "-nowarn", "-cp", jar, "-d", classes,
-		"java/AabbOracle.java", "java/MoveOracle.java")
+		"java/AabbOracle.java", "java/MoveOracle.java", "java/MovementOracle.java")
 	if out, err := build.CombinedOutput(); err != nil {
 		t.Fatalf("compile the oracle harness: %v\n%s", err, out)
 	}

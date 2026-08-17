@@ -32,23 +32,25 @@ func TestGravityIsADoubleSubtraction(t *testing.T) {
 	}
 }
 
-func TestVerticalDragIsASingleWidthProduct(t *testing.T) {
+func TestVerticalDragIsADoubleWidthProduct(t *testing.T) {
 	const drag float32 = 0.9800000190734863
 
-	// A tenth is not exact at single width, so narrowing it first gives a
-	// different product than multiplying at double width would. A value like a
-	// half would be exact in both and the assertion below could not fail.
+	// The drag is a float and the motion is a double, so the game widens the
+	// drag and multiplies at double width. Narrowing the motion first is a
+	// different number, and this is where it shows: a tenth is not exact at
+	// single width, so the two answers disagree. A value like a half would be
+	// exact in both and the assertion below could not fail.
 	motion := geom.Vec3{X: 1, Y: -0.1, Z: 2}
 	got := ApplyVerticalDrag(motion, drag)
 
 	if got.X != motion.X || got.Z != motion.Z {
 		t.Fatalf("the vertical drag moved a horizontal component: %+v", got)
 	}
-	if want := float64(float32(motion.Y) * drag); got.Y != want {
-		t.Fatalf("Y = %v, want the single-width product widened, %v", got.Y, want)
+	if want := motion.Y * float64(drag); got.Y != want {
+		t.Fatalf("Y = %v, want the double-width product %v", got.Y, want)
 	}
-	if got.Y == motion.Y*float64(drag) {
-		t.Fatal("the vertical drag was computed at double width")
+	if got.Y == float64(float32(motion.Y)*drag) {
+		t.Fatal("the vertical motion was narrowed to single width before the drag")
 	}
 }
 
@@ -61,14 +63,14 @@ func TestHorizontalDragTouchesBothHorizontalsAndNotTheVertical(t *testing.T) {
 	if got.Y != motion.Y {
 		t.Fatalf("the horizontal drag moved Y to %v", got.Y)
 	}
-	if want := float64(float32(motion.X) * friction); got.X != want {
+	if want := motion.X * float64(friction); got.X != want {
 		t.Fatalf("X = %v, want %v", got.X, want)
 	}
-	if want := float64(float32(motion.Z) * friction); got.Z != want {
+	if want := motion.Z * float64(friction); got.Z != want {
 		t.Fatalf("Z = %v, want %v", got.Z, want)
 	}
 
-	// The assertions above pin single width, but only for values where the two
+	// The assertions above pin double width, but only for values where the two
 	// widths actually disagree. Most do not, so the separating value is searched
 	// for rather than guessed at, and a run that cannot find one fails: a check
 	// that silently became vacuous is worse than no check.
@@ -81,9 +83,9 @@ func TestHorizontalDragTouchesBothHorizontalsAndNotTheVertical(t *testing.T) {
 		}
 		separated = true
 
-		if drifted := ApplyHorizontalDrag(geom.Vec3{X: candidate}, friction); drifted.X != narrow {
-			t.Fatalf("X = %v for %v, want the single-width product %v (double width gives %v)",
-				drifted.X, candidate, narrow, wide)
+		if drifted := ApplyHorizontalDrag(geom.Vec3{X: candidate}, friction); drifted.X != wide {
+			t.Fatalf("X = %v for %v, want the double-width product %v (single width gives %v)",
+				drifted.X, candidate, wide, narrow)
 		}
 	}
 	if !separated {

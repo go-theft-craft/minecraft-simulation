@@ -17,10 +17,17 @@ func ApplyGravity(motion geom.Vec3, gravity float64) geom.Vec3 {
 
 // ApplyVerticalDrag multiplies the vertical motion by one tick of drag.
 //
-// The product is formed at single width and widened once, which is what makes a
-// long fall reach the same terminal speed the game reaches.
+// The drag arrives as a float32 because the game's constant is a float literal,
+// and the product is formed at double width because the motion is a double and
+// Java widens the float to meet it. Narrowing the motion to single width first
+// is a different number: the oracle caught it on the first tick it compared, on
+// a body that was doing nothing but standing still.
+//
+// This is the shape of every product in this package that mixes the two widths.
+// A float constant times a double motion is a double product. Only products
+// whose operands are all floats in the game are formed at single width.
 func ApplyVerticalDrag(motion geom.Vec3, drag float32) geom.Vec3 {
-	motion.Y = float64(float32(motion.Y) * drag)
+	motion.Y *= float64(drag)
 
 	return motion
 }
@@ -31,9 +38,12 @@ func ApplyVerticalDrag(motion geom.Vec3, drag float32) geom.Vec3 {
 // The friction is the one computed before the body moved. A player who walks off
 // ice keeps ice friction for the tick that leaves it, and recomputing here from
 // the post-move position would take that away.
+//
+// The friction is a float and the motion is a double, so the product is a double
+// one, as in ApplyVerticalDrag.
 func ApplyHorizontalDrag(motion geom.Vec3, friction float32) geom.Vec3 {
-	motion.X = float64(float32(motion.X) * friction)
-	motion.Z = float64(float32(motion.Z) * friction)
+	motion.X *= float64(friction)
+	motion.Z *= float64(friction)
 
 	return motion
 }
