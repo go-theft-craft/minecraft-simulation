@@ -35,6 +35,9 @@ jobs:
   digest:
     name: ${{ matrix.target.label }}
     runs-on: ${{ matrix.target.runner }}
+    # A replay of five recordings takes seconds. This bound is here so that a
+    # target which hangs fails visibly instead of leaving the run unfinished.
+    timeout-minutes: 15
     strategy:
       # Every target reports. A shared failure and a single-platform failure are
       # different findings, and fail-fast would hide which one this is.
@@ -43,7 +46,12 @@ jobs:
         target:
           - { runner: ubuntu-latest, label: linux-amd64 }
           - { runner: ubuntu-24.04-arm, label: linux-arm64 }
-          - { runner: macos-13, label: macos-amd64 }
+          # macos-13 never started: it sat queued for a quarter of an hour on
+          # three separate runs and was scheduled on none of them, which is what
+          # a retired image looks like from here. macos-15-intel is GitHub's
+          # Intel replacement, and if it does not start either then this gate
+          # covers five targets rather than six and says so.
+          - { runner: macos-15-intel, label: macos-amd64 }
           - { runner: macos-latest, label: macos-arm64 }
           - { runner: windows-latest, label: windows-amd64 }
           - { runner: windows-11-arm, label: windows-arm64 }
