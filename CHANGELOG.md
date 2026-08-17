@@ -49,3 +49,10 @@ This file records notable user-visible changes. It follows [Keep a Changelog](ht
   whole movement path, and a whole movement tick against a real 1.8.9 server jar
   and require bit-identical results. They skip when no prepared jar or JDK is
   present.
+- `terrain`: static predicates over a world view — whether a body fits, whether
+  anything holds it up, and whether a cell is clear, steppable, blocked, or
+  undescribed — with the body as a value and every block fact the collision
+  shape does not carry supplied through a profile oracle.
+- `navigation`: a bounded route search over walk, step, fall, and swim edges,
+  costed in ticks, whose frontier breaks ties on a total node order so two
+  identical searches return identical paths.

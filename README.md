@@ -13,6 +13,8 @@ persistence, rendering, and AI remain outside this repository.
 | `geom` | Vectors, block positions, axis-aligned boxes, and per-block voxel shapes |
 | `world` | The tri-state block view and a deterministic in-memory implementation |
 | `collision` | Swept candidate gathering and vanilla-order axis resolution with step-up |
+| `terrain` | Static predicates over a world view: fit, ground, passability, hazards, fluids |
+| `navigation` | The edge vocabulary, a body's capability, and a bounded deterministic route search |
 | `entity` | Entity identity, physics families, and the body state a tick moves |
 | `sim` | The tick contract: input, result, canonical digest, profile, phases, kernel |
 | `movement` | The movement rules a profile's phases call: friction, heading, jump, gravity, drags |
@@ -33,7 +35,15 @@ geom  ->  world  ->  entity  ->  movement  ->  sim  ->  runtime  ->  adapter
 profile/java/v1_8  ->  sim, movement, and one version's game data
 scene              ->  sim, world, geom
 mctest, replay     ->  sim, runtime, movement, scene
+terrain            ->  geom, world, collision
+navigation         ->  terrain, geom, world
 ```
+
+`terrain` and `navigation` import `geom`, `world`, and `collision` and nothing
+else. Neither imports `sim`, so a version's numbers reach them as arguments the
+same way they reach `movement` — a body's width and step height on a value, a
+block's hazard through an oracle the profile supplies. That is what lets one
+search serve a 1.8.9 mob and a 26.1.2 bot.
 
 `profile/java/v1_8` is the only package here that imports game data. Everything
 below it is version neutral: a rule that needs a 1.8.9 number receives it as an
