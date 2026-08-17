@@ -153,29 +153,29 @@ This is a change to contracts M8.3 closed, so it comes first and it is explicit.
 
 If that import direction proves wrong when the code exists, the fix is to move `Locomotion` into `entity` as a second state struct, not to weaken the encoding. Record which was chosen in the commit message.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Extend `TestDigestNoticesEveryField` with a `locomotion` case that changes `Op.Locomotion.JumpTicks` and requires the digest to change. Add `movement/input_test.go` covering: `Input.CommandKind() == "movement.input"`; `Locomotion` is comparable; `Bodies` returns what it was given, reports a missing entity, and clones without aliasing.
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./sim/ ./movement/`
 
-- [ ] **Step 3: Write `movement/input.go` and `movement/view.go`**
+- [x] **Step 3: Write `movement/input.go` and `movement/view.go`**
 
-- [ ] **Step 4: Extend `sim`**
+- [x] **Step 4: Extend `sim`**
 
 Add the operation kind, the field, the view on `TickInput`, the two `TickState` methods, and the encoding. The encoder gains a `tagLocomotion` appended to the tag list, never inserted into it, because inserting would renumber every existing tag and change every digest ever recorded.
 
-- [ ] **Step 5: Re-pin the empty-tick digest**
+- [x] **Step 5: Re-pin the empty-tick digest**
 
 Adding a field to the encoding changes the empty tick's digest. Run `TestEmptyTickDigestIsPinned`, read the new value, and update the constant **in this commit**, so the change is attributable to this task rather than discovered three tasks later.
 
-- [ ] **Step 6: Run the repository checks**
+- [x] **Step 6: Run the repository checks**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- task fmt && devbox run -- task verify`
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add sim/ movement/
@@ -201,7 +201,7 @@ git commit -m "feat(sim): carry per-entity locomotion state through the tick"
 
 `Sin` reads `entries[int32(angle * 10430.378) & 65535]`. Two details decide correctness and both are easy to get wrong: the multiply is `float32`, and the conversion truncates toward zero rather than rounding. `Cos` adds `16384` inside the `float32` multiply's result before converting.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Cover:
 - `NewTable` rejects a table of the wrong length and accepts 65536 entries.
@@ -210,9 +210,9 @@ Cover:
 - `Sin` over a full turn stays within `[-1, 1]` and `Sin(angle)` and `Sin(angle + 2π)` agree for a spread of angles, which is what the mask is for.
 - The table is not mutated by a read, and `NewTable` copies its input.
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 ```go
 // Sin returns the game's sine: a table read, not a computation.
@@ -230,7 +230,7 @@ func (t Table) Sin(angle float32) float32 {
 }
 ```
 
-- [ ] **Step 4 to 6: Verify, check, and commit**
+- [x] **Step 4 to 6: Verify, check, and commit**
 
 ```bash
 git add movement/trig.go movement/trig_test.go
@@ -256,7 +256,7 @@ Every signature is `float32` in and `float32` out. That is the discipline: the w
 
 `GroundFrictionBlock` returns the cell whose slipperiness applies: `floor(posX)`, `floor(box.MinY) - 1`, `floor(posZ)`. It takes the box and the position separately because the game uses the box for the vertical coordinate and the position for the horizontal ones, and a function that took only one of them would have to guess.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Cover:
 - `Friction` is exactly `0.91` widened from `float32` when airborne, whatever the slipperiness.
@@ -265,7 +265,7 @@ Cover:
 - `Speed` returns the jump factor unchanged when airborne, and the product when grounded.
 - `GroundFrictionBlock` for a body flush at `y = 0` returns `y = -1`, and for a body at `y = 0.5` also returns `y = -1`, since the floor of `0.5` is `0`.
 
-- [ ] **Step 2 to 6: Fail, implement, verify, check, commit**
+- [x] **Step 2 to 6: Fail, implement, verify, check, commit**
 
 ```bash
 git add movement/friction.go movement/friction_test.go
@@ -292,7 +292,7 @@ This is step 7 of the tick and the single most float-sensitive function in the m
 5. `sin = table.Sin(yaw · π / 180)` and `cos = table.Cos(yaw · π / 180)`, with the conversion factor in `float32`.
 6. `motion.X += float64(strafe·cos − forward·sin)` and `motion.Z += float64(forward·cos + strafe·sin)`. Each bracket is formed in `float32` and widened once.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Cover:
 - Zero input returns the motion unchanged, including the case where both inputs are tiny but non-zero and their squares fall below the threshold.
@@ -303,7 +303,7 @@ Cover:
 - The widening happens once: compute the expected value in the test with explicit `float32` brackets and compare bit for bit, and add a case whose `float64`-throughout answer differs, so the test fails if the discipline is broken.
 - Yaw of `360` and yaw of `0` agree, exercising the table mask.
 
-- [ ] **Step 2 to 6: Fail, implement, verify, check, commit**
+- [x] **Step 2 to 6: Fail, implement, verify, check, commit**
 
 ```bash
 git add movement/heading.go movement/heading_test.go
@@ -333,7 +333,7 @@ git commit -m "feat(movement): apply strafe and forward input to motion"
 
 `Step` is a thin adapter over `collision.Resolve`: it builds a `collision.Move` from the body, passes the candidate budget through, and returns the result untouched. It must not adjust the result. M8.2 established that `collision.Result` reports what the game reports, including a step's Y motion being the settle alone, and a phase that "fixed" that would reintroduce the bug the oracle caught.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Cover for gravity and drags: each function touches only the components it should; the vertical drag result is bit-identical to the `float32` product widened; and gravity applied to a `float64` motion is a plain subtraction, so a test that expects `0.08` to be widened from `float32` fails.
 
@@ -341,7 +341,7 @@ Cover for jump: it fires only when the body is on the ground, the jump flag is s
 
 Cover for step: a free move passes through unchanged; an unknown region surfaces as a non-empty `Unknown` in the returned result rather than an error; the candidate budget reaches `collision`, which a zero-budget case with a huge motion proves by returning `collision.ErrCandidateLimit`.
 
-- [ ] **Step 2 to 6: Fail, implement, verify, check, commit**
+- [x] **Step 2 to 6: Fail, implement, verify, check, commit**
 
 ```bash
 git add movement/gravity.go movement/jump.go movement/step.go movement/*_test.go
@@ -370,11 +370,11 @@ Slipperiness is stored as `float32`, because the game's field is a `float` and t
 
 `ref` exists for tests and fixtures, which name blocks rather than handles.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Cover: the table resolves stone to a full cube and air to an empty shape; slipperiness of ice, packed ice, slime, and soul sand differ from the default, so the dataset is genuinely wired up and not defaulting silently; an unknown handle reports `false` rather than a zero shape; and every slipperiness in the dataset narrows to `float32` and back without changing value.
 
-- [ ] **Step 2 to 6: Fail, implement, verify, check, commit**
+- [x] **Step 2 to 6: Fail, implement, verify, check, commit**
 
 ```bash
 git add profile/java/v1_8/blocks.go profile/java/v1_8/blocks_test.go
@@ -416,7 +416,7 @@ v1_8.commit
 
 The friction the horizontal drag uses is the one `v1_8.friction` computed from the pre-move position. The phase list is what makes that guaranteed rather than incidental: `move` runs between them and cannot change what `friction` already recorded.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Cover:
 - `New` returns a profile whose identity is `java/1.8.9@1` and whose phase list has the eleven identifiers above, in that order, asserted as a literal slice. A reordering must fail this test loudly, because reordering is exactly the kind of change that quietly breaks trajectories.
@@ -425,7 +425,7 @@ Cover:
 - `Slipperiness` of an unknown handle returns the default.
 - Running one tick of a standing player on a stone floor through `sim` and `runtime` leaves the body on the floor and reports it on the ground.
 
-- [ ] **Step 2 to 6: Fail, implement, verify, check, commit**
+- [x] **Step 2 to 6: Fail, implement, verify, check, commit**
 
 ```bash
 git add profile/java/v1_8/
@@ -449,11 +449,11 @@ The Java work is larger than `MoveOracle`'s because `EntityLivingBase` has more 
 
 **If the subclass proves impractical**, the fallback is to drive `EntityPlayerMP`, which is concrete. It needs a `GameProfile`, a `MinecraftServer`, and an interaction manager, which is more setup but no guesswork. Try the minimal subclass first and record which one worked and why in the commit message. Do not fall back to transcribing the tick into Java: that is a derivative work of the kind the parent design rejects, and it would test our reading rather than the game.
 
-- [ ] **Step 1: Write the harness and a smoke test**
+- [x] **Step 1: Write the harness and a smoke test**
 
 Run one tick of a player standing on a stone floor with no input, print the result, and compare it by hand against the tick above: motion should be `0.08` of gravity, dragged, and clamped by the floor to zero, leaving the body where it was and on the ground.
 
-- [ ] **Step 2: Write the differential test**
+- [x] **Step 2: Write the differential test**
 
 For each of the six scenarios the exit criterion names — walk, sprint, jump, sneak, fall, collide — and for a spread of random worlds and yaws:
 
@@ -465,11 +465,11 @@ Comparing every tick rather than the endpoint is what makes a failure debuggable
 
 Expect this test to fail on first run. That is its purpose. Each failure is a finding about the tick above; fix the rule, and record findings worth keeping in the README, as M8.2 did.
 
-- [ ] **Step 3: Run it, fix what it finds, and record**
+- [x] **Step 3: Run it, fix what it finds, and record**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./internal/oracle/ -run TestMovement -v`
 
-- [ ] **Step 4 to 6: Verify, check, and commit**
+- [x] **Step 4 to 6: Verify, check, and commit**
 
 ```bash
 git add internal/oracle/
@@ -497,21 +497,21 @@ A fixture records the profile identity, the world as named blocks with metadata 
 
 `Replay` needs no JDK and no jar. That is what makes the suite portable to M8.7 and to CI.
 
-- [ ] **Step 1: Write the fixture format and its round-trip test**
+- [x] **Step 1: Write the fixture format and its round-trip test**
 
 Cover: save then load returns an equal fixture; a fixture naming an unknown block fails to replay with an error that names the block; a fixture whose profile identity does not match the profile fails before simulating, per the parent design.
 
-- [ ] **Step 2: Generate the fixtures**
+- [x] **Step 2: Generate the fixtures**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./internal/oracle/ -run TestGenerateFixtures -args -write-fixtures`
 
-- [ ] **Step 3: Replay them without a JDK**
+- [x] **Step 3: Replay them without a JDK**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && PATH=/usr/bin devbox run -- go test ./mctest/ -v`
 
 Expected: PASS, with the six scenarios replaying from committed data. Confirm the oracle tests skip under this `PATH` rather than fail, which proves the suite is genuinely portable.
 
-- [ ] **Step 4 to 6: Verify, check, and commit**
+- [x] **Step 4 to 6: Verify, check, and commit**
 
 ```bash
 git add mctest/ internal/oracle/generate_test.go
@@ -525,13 +525,13 @@ git commit -m "test(mctest): generate movement fixtures from the game and replay
 **Files:**
 - Modify: `README.md`, `CHANGELOG.md`
 
-- [ ] **Step 1: Record the packages and the findings**
+- [x] **Step 1: Record the packages and the findings**
 
 Extend the package table with `movement`, `profile/java/v1_8`, and `mctest`. Add a section stating the `float32` discipline and where the widening happens, because it is the rule most likely to be broken by a later contributor who sees `float32` in a signature and assumes it is a mistake.
 
 Record every divergence Task 8 found, in the same form M8.2 used: what we believed, what the game does, and how it was found.
 
-- [ ] **Step 2: Changelog, verify, commit**
+- [x] **Step 2: Changelog, verify, commit**
 
 ```bash
 git add README.md CHANGELOG.md

@@ -101,17 +101,17 @@ minecraft-simulation/
 
 Nothing else in this milestone is worth building if the matrix cannot run, so the matrix runs first, against a placeholder test that passes trivially. A green six-target matrix on an empty check is a real result: it retires the milestone's stated risk.
 
-- [ ] **Step 1: Confirm each target actually starts**
+- [x] **Step 1: Confirm each target actually starts**
 
 Add `determinism.yml` with a matrix over `ubuntu-latest`, `ubuntu-24.04-arm`, `macos-latest`, `macos-13`, `windows-latest`, and `windows-11-arm`, each using `actions/setup-go` and running `go version` followed by `go test ./replay/`. Push it and read the result.
 
 If a target does not exist or does not start, **do not silently drop it.** Record which target failed and why in the workflow file as a comment and in the master plan, and state the reduced claim the gate now makes. A matrix that quietly covers four platforms while the plan claims six is worse than a matrix that covers four and says so.
 
-- [ ] **Step 2: Pin the Go version in one place**
+- [x] **Step 2: Pin the Go version in one place**
 
 The workflow must not name a Go version that `devbox.json` does not. Add a test to `internal/buildcheck` that reads `devbox.json` and `.github/workflows/determinism.yml` and fails if the Go versions disagree. Two toolchains are acceptable; two versions are not, because then the matrix tests a compiler nothing else uses.
 
-- [ ] **Step 3: Add the task**
+- [x] **Step 3: Add the task**
 
 ```yaml
   determinism:
@@ -120,7 +120,7 @@ The workflow must not name a Go version that `devbox.json` does not. Add a test 
       - go test ./replay/ -run TestRecordingsAreReproducible {{.CLI_ARGS}}
 ```
 
-- [ ] **Step 4: Verify and commit**
+- [x] **Step 4: Verify and commit**
 
 ```bash
 git add Taskfile.yml .github/workflows/determinism.yml internal/buildcheck/toolchain_test.go
@@ -149,11 +149,11 @@ Blocks are named, with metadata, never handles, for the reason M8.4's fixtures a
 
 `Command` in a recording is a serialized form rather than the `sim.Command` interface, because an interface does not round-trip through JSON. It carries a kind string and the fields the movement input needs. When later mechanics add commands, this type grows; a recording naming a kind the loader does not know must fail loudly rather than replay a tick with no input, which would produce a plausible wrong digest.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Cover: save then load round-trips; field order in the written file is stable across saves, checked by saving twice and comparing bytes; a recording whose profile identity differs fails `checkProfile` with `ErrProfileMismatch` before any simulation; a differing data digest fails with `ErrDataMismatch`; an unknown command kind fails to load with an error naming the kind; and an empty recording loads without error but is reported as covering nothing.
 
-- [ ] **Step 2 to 5: Fail, implement, verify, commit**
+- [x] **Step 2 to 5: Fail, implement, verify, commit**
 
 ```bash
 git add replay/recording.go replay/recording_test.go
@@ -178,7 +178,7 @@ git commit -m "feat(replay): add the canonical recording format"
 
 `Verify` stops at the first mismatch. A run that diverges at tick 12 will differ at every tick after it, and reporting 88 consequences of one cause is noise. `Mismatch.Detail` carries the expected and actual result for that tick alone, rendered for a human.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Cover:
 - Recording then verifying the same setup passes.
@@ -187,7 +187,7 @@ Cover:
 - A recording is reproducible: recording twice from the same setup produces identical digests, which is the same property the matrix checks and worth having locally too.
 - Verify refuses a recording whose profile does not match, before simulating.
 
-- [ ] **Step 2 to 5: Fail, implement, verify, commit**
+- [x] **Step 2 to 5: Fail, implement, verify, commit**
 
 ```bash
 git add replay/record.go replay/verify.go replay/*_test.go
@@ -216,17 +216,17 @@ Required recordings, each at least 200 ticks:
 
 Two rules for generating them: they are produced by `Record` on the reference platform and committed with the digest they produced, and any change to them is a deliberate commit whose message says which behaviour changed. A recording silently regenerated to make a red matrix go green would convert the gate into a rubber stamp, so the definition of done requires that no task in this plan regenerates a recording to fix a failure.
 
-- [ ] **Step 1: Generate and commit the recordings**
+- [x] **Step 1: Generate and commit the recordings**
 
-- [ ] **Step 2: Add `TestRecordingsAreReproducible`**
+- [x] **Step 2: Add `TestRecordingsAreReproducible`**
 
 It loads every file in `testdata`, verifies each, and fails naming the file and tick. This is the single test the determinism task runs, so it must not need a JDK, a jar, or a network.
 
-- [ ] **Step 3: Assert the recordings are not trivial**
+- [x] **Step 3: Assert the recordings are not trivial**
 
 Add a test that fails if any committed recording has fewer than 200 ticks, or if the set does not cover every scenario named above. Without it, a future contributor shrinking a recording to speed up CI would quietly weaken the gate.
 
-- [ ] **Step 4 to 6: Verify locally, then read the matrix**
+- [x] **Step 4 to 6: Verify locally, then read the matrix**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- task determinism`
 
@@ -245,11 +245,11 @@ git commit -m "test(replay): commit recordings that exercise the float32 paths"
 
 **Files:** modify `README.md`, `CHANGELOG.md`
 
-- [ ] **Step 1: Record what the matrix covers and what it does not**
+- [x] **Step 1: Record what the matrix covers and what it does not**
 
 State the six targets, which ones ran, and the two-toolchain arrangement with the reason. State that the matrix tests M8.4's arithmetic more than the encoder.
 
-- [ ] **Step 2: Changelog, verify, commit**
+- [x] **Step 2: Changelog, verify, commit**
 
 ```bash
 git add README.md CHANGELOG.md

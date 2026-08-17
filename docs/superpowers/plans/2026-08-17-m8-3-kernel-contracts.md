@@ -144,7 +144,7 @@ minecraft-simulation/
 
 `Revision` counts applied change sets and `Tick` counts simulated ticks. They are separate types because they move independently: a tick that is incomplete, cancelled, or rejected advances the tick counter and produces no revision. Giving them one type would let a caller pass either where the other belongs, and the compiler would not notice.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```go
 package sim
@@ -178,13 +178,13 @@ func TestRevisionAndTickAreDistinctTypes(t *testing.T) {
 }
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./sim/`
 
 Expected: FAIL to build, with `undefined: ProfileID`.
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 ```go
 // Package sim owns the tick contract: what one simulation step consumes, what
@@ -254,17 +254,17 @@ func (p ProfileID) validate() error {
 }
 ```
 
-- [ ] **Step 4: Run the test to verify it passes**
+- [x] **Step 4: Run the test to verify it passes**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./sim/ -v`
 
 Expected: PASS, three tests. `validate` is unused until Task 9; if the linter objects to that, move this function to Task 9 rather than exporting it to satisfy the linter.
 
-- [ ] **Step 5: Run the repository checks**
+- [x] **Step 5: Run the repository checks**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- task fmt && devbox run -- task verify`
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation
@@ -294,7 +294,7 @@ A `BlockRef` is an opaque handle a profile assigns to one block state. This pack
 
 `Set` and `SetAir` keep their M8.2 meaning and record the zero handle. A caller that cares about handles uses `SetBlock`. Changing what `Set` means would break every M8.2 test for no gain.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```go
 package world
@@ -375,13 +375,13 @@ func TestForgetClearsTheHandleToo(t *testing.T) {
 var _ View = (*Blocks)(nil)
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./world/`
 
 Expected: FAIL to build, with `undefined: View` and `b.SetBlock undefined`.
 
-- [ ] **Step 3: Write `world/state.go`**
+- [x] **Step 3: Write `world/state.go`**
 
 ```go
 package world
@@ -419,7 +419,7 @@ type View interface {
 }
 ```
 
-- [ ] **Step 4: Extend `world/fake.go`**
+- [x] **Step 4: Extend `world/fake.go`**
 
 Replace the `shapes` field and the methods that touch it, so that a cell records both a handle and a shape:
 
@@ -504,17 +504,17 @@ func (b *Blocks) BlockState(pos geom.BlockPos) (BlockRef, Lookup) {
 }
 ```
 
-- [ ] **Step 5: Run the tests to verify they pass**
+- [x] **Step 5: Run the tests to verify they pass**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./world/ ./collision/ -v`
 
 Expected: PASS. `collision` runs too, because it consumes `Blocks` and this task changed its internals; every M8.2 collision test must still pass untouched.
 
-- [ ] **Step 6: Run the repository checks**
+- [x] **Step 6: Run the repository checks**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- task fmt && devbox run -- task verify`
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation
@@ -549,7 +549,7 @@ git commit -m "feat(world): add opaque block handles and the combined view"
 
 `IDs` returns identifiers in ascending order. A view backed by a map must sort, because a tick that iterated entities in map order would produce a different change set on every run and no digest would ever be stable.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 ```go
 package entity
@@ -659,13 +659,13 @@ var _ View = (*Bodies)(nil)
 
 `TestIDsAreSortedAndStable` repeats because a single pass over a small map can come out sorted by luck. Twenty passes over six keys will not.
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./entity/`
 
 Expected: FAIL to build, with `undefined: Family`.
 
-- [ ] **Step 3: Write `entity/entity.go`**
+- [x] **Step 3: Write `entity/entity.go`**
 
 ```go
 // Package entity owns entity identity and the body state a simulation moves.
@@ -736,7 +736,7 @@ type State struct {
 }
 ```
 
-- [ ] **Step 4: Write `entity/view.go`**
+- [x] **Step 4: Write `entity/view.go`**
 
 ```go
 package entity
@@ -810,17 +810,17 @@ func (b *Bodies) Clone() *Bodies {
 }
 ```
 
-- [ ] **Step 5: Run the tests to verify they pass**
+- [x] **Step 5: Run the tests to verify they pass**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./entity/ -v`
 
 Expected: PASS, six tests. `Clone` has no test of its own here; Task 10 covers it.
 
-- [ ] **Step 6: Run the repository checks**
+- [x] **Step 6: Run the repository checks**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- task fmt && devbox run -- task verify`
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation
@@ -851,7 +851,7 @@ The struct is a flat union rather than an interface so that it stays comparable 
 
 `sortDependencies` deduplicates and orders by kind, then by name, then by block coordinate, then by entity. It is unexported because callers receive already-sorted slices; it exists as a named function so Task 8 and Task 9 sort identically.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```go
 package sim
@@ -945,13 +945,13 @@ func TestAnIncompleteResultNamesWhatWasMissing(t *testing.T) {
 }
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./sim/ -run TestDependency`
 
 Expected: FAIL to build, with `undefined: DependencyBlock`.
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 ```go
 package sim
@@ -1061,17 +1061,17 @@ func sortDependencies(in []Dependency) []Dependency {
 }
 ```
 
-- [ ] **Step 4: Run the test to verify it passes**
+- [x] **Step 4: Run the test to verify it passes**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./sim/ -v`
 
 Expected: PASS.
 
-- [ ] **Step 5: Run the repository checks**
+- [x] **Step 5: Run the repository checks**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- task fmt && devbox run -- task verify`
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation
@@ -1101,7 +1101,7 @@ Operations keep insertion order. A later operation may overwrite an earlier one,
 
 There is no partial apply. `ChangeSet` records the revision it was computed against, and a store applies all of it or none of it.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```go
 package sim
@@ -1162,13 +1162,13 @@ func TestOpIsComparable(t *testing.T) {
 }
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./sim/ -run 'TestOp|TestChangeSet'`
 
 Expected: FAIL to build, with `undefined: OpKind`.
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 ```go
 package sim
@@ -1241,17 +1241,17 @@ func (c ChangeSet) IsEmpty() bool {
 }
 ```
 
-- [ ] **Step 4: Run the test to verify it passes**
+- [x] **Step 4: Run the test to verify it passes**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./sim/ -v`
 
 Expected: PASS.
 
-- [ ] **Step 5: Run the repository checks**
+- [x] **Step 5: Run the repository checks**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- task fmt && devbox run -- task verify`
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation
@@ -1296,7 +1296,7 @@ Events carry a namespaced `Kind` string, such as `movement.collided`. A `uint8` 
 
 `RandomState` is a list of named streams, each a single `uint64`, which holds Java's 48-bit generator seed with room to spare. Streams are named because the parent design requires separate sources to stay separate when the game version uses them.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```go
 package sim
@@ -1383,13 +1383,13 @@ func TestRandomStateCloneDoesNotAlias(t *testing.T) {
 }
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./sim/ -run 'TestACommand|TestLimits|TestRandom'`
 
 Expected: FAIL to build, with `undefined: Command`.
 
-- [ ] **Step 3: Write `sim/command.go`**
+- [x] **Step 3: Write `sim/command.go`**
 
 ```go
 package sim
@@ -1423,7 +1423,7 @@ type CommandOutcome struct {
 }
 ```
 
-- [ ] **Step 4: Write `sim/event.go`**
+- [x] **Step 4: Write `sim/event.go`**
 
 ```go
 package sim
@@ -1456,7 +1456,7 @@ type PresentationEvent struct {
 }
 ```
 
-- [ ] **Step 5: Write `sim/limits.go`**
+- [x] **Step 5: Write `sim/limits.go`**
 
 ```go
 package sim
@@ -1519,7 +1519,7 @@ func (l Limits) withDefaults() Limits {
 }
 ```
 
-- [ ] **Step 6: Write `sim/random.go`**
+- [x] **Step 6: Write `sim/random.go`**
 
 ```go
 package sim
@@ -1588,17 +1588,17 @@ func (r RandomState) WithStream(name string, state uint64) RandomState {
 }
 ```
 
-- [ ] **Step 7: Run the tests to verify they pass**
+- [x] **Step 7: Run the tests to verify they pass**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./sim/ -v`
 
 Expected: PASS.
 
-- [ ] **Step 8: Run the repository checks**
+- [x] **Step 8: Run the repository checks**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- task fmt && devbox run -- task verify`
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation
@@ -1626,7 +1626,7 @@ Two float rules, stated once and relied on everywhere:
 - `-0.0` encodes as `0.0`. A step-up settle can produce a negative zero, and two results that differ only in a zero's sign describe the same state: adding either to a coordinate gives the same coordinate, and `value < 0` is false for both.
 - Every NaN encodes as one canonical quiet NaN. NaN payloads are not portable across platforms, which would defeat M8.6's whole purpose. A NaN in simulation state is a bug, and Task 9 asserts separately that none reaches a result; folding the bits here is about the digest being portable, not about tolerating the bug.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```go
 package sim
@@ -1723,13 +1723,13 @@ func TestEncoderWritesCompositesReproducibly(t *testing.T) {
 }
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./sim/ -run TestEncoder`
 
 Expected: FAIL to build, with `undefined: encoder`.
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 ```go
 package sim
@@ -1877,17 +1877,17 @@ func (e *encoder) blockPos(value geom.BlockPos) {
 }
 ```
 
-- [ ] **Step 4: Run the test to verify it passes**
+- [x] **Step 4: Run the test to verify it passes**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./sim/ -v -run TestEncoder`
 
 Expected: PASS, seven tests. `bytes` and some tags are unused until Task 8; if the linter objects, add the remaining encoders in Task 8 instead of leaving dead code here.
 
-- [ ] **Step 5: Run the repository checks**
+- [x] **Step 5: Run the repository checks**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- task fmt && devbox run -- task verify`
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation
@@ -1921,7 +1921,7 @@ The digest covers the profile identity and every field of the result except the 
 
 `Scope` names the entities a tick simulates, in order. It is a struct rather than a bare slice so that later milestones can add dimensions and regions without changing every signature.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```go
 package sim
@@ -2026,17 +2026,17 @@ func TestDigestStringIsHex(t *testing.T) {
 
 `TestDigestNoticesEveryField` is the important one. A digest that misses a field is worse than useless, because every later milestone trusts it to prove two runs agree.
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./sim/ -run TestDigest`
 
 Expected: FAIL to build, with `undefined: TickResult`.
 
-- [ ] **Step 3: Write `sim/result.go`**
+- [x] **Step 3: Write `sim/result.go`**
 
 Define `Scope`, `TickInput`, and `TickResult` with the fields listed above. Document on `TickInput` that the views must stay valid and unchanged for the whole `Step` call, and that the kernel reads nothing else: no clock, no global random state, no mutable application object. Document on `TickResult` that an incomplete result carries no operations and no events, so that applying one is impossible rather than discouraged.
 
-- [ ] **Step 4: Write `sim/digest.go`**
+- [x] **Step 4: Write `sim/digest.go`**
 
 ```go
 package sim
@@ -2159,17 +2159,17 @@ func encodeDependency(e *encoder, dependency Dependency) {
 }
 ```
 
-- [ ] **Step 5: Run the tests to verify they pass**
+- [x] **Step 5: Run the tests to verify they pass**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./sim/ -v -run TestDigest`
 
 Expected: PASS, including all twelve subtests of `TestDigestNoticesEveryField`. A subtest that fails names the field the encoding forgot.
 
-- [ ] **Step 6: Run the repository checks**
+- [x] **Step 6: Run the repository checks**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- task fmt && devbox run -- task verify`
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation
@@ -2223,7 +2223,7 @@ git commit -m "feat(sim): add tick input, tick result, and the canonical digest"
 
 Phases run on one goroutine. Cancellation and a limit failure both abort and return no applicable change set, per the parent design's error model.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```go
 package sim
@@ -2535,23 +2535,23 @@ func TestANaNInAResultIsRefused(t *testing.T) {
 
 Add `"math"` to the test imports for the last case.
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./sim/ -run 'TestNewKernel|TestEmptyTick|TestAPhase|TestAnUnknown|TestRead|TestCancellation|TestTheEvent|TestANaN'`
 
 Expected: FAIL to build, with `undefined: NewKernel`.
 
-- [ ] **Step 3: Write `sim/profile.go`**
+- [x] **Step 3: Write `sim/profile.go`**
 
 Declare `MotionConstants`, `Profile`, `Phase`, and `TickState` with the members listed above. `TickState` holds the input views, the accumulated operations, events, outcomes, dependencies, missing set, random state, effective limits, and running counters for each budget. Every recorder checks its budget and returns `ErrLimitExhausted` through a stored error that `Step` reports, so a phase that ignores an error cannot smuggle work past a limit.
 
 Document on `Blocks()` that a phase using it must forward `collision.Result.Unknown` to `MissingBlocks`, because `collision` reports incompleteness in its own return value and the kernel cannot see inside it.
 
-- [ ] **Step 4: Write `sim/kernel.go`**
+- [x] **Step 4: Write `sim/kernel.go`**
 
 Implement `NewKernel` and `Step` following the five steps described above. `NewKernel` validates the profile identity with `ProfileID.validate` and rejects duplicate phase identifiers. `Step` returns `(TickResult, error)` where the result is still digested on the incomplete path, because an incomplete tick is a result a caller may record, and returns a zero-change result on the error paths.
 
-- [ ] **Step 5: Write `sim/fake.go`**
+- [x] **Step 5: Write `sim/fake.go`**
 
 ```go
 package sim
@@ -2574,17 +2574,17 @@ type StaticProfile struct {
 
 with methods satisfying `Profile`. `Slipperiness` falls back to `Default`, `Motion` returns the zero value for an unknown family, `Shape` reports `false` for an unknown handle, and `Phases` returns the list. Rename the awkward `Slipperiness_` field to whatever reads well once the method set is written; the field and the method cannot share a name.
 
-- [ ] **Step 6: Run the tests, then pin the digest**
+- [x] **Step 6: Run the tests, then pin the digest**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./sim/ -v`
 
 `TestEmptyTickDigestIsPinned` fails first with the real digest in its message. Copy that value into the constant and re-run. Every other test must pass without editing an expectation.
 
-- [ ] **Step 7: Run the repository checks**
+- [x] **Step 7: Run the repository checks**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- task fmt && devbox run -- task verify`
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation
@@ -2615,29 +2615,29 @@ git commit -m "feat(sim): add the profile contract, tick phases, and the kernel"
 
 `Snapshot` returns a store at the same revision that shares no state, which is the fork the client prediction path needs. It copies, and the doc comment says so.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Cover: a fresh store is at revision zero; applying an empty set at the right revision bumps the revision; applying at a stale revision returns `ErrStaleRevision` and changes nothing; applying at a *future* revision is refused too; a set-entity operation is readable afterwards; a remove-entity operation makes the body absent; a set-block operation is visible through both `CollisionShape` and `BlockState`; a set containing an unknown handle is refused whole, with an earlier valid operation in the same set proving nothing was written; and a snapshot does not follow its origin.
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./runtime/`
 
 Expected: FAIL to build, with `undefined: NewMemory`.
 
-- [ ] **Step 3: Write `runtime/store.go` and `runtime/memory.go`**
+- [x] **Step 3: Write `runtime/store.go` and `runtime/memory.go`**
 
 `Memory` holds a revision, a `*world.Blocks`, a `*entity.Bodies`, and the profile it resolves handles through. `Apply` runs the revision check, then a validation pass that resolves every `OpSetBlock` handle through `Profile.Shape`, then the write pass, then increments the revision.
 
-- [ ] **Step 4: Run the tests to verify they pass**
+- [x] **Step 4: Run the tests to verify they pass**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./runtime/ -v`
 
-- [ ] **Step 5: Run the repository checks**
+- [x] **Step 5: Run the repository checks**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- task fmt && devbox run -- task verify`
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation
@@ -2667,7 +2667,7 @@ git commit -m "feat(runtime): add the in-memory store and the revision check"
 
 The runner keeps the random state the result returned, so a sequence of ticks draws a sequence of numbers rather than the same one repeatedly.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Cover: stepping an empty profile twice advances the tick and leaves the revision alone, since an empty change set still applies but changes nothing — decide and document which of those two it is, and assert it; a phase that writes an entity leaves it readable in the store afterwards; the second step sees the first step's revision as its base; an incomplete result is not applied and the store's revision does not move; and the runner's random state follows the results.
 
@@ -2679,21 +2679,21 @@ Cover: stepping an empty profile twice advances the tick and leaves the revision
 
 That is the milestone's second gate: a change set that a store at a newer revision rejects.
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./runtime/`
 
-- [ ] **Step 3: Write `runtime/runner.go`**
+- [x] **Step 3: Write `runtime/runner.go`**
 
-- [ ] **Step 4: Run the tests to verify they pass**
+- [x] **Step 4: Run the tests to verify they pass**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./runtime/ -v`
 
-- [ ] **Step 5: Record the packages in the README**
+- [x] **Step 5: Record the packages in the README**
 
 Extend the package table with `sim`, `entity`, and `runtime`, and add a short paragraph stating the dependency direction and the one deviation from the parent layout, so a reader does not have to find it in this plan.
 
-- [ ] **Step 6: Add the changelog entry**
+- [x] **Step 6: Add the changelog entry**
 
 Under `## Unreleased`, `### Added`:
 
@@ -2703,13 +2703,13 @@ Under `## Unreleased`, `### Added`:
   set computed against older state.
 ```
 
-- [ ] **Step 7: Run the full verification**
+- [x] **Step 7: Run the full verification**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- task fmt && devbox run -- task verify`
 
 Expected: `lint`, `secrets`, `test`, `vuln`, and `build` all pass. `internal/oracle` still passes untouched: nothing in this milestone changes collision, and if an oracle test fails here, this milestone broke M8.2.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation
