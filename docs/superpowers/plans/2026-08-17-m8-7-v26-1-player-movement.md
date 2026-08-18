@@ -4,7 +4,9 @@
 
 **Goal:** Deliver `profile/java/v26_1` for the player, so that the M8.4 scenario suite passes on Java Edition 26.1.2, and extend the ground-truth pipeline far enough to supply that version's constants.
 
-**Status:** Task 1 is done and its answer is in
+**Status:** Tasks 1, 2, 3, 4a, and 4 are done, and Task 5's tick order is
+established; what is left is the phase package, the gate, and the extraction.
+Task 1's answer is in
 `docs/superpowers/notes/2026-08-17-v26-1-oracle-feasibility.md`. A jar-backed
 oracle is possible and cheaper than 1.8.9's, because Mojang ships this version
 unobfuscated — so this milestone takes the strong branch below and the gate is
@@ -231,13 +233,11 @@ answered that it was not asked:
   test, because a table carried over by name would have walked the modern block
   on ordinary friction.
 
-**Task 4 onward is blocked on a release.** `minecraft-simulation` requires
-`minecraft-protocol v0.2.0` as a released module with no `replace` directive, so
-the constants this task generated are not visible here until
-`minecraft-protocol` is tagged and published. That is a decision about a public
-module rather than a step in this plan: the Go module mirror serves an immutable
-snapshot of whatever is tagged, so the tag is owed a maintainer's approval rather
-than an agent's.
+**The release Task 4 was blocked on landed as `v0.5.0`**, on 2026-08-18 and
+with the maintainer's say-so. `minecraft-simulation` consumes it as a released
+module with no `replace` directive, and every committed 1.8.9 recording still
+verifies against it, which is what says the shared dataset did not move under the
+older profile.
 
 ---
 
@@ -339,12 +339,58 @@ The same job as M8.4's block table, against this version's block model. The 1.13
 
 Slipperiness narrows to `float32` at this boundary if and only if Task 1 found it to be a `float` in this version. If it is a `double`, keep it `float64` and say so in a comment, because the asymmetry with the 1.8.9 table will otherwise read as a mistake.
 
-- [ ] **Steps: as M8.4 Task 6, against this version's data**
+- [x] **Steps: as M8.4 Task 6, against this version's data**
 
 ```bash
 git add profile/java/v26_1/blocks.go profile/java/v26_1/blocks_test.go
 git commit -m "feat(profile): map 26.1.2 block data to simulation handles"
 ```
+
+**Done 2026-08-18**, as `c3db3c2`. The flattening decided the shape of the
+table, and it is not the shape this task expected:
+
+- **A handle is a state, and only the shape belongs to it.** The dataset
+  describes 1,168 blocks across 29,873 states with 5,128 distinct shapes. The
+  shape is the state's — a slab's two halves and a stair's eighty orientations
+  are states of one block and they do not stand in the same volume — while the
+  friction is the block's, so it is stored once per block and every state of it
+  answers the same. So the handle is the state identifier plus one, which is also
+  the number this version's protocol carries.
+- **The shape list is one per block or one per state, and the table refuses
+  anything else.** 410 blocks name a single shape for every state they have and
+  758 name one apiece; a list of any other length would be a state-to-shape
+  mapping the table would have to guess at, so it is an error instead.
+- **The state numbering has to be whole.** An overlap or a hole would leave a
+  handle answering with an empty shape and the default friction, which is a
+  description of air, and the cell it was read from is not air. The constructor
+  checks both. This is also what makes the table refuse a 1.8.9-shaped dataset,
+  where every block's state span is zero.
+- **There is no way to name a state by its properties.** `minecraft-protocol`
+  publishes which properties a block varies over and not which state a
+  combination of them lands on, so `ref(name)` answers with the block's default
+  state and `refState(id)` is the way in for a world arriving from a server.
+  Task 6's fixtures can name blocks; a fixture wanting a stair facing east needs
+  the state number until something resolves properties.
+- **Slipperiness is a `float` here as it is in 1.8.9**, per Task 1's width table,
+  and this dataset stores it as the round decimal the way 1.8.9's does — so the
+  narrowing at the boundary recovers the width the game computes at rather than
+  losing one. The asymmetry with the step height, which the same dataset stores
+  already widened at `0.6000000238418579`, is pinned by its own test here as it
+  is there.
+- **Five blocks differ from the default friction and one is renamed.** Blue ice
+  is `0.989`, which is neither the default nor the `0.98` the other three ices
+  carry, and 1.8.9's `slime` is `slime_block`. A test asserts that `slime`
+  resolves to nothing, because a fixture carrying the old name over would place
+  air and say nothing about it.
+- **The shapes feed Task 4a's voxel step-up, not just the sweep.** A test takes
+  the default oak slab's `GridY` and asserts it offers zero, a half, and one,
+  which is the grid the step-up asks a shape for.
+
+Two things Task 5 inherits: `ErrInvalidProfile` lives in `blocks.go` for now,
+because the package cannot have a `profile.go` yet; and the block speed factor
+of statement 9 needs a second table — soul sand and honey carry the default
+friction here, and the slowing they do is a step in the tick rather than a
+friction.
 
 ---
 
