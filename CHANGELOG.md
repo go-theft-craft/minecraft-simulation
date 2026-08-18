@@ -4,6 +4,64 @@ This file records notable user-visible changes. It follows [Keep a Changelog](ht
 
 ## Unreleased
 
+### Added
+
+- `navigation`: the edges the design named and never had. `EdgeJumpGap` crosses
+  a gap, which nothing in the shipped vocabulary could — `EdgeStep` rises into an
+  adjacent cell and `EdgeFall` descends into one, so a body at the edge of a
+  two-block hole had no edge that reached the far side and every route around
+  every gap was a detour. `EdgeWaterDrop` takes a drop past the safe fall when
+  there is enough water at the bottom, `EdgeClimb` goes up and down ladders and
+  vines, and `EdgeDoor` opens a door on the way through.
+
+- `navigation/reach`: the jump reach, measured by running a profile's own
+  movement kernel over flat ground rather than guessed. The 2026-08-17 plan
+  deferred the jump edge rather than ship a maximum gap this repository could not
+  verify, and this is the deliverable that unblocked it. The two versions
+  disagree, which is the gate: 1.8.9 clears 2.439107 blocks from a standing
+  sprint jump and 26.1.2 clears 2.731274, and a table reading a shared constant
+  fails the test that compares them.
+
+- `navigation`: `PostureSneak`, `PostureFall`, and `PostureCrawl`. Crawling is
+  the first behaviour here that one supported version has and the other does not
+  — 26.1.2 fits through a one-block gap and 1.8.9 has no crawl at all — and the
+  absence is asserted in both directions rather than skipped. Sneaking is a
+  ledge-crossing posture and buys no headroom, deliberately: both versions
+  shorten the body when it crouches and on a block grid that changes nothing,
+  because 1.8 and 1.5 need the same two cells.
+
+- `navigation`: `Overlay`, `EdgePlace`, and `EdgePillar`, with the re-run-and-ban
+  validation loop the design specifies. A search expands nodes with no notion of
+  which placements a route has already made, so a winning path can put a block in
+  a cell one of its own later edges needs; validating the winner forward through
+  an overlay and banning the offending edge is what resolves it. `EdgePillar` is
+  the edge the design's list had no member for: `Place` bridges horizontally and
+  nothing gained height, so a body with a stack of blocks was capped by its step
+  height exactly as a body with none. It comes with a vertical envelope and a
+  per-column limit, because a search that can reach every Y coordinate will
+  otherwise spend its whole node budget finding that out.
+
+- `terrain`: `Facts` answers `Climbable` and `Door`. Neither is readable from a
+  collision shape — a ladder's box is empty and a closed door looks like a wall —
+  so both arrive from the profile, the same way hazards and fluids do.
+
+- `geom`: `AABB.Nearest` and `AABB.Reaches`, and the aiming arithmetic —
+  `Vec3.Pitch`, `Vec3.Look`, `Vec3.Toward`, `Vec3.Yaw`, `Vec3.HorizontalDistance`,
+  and the `Behind`, `Lead`, `Tangent`, and `Away` functions. Reach is measured to
+  a box's nearest point rather than to its centre, because that is what the game
+  measures and a client using the centre refuses hits the server accepts. The
+  package still imports nothing outside the standard library.
+
+### Fixed
+
+- `navigation`: the heuristic floor is computed over the edges a capability
+  actually enables. It was computed over the movement edges alone, so the moment
+  a body could place, jump, or climb more cheaply per block than it could walk,
+  the heuristic overestimated and A* stopped returning shortest routes. The
+  symptom would have been paths that are merely suboptimal, which is the hardest
+  kind of wrongness to notice; a property test over random capabilities with
+  random subsets enabled is what now catches it.
+
 ## 0.1.0 - 2026-08-18
 
 The first release. Everything below is what the module is on the day it is
