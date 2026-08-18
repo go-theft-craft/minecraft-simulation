@@ -12,7 +12,7 @@ import (
 func TestMemoAnswersAsTheDirectOracle(t *testing.T) {
 	blocks := maze(seeds[0])
 	direct := directOracle{query: walker.query(blocks, nil), capability: walker}
-	memo := newMemoOracle(blocks, nil, walker)
+	memo := newMemoOracle(blocks, nil, walker, 0)
 
 	for x := int32(0); x <= 11; x++ {
 		for z := int32(0); z <= 11; z++ {
@@ -38,7 +38,7 @@ func TestMemoAnswersAsTheDirectOracle(t *testing.T) {
 
 func TestMemoServesTheSecondCallFromCache(t *testing.T) {
 	blocks := flat(-1, -1, 1, 1)
-	memo := newMemoOracle(blocks, nil, walker)
+	memo := newMemoOracle(blocks, nil, walker, 0)
 	cell := geom.BlockPos{X: 0, Y: 0, Z: 0}
 
 	if _, err := memo.passable(cell); err != nil {
@@ -59,7 +59,7 @@ func TestMemoServesTheSecondCallFromCache(t *testing.T) {
 // under c, so changing the ground must invalidate c.
 func TestMemoInvalidatesByDependency(t *testing.T) {
 	blocks := flat(-1, -1, 1, 1)
-	memo := newMemoOracle(blocks, nil, walker)
+	memo := newMemoOracle(blocks, nil, walker, 0)
 	cell := geom.BlockPos{X: 0, Y: 0, Z: 0}
 	ground := geom.BlockPos{X: 0, Y: -1, Z: 0}
 
@@ -88,7 +88,7 @@ func TestMemoInvalidatesByDependency(t *testing.T) {
 // nothing at all.
 func TestMemoWithoutInvalidationIsStale(t *testing.T) {
 	blocks := flat(-1, -1, 1, 1)
-	memo := newMemoOracle(blocks, nil, walker)
+	memo := newMemoOracle(blocks, nil, walker, 0)
 	cell := geom.BlockPos{X: 0, Y: 0, Z: 0}
 
 	if _, err := memo.passable(cell); err != nil {
@@ -108,7 +108,7 @@ func TestMemoWithoutInvalidationIsStale(t *testing.T) {
 
 func TestMemoResetDropsEverything(t *testing.T) {
 	blocks := flat(-1, -1, 1, 1)
-	memo := newMemoOracle(blocks, nil, walker)
+	memo := newMemoOracle(blocks, nil, walker, 0)
 	cell := geom.BlockPos{X: 0, Y: 0, Z: 0}
 
 	if _, err := memo.passable(cell); err != nil {
@@ -126,3 +126,64 @@ func TestMemoResetDropsEverything(t *testing.T) {
 }
 
 var _ oracle = (*memoOracle)(nil)
+
+func TestMemoEvictsWhenFull(t *testing.T) {
+	blocks := flat(-1, -1, 20, 1)
+	memo := newMemoOracle(blocks, nil, walker, 4)
+
+	for x := int32(0); x < 8; x++ {
+		if _, err := memo.passable(geom.BlockPos{X: x, Y: 0, Z: 0}); err != nil {
+			t.Fatalf("passable returned an error: %v", err)
+		}
+	}
+
+	if len(memo.pass) > 4 {
+		t.Fatalf("cached %d answers, want at most 4", len(memo.pass))
+	}
+}
+
+// Eviction must not leave dangling index entries, or invalidate would walk a
+// reverse index that outlived the answers it points at and grow without bound.
+func TestMemoEvictionCleansTheDependencyIndex(t *testing.T) {
+	blocks := flat(-1, -1, 20, 1)
+	memo := newMemoOracle(blocks, nil, walker, 2)
+
+	for x := int32(0); x < 8; x++ {
+		if _, err := memo.passable(geom.BlockPos{X: x, Y: 0, Z: 0}); err != nil {
+			t.Fatalf("passable returned an error: %v", err)
+		}
+	}
+
+	for cell, set := range memo.dependents {
+		for key := range set.pass {
+			if _, ok := memo.pass[key]; !ok {
+				t.Fatalf("cell %v still indexes evicted answer %v", cell, key)
+			}
+		}
+	}
+}
+
+// Eviction changes only whether an answer is recomputed, never what it is.
+func TestMemoEvictionDoesNotChangeAnswers(t *testing.T) {
+	blocks := maze(seeds[0])
+	direct := directOracle{query: walker.query(blocks, nil), capability: walker}
+	memo := newMemoOracle(blocks, nil, walker, 2)
+
+	for x := int32(0); x <= 11; x++ {
+		for z := int32(0); z <= 11; z++ {
+			cell := geom.BlockPos{X: x, Y: 0, Z: z}
+
+			want, err := direct.passable(cell)
+			if err != nil {
+				t.Fatalf("direct.passable returned an error: %v", err)
+			}
+			got, err := memo.passable(cell)
+			if err != nil {
+				t.Fatalf("memo.passable returned an error: %v", err)
+			}
+			if got != want {
+				t.Fatalf("memo.passable(%v) = %v, want %v", cell, got, want)
+			}
+		}
+	}
+}

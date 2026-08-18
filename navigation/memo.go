@@ -6,6 +6,11 @@ import (
 	"github.com/go-theft-craft/minecraft-simulation/world"
 )
 
+// defaultMemoCells bounds each cache when Options does not. It is a count of
+// cells, not bytes: an entry is a small value plus its dependency list, and a
+// body's working set over a few chunks is well inside this.
+const defaultMemoCells = 16_384
+
 // passEntry is one cached Passable answer and the cells it was computed from.
 type passEntry struct {
 	value terrain.Passability
@@ -52,6 +57,14 @@ type memoOracle struct {
 	// drops exactly what a change affects rather than everything.
 	dependents map[geom.BlockPos]*dependentSet
 
+	// limit bounds each cache. passOrder and arriveOrder are the insertion
+	// order eviction walks, oldest first. Which answer is evicted changes only
+	// whether it must be recomputed, never what it is, so the policy is free to
+	// be the simplest one that bounds the memory.
+	limit       int
+	passOrder   []geom.BlockPos
+	arriveOrder []geom.BlockPos
+
 	// misses counts recomputations, for tests and for the benchmark report.
 	misses int
 }
@@ -64,8 +77,11 @@ type dependentSet struct {
 }
 
 // newMemoOracle returns an empty memo over a view.
-func newMemoOracle(view world.View, facts terrain.Facts, capability Capability) *memoOracle {
+func newMemoOracle(view world.View, facts terrain.Facts, capability Capability, limit int) *memoOracle {
 	recorder := &recordingView{view: view}
+	if limit <= 0 {
+		limit = defaultMemoCells
+	}
 
 	return &memoOracle{
 		recorder:   recorder,
@@ -74,6 +90,7 @@ func newMemoOracle(view world.View, facts terrain.Facts, capability Capability) 
 		pass:       make(map[geom.BlockPos]passEntry),
 		arrive:     make(map[geom.BlockPos]arriveEntry),
 		dependents: make(map[geom.BlockPos]*dependentSet),
+		limit:      limit,
 	}
 }
 
@@ -93,6 +110,13 @@ func (m *memoOracle) passable(cell geom.BlockPos) (terrain.Passability, error) {
 	deps := m.claim(cell, true)
 	m.pass[cell] = passEntry{value: value, deps: deps}
 
+	m.passOrder = append(m.passOrder, cell)
+	for len(m.pass) > m.limit && len(m.passOrder) > 0 {
+		oldest := m.passOrder[0]
+		m.passOrder = m.passOrder[1:]
+		m.forgetPass(oldest)
+	}
+
 	return value, nil
 }
 
@@ -111,6 +135,13 @@ func (m *memoOracle) arriveAt(cell geom.BlockPos) (arrival, error) {
 
 	deps := m.claim(cell, false)
 	m.arrive[cell] = arriveEntry{value: value, deps: deps}
+
+	m.arriveOrder = append(m.arriveOrder, cell)
+	for len(m.arrive) > m.limit && len(m.arriveOrder) > 0 {
+		oldest := m.arriveOrder[0]
+		m.arriveOrder = m.arriveOrder[1:]
+		m.forgetArrive(oldest)
+	}
 
 	return value, nil
 }
@@ -194,4 +225,6 @@ func (m *memoOracle) reset() {
 	clear(m.pass)
 	clear(m.arrive)
 	clear(m.dependents)
+	m.passOrder = m.passOrder[:0]
+	m.arriveOrder = m.arriveOrder[:0]
 }
