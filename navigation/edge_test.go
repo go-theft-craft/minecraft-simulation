@@ -30,18 +30,28 @@ func TestReasonStringNamesEveryValue(t *testing.T) {
 	}
 }
 
-// The heuristic multiplies distance by the cheapest edge a capability can
-// take. Getting this wrong makes the search inadmissible and it stops
-// returning shortest paths, which no test of a single path would catch.
-func TestCheapestIsTheLowestEnabledEdgeCost(t *testing.T) {
+// The heuristic multiplies Manhattan distance by this floor. It is the lowest
+// cost per block of distance closed, not the lowest edge cost: a step and a
+// fall each close two blocks for one edge's price. Getting it wrong makes the
+// search inadmissible and it stops returning shortest paths, which no test of a
+// single path would catch.
+func TestPerBlockFloorIsTheLowestCostPerBlockClosed(t *testing.T) {
 	walker := Capability{WalkTicks: 5, StepTicks: 9, FallTicks: 3, SwimTicks: 1}
-	if got := walker.cheapest(); got != 3 {
-		t.Fatalf("cheapest = %v, want 3 (swimming disabled)", got)
+	// Walk 5 per block, step 9/2 = 4.5, fall 3/2 = 1.5, swim disabled.
+	if got := walker.perBlockFloor(); got != 1.5 {
+		t.Fatalf("perBlockFloor = %v, want 1.5 (fall, swimming disabled)", got)
 	}
 
 	swimmer := walker
 	swimmer.CanSwim = true
-	if got := swimmer.cheapest(); got != 1 {
-		t.Fatalf("cheapest = %v, want 1", got)
+	// Swim closes one block for 1, which is below the fall's 1.5.
+	if got := swimmer.perBlockFloor(); got != 1 {
+		t.Fatalf("perBlockFloor = %v, want 1", got)
+	}
+
+	// A body whose walk is cheapest per block still floors on the walk.
+	walkerFirst := Capability{WalkTicks: 1, StepTicks: 9, FallTicks: 9, SwimTicks: 9}
+	if got := walkerFirst.perBlockFloor(); got != 1 {
+		t.Fatalf("perBlockFloor = %v, want 1", got)
 	}
 }

@@ -434,3 +434,49 @@ func TestFindFallsBeyondTheColumnWalkFloor(t *testing.T) {
 		t.Fatal("a safe fall past the column-walk floor was refused")
 	}
 }
+
+// A fall closes two blocks of Manhattan distance — one across, one down — for
+// one fall's cost. A heuristic scaled by the cheapest single edge predicts two
+// falls' worth of cost for that move and overestimates, which is what lets Find
+// settle a goal on a non-shortest route.
+func TestHeuristicNeverExceedsTheCostOfAFall(t *testing.T) {
+	from := geom.BlockPos{X: 0, Y: 0, Z: 0}
+	goal := geom.BlockPos{X: 1, Y: -1, Z: 0}
+
+	trueCost := walker.FallTicks
+
+	if got := walker.heuristic(from, goal); got > trueCost {
+		t.Fatalf("heuristic = %v, exceeds the true cost %v of the fall that reaches the goal", got, trueCost)
+	}
+}
+
+// The same property for a step, which closes two blocks for one step's cost.
+func TestHeuristicNeverExceedsTheCostOfAStep(t *testing.T) {
+	from := geom.BlockPos{X: 0, Y: 0, Z: 0}
+	goal := geom.BlockPos{X: 1, Y: 1, Z: 0}
+
+	trueCost := walker.StepTicks
+
+	if got := walker.heuristic(from, goal); got > trueCost {
+		t.Fatalf("heuristic = %v, exceeds the true cost %v of the step that reaches the goal", got, trueCost)
+	}
+}
+
+// A level walk closes one block for one walk's cost, so the floor must not be
+// below the walk cost for a body that can only walk. Guarding the other
+// direction matters: a floor of zero would be admissible and useless, turning
+// the search into Dijkstra.
+func TestHeuristicIsTightForALevelWalk(t *testing.T) {
+	lander := walker
+	lander.StepTicks = 100
+	lander.FallTicks = 100
+
+	from := geom.BlockPos{X: 0, Y: 0, Z: 0}
+	goal := geom.BlockPos{X: 3, Y: 0, Z: 0}
+
+	want := 3 * lander.WalkTicks
+
+	if got := lander.heuristic(from, goal); got != want {
+		t.Fatalf("heuristic = %v, want %v", got, want)
+	}
+}

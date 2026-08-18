@@ -166,15 +166,18 @@ func assemble(cameFrom map[node]link, cost map[node]float64, start, end node, re
 	}
 }
 
-// heuristic estimates the remaining cost. It is Manhattan distance scaled by
-// the cheapest edge available, which never overestimates and so keeps the
-// search returning shortest paths.
+// heuristic estimates the remaining cost as Manhattan distance scaled by the
+// lowest cost the body can pay per block of that distance.
+//
+// The scale is per block closed rather than per edge because a step and a fall
+// each close two blocks at once. It never overestimates, which is what keeps
+// the search returning shortest paths.
 func (c Capability) heuristic(from, goal geom.BlockPos) float64 {
 	distance := math.Abs(float64(goal.X-from.X)) +
 		math.Abs(float64(goal.Y-from.Y)) +
 		math.Abs(float64(goal.Z-from.Z))
 
-	return distance * c.cheapest()
+	return distance * c.perBlockFloor()
 }
 
 // expand returns every edge leaving a node, in the fixed neighbour order.

@@ -69,12 +69,17 @@ type Capability struct {
 	CandidateLimit int
 }
 
-// cheapest returns the lowest cost of any edge this capability may take. The
-// heuristic scales distance by it, and a heuristic that assumed a higher floor
-// would overestimate and stop returning shortest paths.
-func (c Capability) cheapest() float64 {
+// perBlockFloor returns the lowest cost this capability can pay for one block
+// of Manhattan distance closed.
+//
+// It is deliberately not the cheapest edge. A step closes two blocks — one
+// across, one up — for one step's cost, and a fall of depth D closes 1+D blocks
+// for FallTicks*D, which is cheapest per block at D=1. Scaling distance by the
+// cheapest edge instead overestimates on both, and an overestimating heuristic
+// lets the search settle a goal on a route that is not shortest.
+func (c Capability) perBlockFloor() float64 {
 	lowest := c.WalkTicks
-	for _, cost := range []float64{c.StepTicks, c.FallTicks} {
+	for _, cost := range []float64{c.StepTicks / 2, c.FallTicks / 2} {
 		if cost < lowest {
 			lowest = cost
 		}
