@@ -71,7 +71,7 @@ func newPlacementTable(set *data.Set) (placementTable, error) {
 // records which families it covers rather than leaving a reader to assume all
 // of them.
 func (p *profile) PlacedState(
-	item data.ItemID, target placement.Target, face mining.Face, yaw float32, cursor geom.Vec3,
+	item data.ItemID, _ placement.Target, face mining.Face, yaw float32, cursor geom.Vec3,
 ) (world.BlockRef, error) {
 	name, ok := p.placement.blocks[item]
 	if !ok {
@@ -149,6 +149,8 @@ func logMetadata(face mining.Face) int {
 		return 4
 	case placement.AxisZ:
 		return 8
+	case placement.AxisY:
+		return 0
 	default:
 		return 0
 	}

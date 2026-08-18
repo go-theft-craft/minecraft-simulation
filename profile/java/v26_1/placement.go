@@ -94,7 +94,7 @@ func newPlacementTable(set *data.Set) (placementTable, error) {
 // stage adds, and the corpus records which families it covers rather than
 // leaving a reader to assume all of them.
 func (p *profile) PlacedState(
-	item data.ItemID, target placement.Target, face mining.Face, yaw float32, cursor geom.Vec3,
+	item data.ItemID, _ placement.Target, face mining.Face, yaw float32, cursor geom.Vec3,
 ) (world.BlockRef, error) {
 	name, ok := p.placement.blocks[item]
 	if !ok {
