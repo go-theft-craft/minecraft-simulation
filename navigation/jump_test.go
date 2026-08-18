@@ -248,3 +248,52 @@ func TestAReachBelowOneJumpProducesNothing(t *testing.T) {
 		t.Fatalf("a reach of %v produced %d jump edges, want none", capability.JumpReach, len(edges))
 	}
 }
+
+// TestASwimmingBodyDoesNotJump pins that a jump needs ground to push off.
+//
+// It was found by a route rather than by reading the rules. A body in the middle
+// of a pool, with swimming enabled, hopped from water cell to water cell: every
+// landing was admissible for a swimmer, the arc over each was clear, and nothing
+// asked what the body had jumped from. The route was legal edge by edge and
+// impossible as a whole, which is the shape of mistake a per-edge search makes.
+func TestASwimmingBodyDoesNotJump(t *testing.T) {
+	capability := jumpingCapability()
+	capability.CanSwim = true
+	capability.SwimTicks = 11
+
+	view := gap(5, 2)
+	o := directOracle{
+		query:      capability.query(view, nil),
+		capability: capability,
+		crawlQuery: capability.crawling().query(view, nil),
+	}
+	at := node{Pos: geom.BlockPos{X: 1, Y: 0, Z: 0}}
+
+	at.Posture = PostureStand
+	grounded, err := capability.jumps(o, at)
+	if err != nil {
+		t.Fatalf("jumps: %v", err)
+	}
+	if len(grounded) == 0 {
+		t.Fatal("a standing body produced no jump, so the swimming case proves nothing")
+	}
+
+	at.Posture = PostureSwim
+	floating, err := capability.jumps(o, at)
+	if err != nil {
+		t.Fatalf("jumps: %v", err)
+	}
+	if len(floating) != 0 {
+		t.Fatalf("a swimming body produced %d jump edges, want none", len(floating))
+	}
+
+	// Crouching does push off the ground, so it keeps its jump.
+	at.Posture = PostureSneak
+	crouched, err := capability.jumps(o, at)
+	if err != nil {
+		t.Fatalf("jumps: %v", err)
+	}
+	if len(crouched) == 0 {
+		t.Fatal("a crouched body produced no jump, and crouching jumps in the game")
+	}
+}

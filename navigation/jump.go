@@ -15,11 +15,18 @@ import (
 // capability. The order here is the step order, then increasing distance, which
 // keeps the frontier's tie-breaking total and the search deterministic.
 //
-// A body already in the air produces none. That is what PostureFall encodes: a
-// jump starts from the ground, and a search that let one start mid-arc would
-// return routes nothing can walk.
+// A jump starts from the ground, and only from the ground. A body in the air has
+// nothing left to push off, and a body in water has nothing solid to push off at
+// all — it is floating, and floating bodies do not leap. Neither posture
+// produces an edge here.
+//
+// The swimming case was found by a route rather than by reading: a bot in the
+// middle of a pool hopped from water cell to water cell, because the landing was
+// legal for a swimmer and nothing asked what it had jumped from. Every cell in
+// that route was individually admissible and the route as a whole was something
+// no body can do.
 func (c Capability) jumps(o oracle, from node) ([]Edge, error) {
-	if c.JumpReach <= 0 || from.Posture == PostureFall {
+	if c.JumpReach <= 0 || !c.jumpsFrom(from.Posture) {
 		return nil, nil
 	}
 
@@ -79,6 +86,22 @@ func (c Capability) jumps(o oracle, from node) ([]Edge, error) {
 	}
 
 	return edges, nil
+}
+
+// jumpsFrom reports whether a body in this posture can begin a jump.
+//
+// Standing and crouching both push off the ground; a crouched body jumps in the
+// game and the search prices it the same. Falling and swimming cannot, and
+// crawling is a body under a block with nowhere to go but along.
+func (c Capability) jumpsFrom(posture Posture) bool {
+	switch posture {
+	case PostureStand, PostureSneak:
+		return true
+	case PostureFall, PostureSwim, PostureCrawl:
+		return false
+	}
+
+	return false
 }
 
 // minJump is the shortest jump the search produces. A jump of one lands in the
