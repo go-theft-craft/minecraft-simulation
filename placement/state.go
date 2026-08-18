@@ -131,11 +131,13 @@ func HalfFor(face mining.Face, cursor geom.Vec3) Half {
 		return HalfTop
 	case mining.FaceTop:
 		return HalfBottom
-	default:
+	case mining.FaceNorth, mining.FaceSouth, mining.FaceWest, mining.FaceEast:
 		if cursor.Y > 0.5 {
 			return HalfTop
 		}
 
+		return HalfBottom
+	default:
 		return HalfBottom
 	}
 }
@@ -159,8 +161,10 @@ func (a Axis) String() string {
 		return "x"
 	case AxisY:
 		return "y"
-	default:
+	case AxisZ:
 		return "z"
+	default:
+		return "axis(?)"
 	}
 }
 
@@ -175,7 +179,9 @@ func AxisFor(face mining.Face) Axis {
 		return AxisY
 	case mining.FaceNorth, mining.FaceSouth:
 		return AxisZ
-	default:
+	case mining.FaceWest, mining.FaceEast:
 		return AxisX
+	default:
+		return AxisY
 	}
 }
