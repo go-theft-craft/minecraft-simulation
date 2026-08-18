@@ -1,5 +1,16 @@
 # M8.2 Geometry and Collision Core Implementation Plan
 
+> **Status: complete, 2026-08-18.** Shipped as M8.2: `geom`, `world`, and
+> `collision`, with the three exit properties and a differential harness that
+> agrees with a real 1.8.9 server bit for bit across 2,872 whole moves. The
+> checkboxes below were never ticked and are not evidence; do not re-run this
+> plan.
+>
+> One thing here has been superseded rather than completed: M8.4 measured what
+> this plan's prose statements about vanilla were worth and found two of the
+> eight wrong, with no fixture written from the same prose catching either.
+> Fixtures the game generates through `internal/oracle` are the catalog now.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Deliver `geom`, `collision`, and a minimal world view in `minecraft-simulation`, reproducing Java Edition 1.8.9 swept-AABB movement exactly, with no entity types and no profiles.

@@ -1,5 +1,13 @@
 # M8.1 Ground-Truth Pipeline Implementation Plan
 
+> **Status: complete, 2026-08-18.** Shipped as M8.1: `mcreference dump`, a
+> pinned `physics.json` with Mojang provenance, and generated `physics.go`
+> (`b463b3e`, `961702d`). The tool it built became the released
+> `minecraft-reference` repository, and this repository consumes it by version
+> through `MCREFERENCE_VERSION` in `Taskfile.yml` rather than from `main`. The
+> checkboxes below were never ticked and are not evidence; do not re-run this
+> plan.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Extract Java Edition 1.8.9 physics constants from a verified Mojang server jar and publish them as a pinned, digest-verified, generated Go package.
