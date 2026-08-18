@@ -64,7 +64,11 @@ func Find(
 	// once. The value is wider than a word, and converting it at every expand
 	// call cost one heap allocation per node expanded — 3,000 of them on
 	// BenchmarkFindLong.
-	var o oracle = directOracle{query: capability.query(view, facts), capability: capability}
+	var o oracle = directOracle{
+		query:      capability.query(view, facts),
+		capability: capability,
+		crawlQuery: capability.crawling().query(view, facts),
+	}
 
 	return search(ctx, o, capability, from, goal, budget)
 }
@@ -231,6 +235,22 @@ func (c Capability) expand(o oracle, from node) ([]Edge, error) {
 				})
 			}
 		case terrain.Blocked:
+			// Crawling is tried before the cell is treated as a hole. Blocked
+			// covers both "the body does not fit" and "nothing holds it up",
+			// and only the first of those a shorter body can answer
+			// differently: a hole is a hole at any height, so a cell with no
+			// floor produces no crawl edge here and falls through to the drop
+			// below exactly as it did before crawling existed.
+			crawl, ok, err := c.crawl(o, from.Pos, neighbour)
+			if err != nil {
+				return nil, err
+			}
+			if ok {
+				edges = append(edges, crawl)
+
+				break
+			}
+
 			fall, ok, err := c.fall(o, from.Pos, neighbour)
 			if err != nil {
 				return nil, err
@@ -332,6 +352,26 @@ func (c Capability) enter(o oracle, from, to geom.BlockPos) (Edge, bool, error) 
 
 	switch arr.posture {
 	case PostureStand:
+		if c.AvoidLedges {
+			onEdge, err := c.ledge(o, to)
+			if err != nil {
+				return Edge{}, false, err
+			}
+			if onEdge {
+				if c.SneakTicks <= 0 {
+					// The caller asked not to be steered along edges and gave
+					// the body no way to cross one carefully, so the cell is
+					// refused and the search finds a way round.
+					return Edge{}, false, nil
+				}
+
+				return Edge{
+					Kind: EdgeWalk, From: from, To: to,
+					Posture: PostureSneak, Cost: c.SneakTicks,
+				}, true, nil
+			}
+		}
+
 		return Edge{
 			Kind: EdgeWalk, From: from, To: to,
 			Posture: PostureStand, Cost: c.WalkTicks,
@@ -341,15 +381,104 @@ func (c Capability) enter(o oracle, from, to geom.BlockPos) (Edge, bool, error) 
 			Kind: EdgeSwim, From: from, To: to,
 			Posture: PostureSwim, Cost: c.SwimTicks,
 		}, true, nil
-	case PostureFall:
-		// arrivalAt never returns it: a body that has come to rest in a cell
-		// is standing or swimming, never falling. The arm is here because a
-		// posture nobody handles is a posture that gets a silent default the
-		// day something starts producing it.
+	case PostureFall, PostureSneak, PostureCrawl:
+		// arrivalAt returns neither: it answers about hazards and fluid, and a
+		// body that has come to rest in a cell is standing or swimming. Which
+		// of those postures a crouched body is in is decided by sneak, which
+		// is the only thing that knows the body was too tall. The arm is here
+		// because a posture nobody handles is a posture that gets a silent
+		// default the day something starts producing it.
 	}
 
 	return Edge{}, false, nil
 }
+
+// crawl decides whether a cell the standing body cannot enter admits the prone
+// one.
+//
+// It exists because a body under a block is about half a block tall and passes
+// through a one-block gap that stops a standing body — and, on a grid, stops a
+// crouched one too, since 1.8 and 1.5 both need two cells. A capability with no
+// crawl height produces nothing here, which is what keeps the shipped four
+// edges byte for byte what they were, and what keeps 1.8.9 out of a posture it
+// does not have.
+func (c Capability) crawl(o oracle, from, to geom.BlockPos) (Edge, bool, error) {
+	if c.CrawlHeight <= 0 || c.CrawlHeight >= c.Body.Height {
+		return Edge{}, false, nil
+	}
+
+	passable, err := o.passableCrawling(to)
+	if err != nil {
+		return Edge{}, false, err
+	}
+	if passable != terrain.Clear {
+		return Edge{}, false, nil
+	}
+
+	// The hazard and fluid gate is the standing body's, because neither
+	// question depends on how tall the body is. A prone body drowns and burns
+	// exactly as fast.
+	arr, err := o.arriveAt(to)
+	if err != nil {
+		return Edge{}, false, err
+	}
+	if !arr.ok || arr.posture != PostureStand {
+		// A cell that would be entered swimming is not a crawl: the body is in
+		// fluid, and which of the two it is doing there is a question this edge
+		// has no answer for.
+		return Edge{}, false, nil
+	}
+
+	return Edge{
+		Kind: EdgeWalk, From: from, To: to,
+		Posture: PostureCrawl, Cost: c.CrawlTicks,
+	}, true, nil
+}
+
+// ledge reports whether a cell sits beside a drop the body could not survive.
+//
+// It is the four horizontal neighbours, and it asks the same question the fall
+// edge asks: a neighbour is a drop when nothing holds a body up there and no
+// landing is within reach. A cell beside a wall is not a ledge, and neither is
+// one beside a step down the body can take.
+func (c Capability) ledge(o oracle, cell geom.BlockPos) (bool, error) {
+	for _, step := range steps {
+		neighbour := geom.BlockPos{X: cell.X + step.X, Y: cell.Y, Z: cell.Z + step.Z}
+
+		passable, err := o.passable(neighbour)
+		if err != nil {
+			return false, err
+		}
+		if passable != terrain.Blocked {
+			continue
+		}
+
+		// Blocked is a wall or a hole, and only a hole is a ledge. The two are
+		// told apart by whether the body fits there at all: it fits in a hole
+		// and nothing holds it up, and it does not fit in a wall.
+		admits, err := o.clear(neighbour)
+		if err != nil {
+			return false, err
+		}
+		if !admits {
+			continue
+		}
+
+		// A drop the body survives is a route rather than a hazard, and the
+		// fall builder is what already knows which is which.
+		if _, ok, err := c.fall(o, cell, neighbour); err != nil {
+			return false, err
+		} else if ok {
+			continue
+		}
+
+		return true, nil
+	}
+
+	return false, nil
+}
+
+// fall looks down a neighbouring column for a landing within the safe fall.
 
 // fall looks down a neighbouring column for a landing within the safe fall.
 //

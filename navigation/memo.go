@@ -55,10 +55,15 @@ type clearEntry struct {
 type memoOracle struct {
 	recorder   *recordingView
 	query      terrain.Query
+	crawlQuery terrain.Query
 	capability Capability
 
 	pass   map[geom.BlockPos]passEntry
 	arrive map[geom.BlockPos]arriveEntry
+	// crawl is the passability of a cell to the prone body, cached apart from
+	// pass because a shorter body reads a shorter span and gets a different
+	// answer for the same cell.
+	crawl map[geom.BlockPos]passEntry
 	// fits answers whether the body's box fits in a cell, which the jump arc
 	// asks about cells no route ever stands in. It is keyed by cell like the
 	// other two, because it depends on nothing else.
@@ -75,6 +80,7 @@ type memoOracle struct {
 	passOrder   []geom.BlockPos
 	arriveOrder []geom.BlockPos
 	fitsOrder   []geom.BlockPos
+	crawlOrder  []geom.BlockPos
 
 	// misses counts recomputations, for tests and for the benchmark report.
 	misses int
@@ -86,6 +92,7 @@ type dependentSet struct {
 	pass   map[geom.BlockPos]struct{}
 	arrive map[geom.BlockPos]struct{}
 	fits   map[geom.BlockPos]struct{}
+	crawl  map[geom.BlockPos]struct{}
 }
 
 // newMemoOracle returns an empty memo over a view.
@@ -98,10 +105,12 @@ func newMemoOracle(view world.View, facts terrain.Facts, capability Capability, 
 	return &memoOracle{
 		recorder:   recorder,
 		query:      capability.query(recorder, facts),
+		crawlQuery: capability.crawling().query(recorder, facts),
 		capability: capability,
 		pass:       make(map[geom.BlockPos]passEntry),
 		arrive:     make(map[geom.BlockPos]arriveEntry),
 		fits:       make(map[geom.BlockPos]clearEntry),
+		crawl:      make(map[geom.BlockPos]passEntry),
 		dependents: make(map[geom.BlockPos]*dependentSet),
 		limit:      limit,
 	}
@@ -186,6 +195,32 @@ func (m *memoOracle) clear(cell geom.BlockPos) (bool, error) {
 	return value, nil
 }
 
+// passableCrawling implements oracle.
+func (m *memoOracle) passableCrawling(cell geom.BlockPos) (terrain.Passability, error) {
+	if entry, ok := m.crawl[cell]; ok {
+		return entry.value, nil
+	}
+
+	m.misses++
+	m.recorder.reset()
+	value, err := m.crawlQuery.Passable(cell)
+	if err != nil {
+		return terrain.Unknown, err
+	}
+
+	deps := m.claim(cell, answerCrawl)
+	m.crawl[cell] = passEntry{value: value, deps: deps}
+
+	m.crawlOrder = append(m.crawlOrder, cell)
+	for len(m.crawl) > m.limit && len(m.crawlOrder) > 0 {
+		oldest := m.crawlOrder[0]
+		m.crawlOrder = m.crawlOrder[1:]
+		m.forgetCrawl(oldest)
+	}
+
+	return value, nil
+}
+
 // answerKind names which cache an answer belongs to, so one dependency index
 // serves all three.
 type answerKind uint8
@@ -194,6 +229,7 @@ const (
 	answerPass answerKind = iota
 	answerArrive
 	answerFits
+	answerCrawl
 )
 
 // claim copies the recorder's log and files the answer under every cell it read.
@@ -209,6 +245,7 @@ func (m *memoOracle) claim(cell geom.BlockPos, kind answerKind) []geom.BlockPos 
 				pass:   make(map[geom.BlockPos]struct{}),
 				arrive: make(map[geom.BlockPos]struct{}),
 				fits:   make(map[geom.BlockPos]struct{}),
+				crawl:  make(map[geom.BlockPos]struct{}),
 			}
 			m.dependents[dep] = set
 		}
@@ -219,6 +256,8 @@ func (m *memoOracle) claim(cell geom.BlockPos, kind answerKind) []geom.BlockPos 
 			set.arrive[cell] = struct{}{}
 		case answerFits:
 			set.fits[cell] = struct{}{}
+		case answerCrawl:
+			set.crawl[cell] = struct{}{}
 		}
 	}
 
@@ -244,6 +283,9 @@ func (m *memoOracle) invalidate(cells []geom.BlockPos) {
 		}
 		for key := range set.fits {
 			m.forgetFits(key)
+		}
+		for key := range set.crawl {
+			m.forgetCrawl(key)
 		}
 		delete(m.dependents, cell)
 	}
@@ -291,13 +333,29 @@ func (m *memoOracle) forgetFits(cell geom.BlockPos) {
 	delete(m.fits, cell)
 }
 
+// forgetCrawl drops one cached prone passability and its index entries.
+func (m *memoOracle) forgetCrawl(cell geom.BlockPos) {
+	entry, ok := m.crawl[cell]
+	if !ok {
+		return
+	}
+	for _, dep := range entry.deps {
+		if set, ok := m.dependents[dep]; ok {
+			delete(set.crawl, cell)
+		}
+	}
+	delete(m.crawl, cell)
+}
+
 // reset drops every cached answer.
 func (m *memoOracle) reset() {
 	clear(m.pass)
 	clear(m.arrive)
 	clear(m.fits)
+	clear(m.crawl)
 	clear(m.dependents)
 	m.passOrder = m.passOrder[:0]
 	m.arriveOrder = m.arriveOrder[:0]
 	m.fitsOrder = m.fitsOrder[:0]
+	m.crawlOrder = m.crawlOrder[:0]
 }

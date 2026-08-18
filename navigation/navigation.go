@@ -11,6 +11,26 @@
 //
 // Nothing here imports sim. A rule that needs a version's number receives it
 // on Capability, which is what lets 1.8.9 and 26.1.2 share this search.
+//
+// # Where the two supported versions disagree
+//
+// Crawling is the first behaviour this package carries that one supported
+// version has and the other does not. 26.1.2 has a prone posture that fits
+// through a one-block gap; 1.8.9 has no crawl at all, so a 1.8.9 capability
+// supplies no crawl height and the search produces no crawl edge for it.
+//
+// That runs backwards through the two-version rule the project otherwise
+// applies, which reads that a scenario passing on 1.8.9 and not on 26.1.2 is a
+// failure. The resolution is the one the master plan already states: a
+// per-version gate is allowed to say that a behaviour does not exist in a
+// version and record why. So the absence is asserted in both directions rather
+// than skipped — the modern capability crosses the gap, the older one does not,
+// and both are tests. A future version that gained or lost a posture would fail
+// one of them rather than land in silence.
+//
+// The asymmetry is a property of the capability, not a branch in the search.
+// Capability.Postures reports what a body can do, and nothing here asks which
+// version it came from.
 package navigation
 
 import (
@@ -43,6 +63,21 @@ const (
 	// that the posture set is settled before an edge needs it, and so the jump
 	// guard is written once.
 	PostureFall
+	// PostureSneak is a body crouched, which is what crosses a ledge without
+	// being steered off it.
+	//
+	// It is a posture rather than a flag on Capability because it is a
+	// per-position decision. A flag would make a body sneak for a whole route
+	// or none of it, and the value of sneaking is doing it at the one cell
+	// that needs it.
+	PostureSneak
+	// PostureCrawl is a body prone, which fits through a one-block gap that
+	// stops a standing and a crouched body alike.
+	//
+	// Only 26.1.2 has it. 1.8.9 has no crawl at all, which is the first
+	// behaviour in this package that one supported version has and the other
+	// does not.
+	PostureCrawl
 )
 
 // Postures are appended, never inserted, for the reason EdgeKind values are: a
@@ -57,6 +92,10 @@ func (p Posture) String() string {
 		return "swim"
 	case PostureFall:
 		return "fall"
+	case PostureSneak:
+		return "sneak"
+	case PostureCrawl:
+		return "crawl"
 	default:
 		return fmt.Sprintf("Posture(%d)", uint8(p))
 	}
@@ -103,6 +142,52 @@ type Capability struct {
 	// The clearance check needs it: a jump passes over the cells between, and
 	// what it passes through is what stops it.
 	JumpRise float64
+	// AvoidLedges refuses to stand in a cell beside a drop the body could not
+	// survive, unless it can sneak there.
+	//
+	// It is off by default, and that default is the shipped search exactly as
+	// it was. On a grid a standing body never walks off anything — it moves
+	// cell to cell and the fall edge already refuses an unsurvivable drop — so
+	// this is a caller's policy about how close to an edge it wants to be
+	// steered, not a fact about the game. A follower that overshoots a cell
+	// centre has a reason to want it; a server-side mob does not.
+	AvoidLedges bool
+	// SneakTicks is the cost of crossing one block crouched, and enabling it
+	// is what lets a body cross a ledge while AvoidLedges is on. Zero means
+	// the body cannot sneak, and with AvoidLedges on it routes around every
+	// ledge instead.
+	//
+	// Sneaking is a posture rather than a flag on this value because it is a
+	// per-position decision: a body sneaks at the one cell that needs it and
+	// stands everywhere else, and a flag would make it sneak for a whole route
+	// or none of it. The posture is also what a follower reads to know when to
+	// hold the key down.
+	//
+	// It buys no headroom, deliberately. Both supported versions shorten the
+	// body when it crouches — 1.8 to 1.5 in 26.1.2 — and on a block grid that
+	// changes nothing at all, because both heights need the same two cells.
+	// The posture that fits where standing does not is CrawlHeight below, and
+	// only one version has it.
+	SneakTicks float64
+	// CrawlHeight is how tall the body is while crawling, in blocks. Zero
+	// produces no crawl edges.
+	//
+	// This is the posture that reaches what the others cannot: a body under a
+	// block is about half a block tall, so it passes through a one-block gap
+	// that stops a standing and a crouched body alike. It is one field rather
+	// than a flag beside a body for the reason JumpReach is one field — two
+	// values that can disagree about whether a body crawls is a state the
+	// search has no use for.
+	//
+	// Only the height changes. The footprint and the step height are the
+	// body's, and a version that changed those would be changing what the body
+	// is rather than what it is doing.
+	//
+	// 1.8.9 has no crawl and supplies zero. That asymmetry is asserted rather
+	// than tolerated; see the version gate in the tests.
+	CrawlHeight float64
+	// CrawlTicks is the cost of crossing one block on the body's front.
+	CrawlTicks float64
 	// CandidateLimit bounds one terrain query's collision sweep. A
 	// non-positive value means no limit.
 	CandidateLimit int
@@ -135,8 +220,52 @@ func (c Capability) perBlockFloor() float64 {
 	if c.JumpReach > 0 && c.JumpTicks < lowest {
 		lowest = c.JumpTicks
 	}
+	if c.SneakTicks > 0 && c.SneakTicks < lowest {
+		lowest = c.SneakTicks
+	}
+	if c.CrawlHeight > 0 && c.CrawlTicks < lowest {
+		lowest = c.CrawlTicks
+	}
 
 	return lowest
+}
+
+// Postures returns the postures this body has, in their declared order.
+//
+// It is derived from the fields rather than declared beside them. A capability
+// that carried both a crawl height and a list saying whether it crawls has two
+// answers to one question, and the day they disagree the search believes one
+// and the gate believes the other.
+//
+// It exists because the asymmetry between the two supported versions is a
+// property of the value rather than a branch in the search: a 26.1.2 capability
+// has a crawl and a 1.8.9 one does not, and a gate can assert that by asking
+// the value instead of by knowing which version it came from.
+func (c Capability) Postures() []Posture {
+	postures := []Posture{PostureStand}
+	if c.CanSwim {
+		postures = append(postures, PostureSwim)
+	}
+	if c.SneakTicks > 0 {
+		postures = append(postures, PostureSneak)
+	}
+	if c.CrawlHeight > 0 && c.CrawlHeight < c.Body.Height {
+		postures = append(postures, PostureCrawl)
+	}
+
+	return postures
+}
+
+// crawling returns the capability with its prone body, for the queries that ask
+// what fits while the body is down.
+//
+// It returns a copy rather than mutating, because the search holds one
+// capability for a whole route and a body that stayed prone after one cell
+// would crawl the rest of the way.
+func (c Capability) crawling() Capability {
+	c.Body.Height = c.CrawlHeight
+
+	return c
 }
 
 // query returns the terrain query this capability asks with.

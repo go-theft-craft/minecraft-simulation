@@ -24,12 +24,24 @@ type oracle interface {
 	// supports it. Asking passable there would refuse every cell over a gap,
 	// which is every cell a jump is for.
 	clear(cell geom.BlockPos) (bool, error)
+	// passableCrawling classifies a cell for the body while prone.
+	//
+	// It is a second question rather than an argument on the first because the
+	// answers are cached per cell, and a body of a different height reads a
+	// different span and gets a different answer. Two questions with two caches
+	// is the shape that already works here; one question with a body in it
+	// would need the cache keyed by both.
+	passableCrawling(cell geom.BlockPos) (terrain.Passability, error)
 }
 
 // directOracle asks terrain every time, caching nothing.
 type directOracle struct {
 	query      terrain.Query
 	capability Capability
+	// crawlQuery is the same view read with the prone body. It is built once
+	// beside the standing one rather than per call, because building it per
+	// call put a heap allocation in the middle of an expansion.
+	crawlQuery terrain.Query
 }
 
 // passable implements oracle.
@@ -54,4 +66,9 @@ func (d directOracle) clear(cell geom.BlockPos) (bool, error) {
 	}
 
 	return fit == terrain.FitClear, nil
+}
+
+// passableCrawling implements oracle.
+func (d directOracle) passableCrawling(cell geom.BlockPos) (terrain.Passability, error) {
+	return d.crawlQuery.Passable(cell)
 }
