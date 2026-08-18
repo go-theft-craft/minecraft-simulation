@@ -157,12 +157,12 @@ func Spawn(built sim.Profile, pos geom.Vec3, yaw, pitch float32) (entity.State, 
 	constants := owner.Motion(entity.FamilyPlayer)
 
 	return entity.State{
-			Family: entity.FamilyPlayer,
-			Box: geom.AABB{
-				MinX: pos.X - playerHalfWidth, MinY: pos.Y, MinZ: pos.Z - playerHalfWidth,
-				MaxX: pos.X + playerHalfWidth, MaxY: pos.Y + float64(playerHeight),
-				MaxZ: pos.Z + playerHalfWidth,
-			},
+			// The box is built by movement.Box, which both versions share: the
+			// halving at single width and the widening are the same arithmetic
+			// in both, measured against each version's own server. The two
+			// dimensions below are this version's.
+			Family:     entity.FamilyPlayer,
+			Box:        movement.Box(pos, playerWidth, playerHeight),
 			OnGround:   true,
 			StepHeight: constants.StepHeight,
 		}, movement.Locomotion{

@@ -305,10 +305,6 @@ const (
 	playerHeight float32 = 1.8
 )
 
-// playerHalfWidth is the horizontal offset from the position to a face, at the
-// width the game computes it: a float halving, widened once.
-const playerHalfWidth = float64(playerWidth / 2)
-
 // defaultMoveSpeed is the player's movement-speed attribute with no modifiers.
 // This version's attribute default is 0.1, read as a double and narrowed where
 // the tick applies it.

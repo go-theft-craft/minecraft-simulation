@@ -838,14 +838,9 @@ func less(a, b geom.BlockPos) bool {
 
 // playerBox is the box the game builds around a position.
 //
-// The width is halved at single width and the result is added to a double
-// position, which is why the box a player stands in is not the round 0.6 by 1.8
-// it reads as. Rebuilding rather than offsetting is what keeps this profile's
-// box identical to the game's after a move.
+// The construction is movement.Box, which both versions provably share; the two
+// dimensions are this version's own. Rebuilding rather than offsetting is what
+// keeps this profile's box identical to the game's after a move.
 func playerBox(pos geom.Vec3) geom.AABB {
-	return geom.AABB{
-		MinX: pos.X - playerHalfWidth, MinY: pos.Y, MinZ: pos.Z - playerHalfWidth,
-		MaxX: pos.X + playerHalfWidth, MaxY: pos.Y + float64(playerHeight),
-		MaxZ: pos.Z + playerHalfWidth,
-	}
+	return movement.Box(pos, playerWidth, playerHeight)
 }

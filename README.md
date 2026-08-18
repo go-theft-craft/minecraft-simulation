@@ -21,6 +21,7 @@ persistence, rendering, and AI remain outside this repository.
 | `runtime` | The store, its revision check, and a runner that drives one tick after another |
 | `adapter` | The seam a consumer implements to drive one kernel, and the tick assembly they share |
 | `profile/java/v1_8` | Java Edition 1.8.9: the constants, the block table, the widths, and the tick's phase order |
+| `profile/java/v26_1` | Java Edition 26.1.2: the same four things, and not one of them the same |
 | `scene` | A world described by name: a filled region and the blocks in it |
 | `mctest` | Recorded trajectories and a replay that needs no jar |
 | `replay` | Recording a run as inputs and per-tick digests, and replaying it |
@@ -33,6 +34,7 @@ geom  ->  world  ->  entity  ->  movement  ->  sim  ->  runtime  ->  adapter
                \-> collision -------/
 
 profile/java/v1_8  ->  sim, movement, and one version's game data
+profile/java/v26_1 ->  sim, movement, collision, and another version's game data
 scene              ->  sim, world, geom
 mctest, replay     ->  sim, runtime, movement, scene
 terrain            ->  geom, world, collision
@@ -45,8 +47,8 @@ same way they reach `movement` — a body's width and step height on a value, a
 block's hazard through an oracle the profile supplies. That is what lets one
 search serve a 1.8.9 mob and a 26.1.2 bot.
 
-`profile/java/v1_8` is the only package here that imports game data. Everything
-below it is version neutral: a rule that needs a 1.8.9 number receives it as an
+The two profile packages are the only ones here that import game data. Everything
+below them is version neutral: a rule that needs a 1.8.9 number receives it as an
 argument, which is what lets 26.1.2 reuse the same rules while disagreeing about
 almost every constant.
 
@@ -72,6 +74,14 @@ Collision reproduces Java Edition 1.8.9: candidates are gathered once from the
 swept region, motion resolves along Y then X then Z with the body translated
 after each axis, and a blocked horizontal move retries with a step-up whose
 winner is the outcome that travels further in the horizontal plane.
+
+It also reproduces 26.1.2's, which is a different algorithm rather than the same
+one with different numbers. `ResolveVoxel` orders the axes by the motion rather
+than fixing them, compares to a tolerance where 1.8.9 compares exactly, and
+steps up over whatever heights the obstacle's own shape offers — because a shape
+in that version is a grid of filled cells rather than a list of boxes, so a plate
+an eighth thick offers eight rises and seven of them are empty air. A profile
+picks the resolver its version plays by.
 
 ## Float widths are part of the rules
 
@@ -108,11 +118,21 @@ attempts, and the settle — and a whole movement tick through
 threshold, the input decay, the friction lookup, the heading, the move, gravity,
 and the two drags. The results must be bit-identical to ours, every tick.
 
+The same is done for 26.1.2, against that version's own server. Mojang ships it
+unobfuscated, so the harness compiles against the shipped jar and javac checks it
+against the bytecode it will run on: a renamed method fails to compile rather
+than throwing halfway through a run. That harness stands up a level without
+running its constructor — every duty a move does not need throws, so a version
+that starts asking for something else fails loudly — and drives `Entity.collide`,
+the block-shape grid the step-up collects its rises from, and a whole tick
+through `LivingEntity.aiStep`.
+
 The movement gate runs six scenarios — walk, sprint, jump, sneak, fall, and
-collide — over eight randomly obstructed rooms each, a hundred ticks apiece,
-and compares position, motion, and the collision flags at every tick rather
-than at the end: the first differing tick names the rule that drifted, where a
-final position names only the scenario.
+collide — over eight randomly obstructed rooms each, a hundred ticks apiece, per
+version, and compares position, motion, and the collision flags at every tick
+rather than at the end: the first differing tick names the rule that drifted,
+where a final position names only the scenario. 4,800 ticks agree with each
+version's server.
 
 The harness supplies a block lookup, a minimal entity, and a text protocol, and
 it reimplements no game logic. It lives in `internal/oracle/java` and is
@@ -158,14 +178,50 @@ server entity the harness drives never sees it; it is folded into the profile at
 the width the client computes it, and it is indistinguishable from the
 single-width product for the axes a keyboard actually produces.
 
+## What the two versions share, and what they only look like they share
+
+Two profiles ship here, and the list of rules they share is short. It is short
+because sharing was allowed only where both versions were measured doing the same
+arithmetic, never where two rules looked alike:
+
+- **`movement.Box`** builds a body's collision box from a position and two
+  dimensions. Both versions halve the width at single width and add the halves to
+  a double position, so a body 0.6 wide stands in a box a sixteenth of a
+  millionth wider than that. Each version's oracle caught this independently.
+- **`movement.Countdown`, `ApplyGravity`, `ApplyVerticalDrag`,
+  `ApplyHorizontalDrag`** are the same rule and the same widths in both. The
+  constants they multiply by are not: they arrive from each version's dataset.
+- **The trigonometry table** is byte-identical between the two, which is a
+  measurement of both rather than a claim about either. Each version stores its
+  own copy and computes its own index; `Table.At` is the shared read.
+
+Everything else in the two tick lists is duplicated on purpose. Each of these
+looks shareable and is not:
+
+| Rule | Why it is two implementations |
+| --- | --- |
+| The motion threshold | 1.8.9 tests each axis against 0.005; 26.1.2 tests the horizontal *vector* against 0.003 and only for a player |
+| The input handling | 1.8.9's client scales for sneaking and the shared tick then decays; 26.1.2's client decays, scales, and stretches the input onto the unit square in one method, and the clamp at the end of it discards the decay |
+| The jump | 1.8.9 assigns 0.42 over the vertical motion; 26.1.2 takes the larger of an attribute-derived power and what was there, and adds a sprinting body's impulse through a double multiply where 1.8.9 uses a float |
+| Friction and acceleration | The same tick drag falls out of both, but 26.1.2 divides its acceleration by the cube of the *raw* block friction and 1.8.9 by the cube of the product — and their numerators differ to match |
+| The block underfoot | 1.8.9 takes the cell under the body's feet; 26.1.2 takes the column of the block its last move recorded as supporting it, read half a block down, which survives the body walking off an edge |
+| The heading | 1.8.9 is float throughout and thresholds at 1e-4; 26.1.2 normalizes at double width, thresholds at 1e-7, and only its sine and cosine are single width |
+| The table index | A float multiplier through an int against a double multiplier through a long |
+| The move | Two collision algorithms, and two ways of committing one: 1.8.9 offsets the box, 26.1.2 moves the position and rebuilds the box around it |
+| The tick's shape | 26.1.2 has two phases 1.8.9 does not — the input shaping and the block speed factor — and 1.8.9 decays its input after the jump where 26.1.2 shapes it before |
+
+That table is the most useful thing this milestone produced. A later mechanic
+landing on both profiles reads it to find out whether it is writing one
+implementation or two.
+
 ## Replaying without a jar
 
 `mctest` replays recorded trajectories against a profile, with no JDK, no jar,
 and no prepared workspace. The fixtures in `mctest/testdata` are the six
-scenarios above, and every expectation in them is the game's own answer,
-recorded by the oracle rather than by us: a fixture and the differential test
-cannot disagree about what vanilla does, only about whether this module still
-matches it.
+scenarios above for 1.8.9 and, in `mctest/testdata/26_1`, the same six for
+26.1.2. Every expectation in them is the game's own answer, recorded by the
+oracle rather than by us: a fixture and the differential test cannot disagree
+about what vanilla does, only about whether this module still matches it.
 
 Regenerating them is deliberate and leaves a diff:
 

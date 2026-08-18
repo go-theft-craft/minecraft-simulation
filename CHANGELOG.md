@@ -4,6 +4,35 @@ This file records notable user-visible changes. It follows [Keep a Changelog](ht
 
 ## Unreleased
 
+### Added
+
+- `profile/java/v26_1`: Java Edition 26.1.2 for a player on land — the block
+  table, the constants, the widths, and a thirteen-phase tick order established
+  from the version's own movement path rather than from 1.8.9's. 4,800 ticks of
+  walk, sprint, jump, sneak, fall, and collide agree with a real 26.1.2 server
+  bit for bit, and the six scenarios ship as fixtures in `mctest/testdata/26_1`
+  that replay with no JDK.
+  Three rules do not survive being written by analogy, and the README's table
+  lists the rest: the motion threshold is a vector rule and a player's; the
+  input shaping is a client method whose clamp discards the 0.98 decay for any
+  input that reaches it; and the block whose friction applies is the column of
+  the block the last move recorded as supporting the body, not the cell under
+  its feet.
+  The block table is keyed by block *state*, because the flattening made the
+  state number a block's whole identity and a slab's two halves do not stand in
+  the same volume.
+- `movement.Box` builds a body's collision box from a position and two
+  dimensions, and `movement.Table.At` reads the trigonometry table at an index
+  its caller computed. They are two of the three things the two versions
+  provably share; everything else in the two tick lists is duplicated on
+  purpose, and the README says which and why.
+- `entity.State` carries a `Position` and a `Support` record, for a version that
+  moves the position and rebuilds the box around it and that remembers what is
+  holding a body up. Both are written to a tick digest only when they are set,
+  so every recording made before them still verifies unchanged.
+- `replay/testdata/26_1`: four determinism recordings on the new profile, in the
+  same matrix as the others.
+
 ### Fixed
 
 - `navigation`: the search heuristic scaled Manhattan distance by the cheapest
