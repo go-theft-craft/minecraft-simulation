@@ -4,6 +4,8 @@ This file records notable user-visible changes. It follows [Keep a Changelog](ht
 
 ## Unreleased
 
+## 0.2.0 - 2026-08-18
+
 ### Added
 
 - `navigation`: the edges the design named and never had. `EdgeJumpGap` crosses
@@ -51,6 +53,51 @@ This file records notable user-visible changes. It follows [Keep a Changelog](ht
   a box's nearest point rather than to its centre, because that is what the game
   measures and a client using the centre refuses hits the server accepts. The
   package still imports nothing outside the standard library.
+
+- `placement`: whether a block may go where a click points, and what state it
+  becomes. `Resolve` turns a clicked cell and a face into a target, `Check`
+  answers legality over the replaced block and the entities standing in the way,
+  and the `Place` command and its phase carry the click plus the three things a
+  tick cannot know: what is held, where the eye is, and how far it reaches. The
+  write is outside the decision, so a refusal cannot reach the world; a refused
+  placement that still wrote would put a block in the client the server does not
+  have, standing there until the next chunk update took it away. An undescribed
+  cell is neither: the outcome names the cell so a caller knows what to load.
+
+- `placement.Placer`, answered by both profiles in their own vocabularies:
+  1.8.9 computes four bits of metadata, 26.1.2 an offset into the block's state
+  range. The rules that decide which value — the facing a yaw gives, the half a
+  face and a cursor give, the axis a face gives — are version-neutral and live in
+  `placement`, because both editions compute them identically. 26.1.2 needs no
+  per-family bit layout: the offset is a mixed-radix number over the block's own
+  published property list. 1.8.9 publishes no such mapping, so its layouts are
+  transcribed from `BlockStairs`, `BlockSlab`, and `BlockLog`, each naming the
+  method it came from, and the gate is 24 clicks per version compared against
+  `Block.onBlockPlaced` and `Block.getStateForPlacement` on the handle rather
+  than the block name. A placement producing the right block in the wrong
+  orientation resolves a different handle, which is what makes the transcription
+  checkable rather than trusted.
+
+### Changed
+
+- **Breaking for anything that mints or reads a 1.8.9 block handle:**
+  `profile/java/v1_8` gives a handle per block *state* rather than per block. The
+  table mints sixteen handles per block, which is what four bits of metadata and
+  `Block.getMetaFromState` produce, and a name still resolves metadata zero — so
+  every fixture, scene, and trace resolves what it resolved before. Callers that
+  assumed one handle per block need to say which state they mean.
+
+  It closes a defect that was already there. The dataset lists a stone slab's
+  collision shape per metadata, the bottom half for 0 through 7 and the top half
+  for 8 through 15, and the old table took the first and answered it for every
+  metadata, so a body walked through a top slab. The five 1.8.9 replay
+  recordings were regenerated: the only line that moved in each is the data
+  digest, because the table is larger, while every tick digest and every position
+  is identical.
+
+- Requires `minecraft-protocol` v0.7.0, for `BlockMovementRegistry`'s falling and
+  climbable accessors. They are what lets a profile answer `terrain.Facts` from
+  measured data instead of a caller carrying its own ladder list.
 
 ### Fixed
 
