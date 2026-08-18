@@ -2,6 +2,11 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+**Status:** Complete, 2026-08-18. The gate passed on both versions on its first
+real run: six scenarios, 220 ticks apiece, zero corrections from a real 1.8.9
+server and a real 26.1.2 server, and no complaint in either log. What that cost
+and what it found is recorded task by task below.
+
 **Goal:** Run one kernel from both consumers — the headless client predicting locally, the server deciding authoritatively — and prove it by connecting to a real vanilla Java Edition 1.8.9 server and executing scripted input that draws zero correction packets.
 
 **Architecture:** `minecraft-simulation` gains a small adapter contract and nothing else; the simulation does not learn about packets. `headless-minecraft` has already gained its outbound action path (see Task 1, reconciled below); this plan adds a prediction loop that forks a snapshot and correction handling that discards the fork and replays retained commands. `server` drives the same kernel through `runtime.Runner` and treats its result as authoritative.
@@ -154,11 +159,14 @@ and corrections in one subscription.
 
 `Observe` receives every result, complete or not, because a client needs to know a tick was incomplete in order to stop predicting until its chunks arrive, and a server needs to log it.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
-Cover: `Drive` applies a complete result and does not apply an incomplete one; the store's revision reaches the input as the base revision; `Observe` sees both kinds; a sink error propagates and the store is unchanged; and a cancelled context returns without stepping.
+- [x] **Step 2 to 6: Fail, implement, verify, check, commit**
 
-- [ ] **Step 2 to 6: Fail, implement, verify, check, commit**
+**Done.** The seam landed ahead of this milestone's execution and is what both
+drivers below are written against: `Source`, `Sink`, and a `Drive` that assembles
+the input, steps the kernel, observes every result, and applies only a complete
+one.
 
 ```bash
 git add adapter/
@@ -181,11 +189,24 @@ The driver owns a `runtime.Memory`, a kernel built from the v1_8 profile, and a 
 
 `server` is the harness M9 and M10 both need, so this driver must not become the only way to run it: a server with no simulation attached must still accept connections, exactly as it does today.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
-Cover: a connected player's movement command moves the body in the store; an unknown command produces a rejected outcome without aborting the tick; a tick that reads an unloaded region is not applied and is logged; and the driver can be absent entirely without breaking the existing connection tests.
+- [x] **Step 2 to 6: Fail, implement, verify, check, commit**
 
-- [ ] **Step 2 to 6: Fail, implement, verify, check, commit**
+**Done 2026-08-18**, as `server` `2392043`. Two decisions worth recording:
+
+- **An intent whose kind no phase handles is refused at the queue**, not passed
+  to a tick that would ignore it. The plan asked for a rejected outcome; a tick
+  produces outcomes only for commands its phases answer, so a silently ignored
+  intent would reach a connection as neither applied nor rejected. Refusing where
+  it arrives is the same information, earlier.
+- **The driver is a component, not a stage.** Nothing in the server's tick loop
+  was changed, and a server with no driver attached still accepts connections and
+  serves its world exactly as before — which is the property the plan asked for
+  and the reason attaching it belongs to M9 rather than here.
+
+Adding the dependency carried `minecraft-protocol` from v0.2.0 to v0.5.0 in that
+repository. Its whole suite passes on it.
 
 ```bash
 cd ../server
@@ -223,16 +244,36 @@ Reconciliation is where the subtle bugs live, so the tests are the deliverable a
 - Retained commands must be bounded, and the bound must be reached in a test rather than reasoned about.
 - The cadence must match the measured rule without a server present: an idle run reports a bare ground flag each tick and a forced position on the twenty-first, and a drift below the `9.0e-4` squared-distance threshold must not report a position before the counter forces one. A recording writer makes this assertable tick by tick.
 
-- [ ] **Step 1: Write the failing tests against a scripted server**
+- [x] **Step 1: Write the failing tests against a scripted server**
 
 The client's existing end-to-end lane already stands up a stub upstream; reuse it. A stub server that teleports on demand is what makes correction handling testable without a jar.
 
-- [ ] **Step 2 to 6: Fail, implement, verify, check, commit**
+- [x] **Step 2 to 6: Fail, implement, verify, check, commit**
 
 ```bash
 git add predict/
 git commit -m "feat(predict): predict locally and reconcile against corrections"
 ```
+
+**Done 2026-08-18**, as `headless-minecraft` `b639a28`. Three things the plan did
+not anticipate:
+
+- **The world needed a bridge.** A prediction runs over the terrain the server
+  described, and the observed chunks carry block states rather than simulation
+  handles. `predict.Terrain` turns one into the other, and the resolver is per
+  version because the two protocols disagree about what a block state is: one
+  packs an identifier and four bits of metadata into a number and the other
+  carries the flattened state that replaced them.
+- **The fork is a store, not a copy of one.** Implementing `runtime.Store` over
+  the observed world and a local body is cheaper than copying chunks per tick and
+  keeps the server's blocks read-only: a change set that tried to write one is
+  refused, because a client does not predict block changes in this milestone and
+  a silent local edit would be undone by the next chunk update.
+- **Reconciliation drops everything it retained.** The plan asked for retained
+  commands to be replayed past the acknowledged point; this protocol carries no
+  acknowledgement number, so there is nothing to match against. What the server
+  corrected, it corrected in full. The bound on retention is still there and
+  tested, because the queue is what would leak when a server stops answering.
 
 ---
 
@@ -264,11 +305,11 @@ Assertions per scenario:
 2. No "moved wrongly" or "moved too quickly" in the server log.
 3. The client's predicted position and the server's last acknowledged position agree to within the wire's fixed-point precision.
 
-- [ ] **Step 1: Build the harness and confirm it starts and stops cleanly**
+- [x] **Step 1: Build the harness and confirm it starts and stops cleanly**
 
 Confirm no orphaned process survives a failed test, on a timeout as well as on a normal failure. A test suite that leaks server processes will be disabled by the next person who runs it.
 
-- [ ] **Step 2: Add the opt-in task**
+- [x] **Step 2: Add the opt-in task**
 
 ```yaml
   test:vanilla:
@@ -278,7 +319,7 @@ Confirm no orphaned process survives a failed test, on a timeout as well as on a
       - go test ./client/ -run TestVanilla -tags vanilla -timeout 20m {{.CLI_ARGS}}
 ```
 
-- [ ] **Step 3: Run it, and expect to find something**
+- [x] **Step 3: Run it, and expect to find something**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/headless-minecraft && devbox run -- task test:vanilla`
 
@@ -291,12 +332,44 @@ This is the first time the simulation meets a real server, and something will be
 
 Record what it actually was. That is the milestone's most valuable output, and if it turns out to be a constant after all, then M8.4's oracle missed something and that fact belongs in the master plan.
 
-- [ ] **Step 4 to 6: Verify, check, commit**
+- [x] **Step 4 to 6: Verify, check, commit**
 
 ```bash
 git add internal/vanilla/ client/vanilla_e2e_test.go Taskfile.yml
 git commit -m "test(client): gate movement on zero corrections from vanilla 1.8.9"
 ```
+
+**Done 2026-08-18**, as `headless-minecraft` `d5ab174`. It passed on the first
+run that reached a server, which is not what this step expected — so what it
+found is worth stating precisely.
+
+**What was wrong was never physics.** Three things stood between the first run
+and a green one, and all three were about standing a server up and reading it:
+
+- **A server of this age does not run on a modern JVM as shipped.** Its bundled
+  netty reaches a direct buffer's address through `sun.misc.Unsafe`, which is no
+  longer permitted, so every read failed with "Unable to access address of
+  buffer" and no client completed a handshake. The fix is the server's own
+  `use-native-transport=false`; the JVM-side netty properties alone do not reach
+  it, because the transport is chosen by the server rather than by netty.
+- **The client observes nothing unless a world is installed.** `WithWorld` is
+  opt-in, and a prediction over an empty world disagrees with the server about
+  everything. The gate's first green scenario was the one that noticed.
+- **The third assertion, as the plan wrote it, could not be measured.** A 1.8.9
+  server tells a client its position only to correct it: silence is how it
+  accepts one. So with zero corrections there is no "last acknowledged position"
+  to compare against — the silence *is* the agreement. The assertion now compares
+  the two only when the server has spoken, and a fourth was added in its place:
+  that the client kept reporting throughout, since a client that went quiet would
+  draw no corrections either and would have proved nothing.
+
+**The cadence came out exactly as the measured rule predicts**, which is the
+milestone's most useful confirmation. Standing sent 210 bare ground flags and 10
+forced positions over 220 ticks; turning on the spot sent 207 looks and 12
+positions; walking and sneaking sent a position and rotation every tick; jumping,
+which moves without turning, sent 220 bare positions. The rule was read off a
+capture in M8.8 Task 1 and implemented from that reading, and a real server
+accepted all of it.
 
 ---
 
@@ -304,15 +377,28 @@ git commit -m "test(client): gate movement on zero corrections from vanilla 1.8.
 
 **Files:** the vanilla harness, `MASTER_PLAN.md`, `README.md`, `CHANGELOG.md` in each repository
 
-- [ ] **Step 1: Run the 26.1.2 lane**
+- [x] **Step 1: Run the 26.1.2 lane**
+
+**Done 2026-08-18**, as `headless-minecraft` `48ba5f9`, and it passed on its first
+run too. The same six scenarios against a real 26.1.2 server: zero corrections,
+no complaint in the log.
+
+The plan expected this lane to be the risky one — "a failure here is expected to
+be a physics problem rather than a cadence problem" — on the assumption that
+26.1.2 might have no jar-backed oracle. M8.7 built one, and this is what that
+bought: the physics arrived already checked against that version's own bytecode,
+and the only differences this lane had to know about were on the wire. This
+version names its correction packet differently and expects a teleport
+confirmation the client already sent. **The cadence rule needed no change at
+all** — it was measured off a 1.8.9 client and a 26.1.2 server accepts it.
 
 Repeat Task 5 against a pinned 26.1.2 server with the v26_1 profile. If M8.7 found no jar-backed oracle for that version, this is the first real verification of its constants, and a failure here is expected to be a physics problem rather than a cadence problem — the reverse of the 1.8.9 lane's likely causes.
 
-- [ ] **Step 2: Record the milestone honestly**
+- [x] **Step 2: Record the milestone honestly**
 
 State in the master plan: that both adapters run one kernel; that the gate passed in **offline mode** and says nothing about online mode until M6.4 is picked up; which scenarios ran on which version; and what the first run found.
 
-- [ ] **Step 3: Changelog, verify, commit**
+- [x] **Step 3: Changelog, verify, commit**
 
 ```bash
 git commit -m "docs(plan): close M8, and what the vanilla gate found"
