@@ -45,11 +45,20 @@ const (
 // sim.Profile for the same reason sim.BlockNames is — a tick never asks these
 // questions, and terrain must not import sim.
 //
-// A nil Facts is legal. It answers HazardNone and FluidNone for everything,
-// which is what a caller that only cares about geometry wants.
+// A nil Facts is legal. It answers HazardNone, FluidNone, and not climbable for
+// everything, which is what a caller that only cares about geometry wants.
 type Facts interface {
 	// Hazard reports what a block does to a body occupying it.
 	Hazard(ref world.BlockRef) Hazard
 	// Fluid reports the fluid a block is.
 	Fluid(ref world.BlockRef) Fluid
+	// Climbable reports whether a body can climb the column this block
+	// occupies — a ladder, a vine, and in later versions several more.
+	//
+	// It is here rather than derived from a collision shape because a shape
+	// cannot say it. A ladder's box is empty, so a caller reading collision
+	// alone cannot tell one from air, and the two lead somewhere very
+	// different. Like the other two answers it is a fact about a handle only
+	// the profile that minted it can resolve.
+	Climbable(ref world.BlockRef) bool
 }

@@ -195,6 +195,26 @@ func (m *memoOracle) clear(cell geom.BlockPos) (bool, error) {
 	return value, nil
 }
 
+// fluidAt implements oracle.
+//
+// It is not cached. The two answers that are come from a collision sweep over
+// every cell a body's box touches; this one is a single block lookup through the
+// same recording view, so a cache entry would cost more to keep than the lookup
+// costs to repeat.
+func (m *memoOracle) fluidAt(cell geom.BlockPos) (terrain.Fluid, world.Lookup, error) {
+	return m.query.FluidAt(cell)
+}
+
+// climbable implements oracle. It is uncached for the reason fluidAt is.
+func (m *memoOracle) climbable(cell geom.BlockPos) (bool, error) {
+	climbable, lookup, err := m.query.ClimbableAt(cell)
+	if err != nil || lookup == world.LookupUnknown {
+		return false, err
+	}
+
+	return climbable, nil
+}
+
 // passableCrawling implements oracle.
 func (m *memoOracle) passableCrawling(cell geom.BlockPos) (terrain.Passability, error) {
 	if entry, ok := m.crawl[cell]; ok {

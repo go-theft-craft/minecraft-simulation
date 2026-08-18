@@ -257,6 +257,20 @@ func (c Capability) expand(o oracle, from node) ([]Edge, error) {
 			}
 			if ok {
 				edges = append(edges, fall)
+
+				break
+			}
+
+			// A drop the safe fall refuses may still be survivable because of
+			// what is at the bottom of it. This is tried only after the
+			// ordinary fall declines, so a shallow drop keeps the price it has
+			// always had.
+			plunge, ok, err := c.waterDrop(o, from.Pos, neighbour)
+			if err != nil {
+				return nil, err
+			}
+			if ok {
+				edges = append(edges, plunge)
 			}
 		case terrain.Unknown:
 			// An undescribed neighbour is refused, never guessed: append no
@@ -271,8 +285,16 @@ func (c Capability) expand(o oracle, from node) ([]Edge, error) {
 	if err != nil {
 		return nil, err
 	}
+	edges = append(edges, jumps...)
 
-	return append(edges, jumps...), nil
+	// Climbs are last and are vertical, so they change no horizontal ordering
+	// at all. A capability that cannot climb expands exactly what it did.
+	climbs, err := c.climbs(o, from)
+	if err != nil {
+		return nil, err
+	}
+
+	return append(edges, climbs...), nil
 }
 
 // arrival is what arriveAt decides: whether a body may come to rest in a cell,

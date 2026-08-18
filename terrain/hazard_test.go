@@ -11,12 +11,14 @@ import (
 // opaque handle. It is a map, but nothing here iterates it, so no output
 // ordering depends on Go's map order.
 type testFacts struct {
-	hazards map[world.BlockRef]Hazard
-	fluids  map[world.BlockRef]Fluid
+	hazards   map[world.BlockRef]Hazard
+	fluids    map[world.BlockRef]Fluid
+	climbable map[world.BlockRef]bool
 }
 
-func (f testFacts) Hazard(ref world.BlockRef) Hazard { return f.hazards[ref] }
-func (f testFacts) Fluid(ref world.BlockRef) Fluid   { return f.fluids[ref] }
+func (f testFacts) Hazard(ref world.BlockRef) Hazard  { return f.hazards[ref] }
+func (f testFacts) Fluid(ref world.BlockRef) Fluid    { return f.fluids[ref] }
+func (f testFacts) Climbable(ref world.BlockRef) bool { return f.climbable[ref] }
 
 const (
 	refLava   world.BlockRef = 10

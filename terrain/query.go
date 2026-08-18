@@ -127,3 +127,17 @@ func (q Query) FluidAt(cell geom.BlockPos) (Fluid, world.Lookup, error) {
 
 	return q.Facts.Fluid(ref), lookup, nil
 }
+
+// ClimbableAt reports whether a body can climb the cell.
+//
+// The lookup is returned for the reason HazardAt returns one: "not climbable"
+// and "nobody described this cell" are different answers, and a body that
+// confused them would climb into an unloaded chunk.
+func (q Query) ClimbableAt(cell geom.BlockPos) (bool, world.Lookup, error) {
+	ref, lookup := q.View.BlockState(cell)
+	if lookup == world.LookupUnknown || q.Facts == nil {
+		return false, lookup, nil
+	}
+
+	return q.Facts.Climbable(ref), lookup, nil
+}

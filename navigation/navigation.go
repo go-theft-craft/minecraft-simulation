@@ -188,6 +188,20 @@ type Capability struct {
 	CrawlHeight float64
 	// CrawlTicks is the cost of crossing one block on the body's front.
 	CrawlTicks float64
+	// WaterLandingDepth is how many blocks of fluid a column needs before a
+	// drop past SafeFall may land in it. Zero produces no water drops.
+	//
+	// It is the caller's number because how deep the water must be differs by
+	// version and by how far the body fell, and this package types no version
+	// constant. A caller that has not measured its version supplies zero and
+	// gets the search it had before, where every drop is bounded by SafeFall
+	// alone.
+	WaterLandingDepth float64
+	// CanClimb allows climb edges up and down a ladder or a vine.
+	CanClimb bool
+	// ClimbTicks is the cost of moving one cell vertically on a climbable
+	// block.
+	ClimbTicks float64
 	// CandidateLimit bounds one terrain query's collision sweep. A
 	// non-positive value means no limit.
 	CandidateLimit int
@@ -226,6 +240,13 @@ func (c Capability) perBlockFloor() float64 {
 	if c.CrawlHeight > 0 && c.CrawlTicks < lowest {
 		lowest = c.CrawlTicks
 	}
+	if c.CanClimb && c.ClimbTicks < lowest {
+		lowest = c.ClimbTicks
+	}
+	// A water drop of depth D closes 1+D blocks for FallTicks*D, which is the
+	// same rate the ordinary fall is priced at and is cheapest per block at
+	// D=1. It adds no new floor, and it is named here so the next person to
+	// add an edge does not have to work that out again.
 
 	return lowest
 }

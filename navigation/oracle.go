@@ -3,6 +3,7 @@ package navigation
 import (
 	"github.com/go-theft-craft/minecraft-simulation/geom"
 	"github.com/go-theft-craft/minecraft-simulation/terrain"
+	"github.com/go-theft-craft/minecraft-simulation/world"
 )
 
 // oracle answers the only two questions the search asks about a cell.
@@ -32,6 +33,14 @@ type oracle interface {
 	// is the shape that already works here; one question with a body in it
 	// would need the cache keyed by both.
 	passableCrawling(cell geom.BlockPos) (terrain.Passability, error)
+	// fluidAt reports the fluid filling a cell, and whether the view knew.
+	fluidAt(cell geom.BlockPos) (terrain.Fluid, world.Lookup, error)
+	// climbable reports whether a body can climb the cell.
+	//
+	// An undescribed cell is not climbable, which is the cautious reading: a
+	// body that climbed into an unloaded chunk would be climbing a ladder
+	// nobody has said is there.
+	climbable(cell geom.BlockPos) (bool, error)
 }
 
 // directOracle asks terrain every time, caching nothing.
@@ -71,4 +80,19 @@ func (d directOracle) clear(cell geom.BlockPos) (bool, error) {
 // passableCrawling implements oracle.
 func (d directOracle) passableCrawling(cell geom.BlockPos) (terrain.Passability, error) {
 	return d.crawlQuery.Passable(cell)
+}
+
+// fluidAt implements oracle.
+func (d directOracle) fluidAt(cell geom.BlockPos) (terrain.Fluid, world.Lookup, error) {
+	return d.query.FluidAt(cell)
+}
+
+// climbable implements oracle.
+func (d directOracle) climbable(cell geom.BlockPos) (bool, error) {
+	climbable, lookup, err := d.query.ClimbableAt(cell)
+	if err != nil || lookup == world.LookupUnknown {
+		return false, err
+	}
+
+	return climbable, nil
 }

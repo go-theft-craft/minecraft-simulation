@@ -41,6 +41,16 @@ const (
 	// standing at the edge of a two-block hole had no edge reaching the far
 	// side and every route around every gap was a detour.
 	EdgeJumpGap
+	// EdgeWaterDrop descends further than the body's safe fall, into water
+	// deep enough to break the landing.
+	//
+	// EdgeFall is bounded by SafeFall and has no way to say that a drop is
+	// survivable because of what is at the bottom of it rather than because of
+	// how far it is.
+	EdgeWaterDrop
+	// EdgeClimb moves one cell vertically inside a climbable column, in either
+	// direction.
+	EdgeClimb
 )
 
 // String returns the kind's name.
@@ -56,6 +66,10 @@ func (e EdgeKind) String() string {
 		return "swim"
 	case EdgeJumpGap:
 		return "jump-gap"
+	case EdgeWaterDrop:
+		return "water-drop"
+	case EdgeClimb:
+		return "climb"
 	default:
 		return fmt.Sprintf("EdgeKind(%d)", uint8(e))
 	}
