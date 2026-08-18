@@ -23,6 +23,12 @@ type arriveEntry struct {
 	deps  []geom.BlockPos
 }
 
+// clearEntry is one cached fit and the cells it was computed from.
+type clearEntry struct {
+	value bool
+	deps  []geom.BlockPos
+}
+
 // memoOracle caches terrain answers for one body.
 //
 // Keying by cell alone is sound only because one memo serves one Capability: a
@@ -53,6 +59,10 @@ type memoOracle struct {
 
 	pass   map[geom.BlockPos]passEntry
 	arrive map[geom.BlockPos]arriveEntry
+	// fits answers whether the body's box fits in a cell, which the jump arc
+	// asks about cells no route ever stands in. It is keyed by cell like the
+	// other two, because it depends on nothing else.
+	fits map[geom.BlockPos]clearEntry
 	// dependents maps a cell to the answers computed from it, so invalidation
 	// drops exactly what a change affects rather than everything.
 	dependents map[geom.BlockPos]*dependentSet
@@ -64,6 +74,7 @@ type memoOracle struct {
 	limit       int
 	passOrder   []geom.BlockPos
 	arriveOrder []geom.BlockPos
+	fitsOrder   []geom.BlockPos
 
 	// misses counts recomputations, for tests and for the benchmark report.
 	misses int
@@ -74,6 +85,7 @@ type memoOracle struct {
 type dependentSet struct {
 	pass   map[geom.BlockPos]struct{}
 	arrive map[geom.BlockPos]struct{}
+	fits   map[geom.BlockPos]struct{}
 }
 
 // newMemoOracle returns an empty memo over a view.
@@ -89,6 +101,7 @@ func newMemoOracle(view world.View, facts terrain.Facts, capability Capability, 
 		capability: capability,
 		pass:       make(map[geom.BlockPos]passEntry),
 		arrive:     make(map[geom.BlockPos]arriveEntry),
+		fits:       make(map[geom.BlockPos]clearEntry),
 		dependents: make(map[geom.BlockPos]*dependentSet),
 		limit:      limit,
 	}
@@ -107,7 +120,7 @@ func (m *memoOracle) passable(cell geom.BlockPos) (terrain.Passability, error) {
 		return terrain.Unknown, err
 	}
 
-	deps := m.claim(cell, true)
+	deps := m.claim(cell, answerPass)
 	m.pass[cell] = passEntry{value: value, deps: deps}
 
 	m.passOrder = append(m.passOrder, cell)
@@ -133,7 +146,7 @@ func (m *memoOracle) arriveAt(cell geom.BlockPos) (arrival, error) {
 		return refused, err
 	}
 
-	deps := m.claim(cell, false)
+	deps := m.claim(cell, answerArrive)
 	m.arrive[cell] = arriveEntry{value: value, deps: deps}
 
 	m.arriveOrder = append(m.arriveOrder, cell)
@@ -146,8 +159,45 @@ func (m *memoOracle) arriveAt(cell geom.BlockPos) (arrival, error) {
 	return value, nil
 }
 
+// clear implements oracle.
+func (m *memoOracle) clear(cell geom.BlockPos) (bool, error) {
+	if entry, ok := m.fits[cell]; ok {
+		return entry.value, nil
+	}
+
+	m.misses++
+	m.recorder.reset()
+	fit, err := m.query.Fits(terrain.FeetOf(cell))
+	if err != nil {
+		return false, err
+	}
+	value := fit == terrain.FitClear
+
+	deps := m.claim(cell, answerFits)
+	m.fits[cell] = clearEntry{value: value, deps: deps}
+
+	m.fitsOrder = append(m.fitsOrder, cell)
+	for len(m.fits) > m.limit && len(m.fitsOrder) > 0 {
+		oldest := m.fitsOrder[0]
+		m.fitsOrder = m.fitsOrder[1:]
+		m.forgetFits(oldest)
+	}
+
+	return value, nil
+}
+
+// answerKind names which cache an answer belongs to, so one dependency index
+// serves all three.
+type answerKind uint8
+
+const (
+	answerPass answerKind = iota
+	answerArrive
+	answerFits
+)
+
 // claim copies the recorder's log and files the answer under every cell it read.
-func (m *memoOracle) claim(cell geom.BlockPos, isPass bool) []geom.BlockPos {
+func (m *memoOracle) claim(cell geom.BlockPos, kind answerKind) []geom.BlockPos {
 	read := m.recorder.read()
 	deps := make([]geom.BlockPos, len(read))
 	copy(deps, read)
@@ -158,13 +208,17 @@ func (m *memoOracle) claim(cell geom.BlockPos, isPass bool) []geom.BlockPos {
 			set = &dependentSet{
 				pass:   make(map[geom.BlockPos]struct{}),
 				arrive: make(map[geom.BlockPos]struct{}),
+				fits:   make(map[geom.BlockPos]struct{}),
 			}
 			m.dependents[dep] = set
 		}
-		if isPass {
+		switch kind {
+		case answerPass:
 			set.pass[cell] = struct{}{}
-		} else {
+		case answerArrive:
 			set.arrive[cell] = struct{}{}
+		case answerFits:
+			set.fits[cell] = struct{}{}
 		}
 	}
 
@@ -187,6 +241,9 @@ func (m *memoOracle) invalidate(cells []geom.BlockPos) {
 		}
 		for key := range set.arrive {
 			m.forgetArrive(key)
+		}
+		for key := range set.fits {
+			m.forgetFits(key)
 		}
 		delete(m.dependents, cell)
 	}
@@ -220,11 +277,27 @@ func (m *memoOracle) forgetArrive(cell geom.BlockPos) {
 	delete(m.arrive, cell)
 }
 
+// forgetFits drops one cached fit and its index entries.
+func (m *memoOracle) forgetFits(cell geom.BlockPos) {
+	entry, ok := m.fits[cell]
+	if !ok {
+		return
+	}
+	for _, dep := range entry.deps {
+		if set, ok := m.dependents[dep]; ok {
+			delete(set.fits, cell)
+		}
+	}
+	delete(m.fits, cell)
+}
+
 // reset drops every cached answer.
 func (m *memoOracle) reset() {
 	clear(m.pass)
 	clear(m.arrive)
+	clear(m.fits)
 	clear(m.dependents)
 	m.passOrder = m.passOrder[:0]
 	m.arriveOrder = m.arriveOrder[:0]
+	m.fitsOrder = m.fitsOrder[:0]
 }

@@ -15,6 +15,15 @@ type oracle interface {
 	passable(cell geom.BlockPos) (terrain.Passability, error)
 	// arriveAt reports whether the body may come to rest in a cell, and how.
 	arriveAt(cell geom.BlockPos) (arrival, error)
+	// clear reports whether the body's box fits in a cell, with no question of
+	// what holds it up.
+	//
+	// It is separate from passable because it asks half of what passable asks.
+	// A body mid-jump is not standing on anything and must not be: a cell the
+	// arc passes through is legal precisely when the box fits and nothing
+	// supports it. Asking passable there would refuse every cell over a gap,
+	// which is every cell a jump is for.
+	clear(cell geom.BlockPos) (bool, error)
 }
 
 // directOracle asks terrain every time, caching nothing.
@@ -31,4 +40,18 @@ func (d directOracle) passable(cell geom.BlockPos) (terrain.Passability, error) 
 // arriveAt implements oracle.
 func (d directOracle) arriveAt(cell geom.BlockPos) (arrival, error) {
 	return d.capability.arrivalAt(d.query, cell)
+}
+
+// clear implements oracle.
+//
+// An unknown fit is not clear. A body that treated a cell nobody described as
+// room to fly through would jump into unloaded chunks, which is the same
+// mistake as treating one as a wall and lands harder.
+func (d directOracle) clear(cell geom.BlockPos) (bool, error) {
+	fit, err := d.query.Fits(terrain.FeetOf(cell))
+	if err != nil {
+		return false, err
+	}
+
+	return fit == terrain.FitClear, nil
 }

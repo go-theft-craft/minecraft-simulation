@@ -14,10 +14,14 @@ type terrainView = world.View
 
 // EdgeKind names one way of getting from one cell to the next.
 //
-// The design also specifies JumpGap, Dig, Place, Support, and Collapse. They
-// are absent rather than stubbed: each needs work that has not landed, and a
-// kind that exists but is never produced is a kind a caller will switch on and
-// be wrong about.
+// The design also specifies Dig, Place, Support, and Collapse. They are absent
+// rather than stubbed: each needs work that has not landed, and a kind that
+// exists but is never produced is a kind a caller will switch on and be wrong
+// about.
+//
+// Values are appended, never inserted. A kind's number reaches a recorded path,
+// so renumbering one would make every recording taken before the change
+// disagree with the build for a reason nothing in it explains.
 type EdgeKind uint8
 
 const (
@@ -29,6 +33,14 @@ const (
 	EdgeFall
 	// EdgeSwim crosses to an adjacent cell through fluid.
 	EdgeSwim
+	// EdgeJumpGap crosses a gap the body's jump arc clears.
+	//
+	// It is the one edge that reaches past an adjacent cell. Without it
+	// nothing in the vocabulary crosses a hole at all: EdgeStep rises into an
+	// adjacent cell and EdgeFall descends into an adjacent column, so a body
+	// standing at the edge of a two-block hole had no edge reaching the far
+	// side and every route around every gap was a detour.
+	EdgeJumpGap
 )
 
 // String returns the kind's name.
@@ -42,6 +54,8 @@ func (e EdgeKind) String() string {
 		return "fall"
 	case EdgeSwim:
 		return "swim"
+	case EdgeJumpGap:
+		return "jump-gap"
 	default:
 		return fmt.Sprintf("EdgeKind(%d)", uint8(e))
 	}

@@ -244,7 +244,15 @@ func (c Capability) expand(o oracle, from node) ([]Edge, error) {
 		}
 	}
 
-	return edges, nil
+	// Jumps come after the four-step walk so that a capability which cannot
+	// jump expands exactly the edges it did before this existed, in exactly
+	// the order it did.
+	jumps, err := c.jumps(o, from)
+	if err != nil {
+		return nil, err
+	}
+
+	return append(edges, jumps...), nil
 }
 
 // arrival is what arriveAt decides: whether a body may come to rest in a cell,
@@ -333,6 +341,11 @@ func (c Capability) enter(o oracle, from, to geom.BlockPos) (Edge, bool, error) 
 			Kind: EdgeSwim, From: from, To: to,
 			Posture: PostureSwim, Cost: c.SwimTicks,
 		}, true, nil
+	case PostureFall:
+		// arrivalAt never returns it: a body that has come to rest in a cell
+		// is standing or swimming, never falling. The arm is here because a
+		// posture nobody handles is a posture that gets a silent default the
+		// day something starts producing it.
 	}
 
 	return Edge{}, false, nil

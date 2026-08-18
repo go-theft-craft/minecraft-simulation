@@ -1,6 +1,7 @@
 package reach_test
 
 import (
+	"slices"
 	"testing"
 
 	gen "github.com/go-theft-craft/minecraft-protocol/generated/java/v1_8"
@@ -9,10 +10,13 @@ import (
 	"github.com/go-theft-craft/minecraft-simulation/entity"
 	"github.com/go-theft-craft/minecraft-simulation/geom"
 	"github.com/go-theft-craft/minecraft-simulation/movement"
+	"github.com/go-theft-craft/minecraft-simulation/navigation"
 	"github.com/go-theft-craft/minecraft-simulation/navigation/reach"
 	v1_8 "github.com/go-theft-craft/minecraft-simulation/profile/java/v1_8"
 	v26_1 "github.com/go-theft-craft/minecraft-simulation/profile/java/v26_1"
 	"github.com/go-theft-craft/minecraft-simulation/sim"
+	"github.com/go-theft-craft/minecraft-simulation/terrain"
+	"github.com/go-theft-craft/minecraft-simulation/world"
 )
 
 // version is one profile and the way to spawn its own player.
@@ -207,5 +211,67 @@ func TestMeasureRefusesAnImpossibleRequest(t *testing.T) {
 	}
 	if _, err := reach.Measure(built, body, 0); err == nil {
 		t.Error("Measure accepted a run of no ticks")
+	}
+}
+
+// TestTheMeasuredReachCrossesTheHoleItMeasures is the end of the chain this
+// package exists for: a number measured out of a profile's own kernel becomes
+// the field a search routes with, and a body crosses a hole because of it.
+//
+// It lives here rather than in navigation because it needs the profiles, and
+// navigation may import neither those nor this. The dependency runs one way —
+// a caller measures, then hands the number over as a Capability field — and
+// this test is the only place both ends are visible at once.
+//
+// The hole is one block wide because that is what the measurement supports. A
+// standing sprint jump clears a little over two blocks in both versions, which
+// reaches the cell two away and not the cell three away, and a test asserting
+// otherwise would be asserting a number nobody measured.
+func TestTheMeasuredReachCrossesTheHoleItMeasures(t *testing.T) {
+	t.Parallel()
+
+	for _, version := range versions() {
+		t.Run(version.name, func(t *testing.T) {
+			t.Parallel()
+
+			built := version.build(t)
+			table := measure(t, built, version.standing(t, built).Sprinting())
+
+			capability := navigation.Capability{
+				Body:      terrain.Body{HalfWidth: 0.3, Height: 1.8, StepHeight: 0.6},
+				SafeFall:  3,
+				WalkTicks: 5,
+				StepTicks: 7,
+				FallTicks: 3,
+				JumpTicks: 13,
+				JumpReach: table.HorizontalBlocks,
+				JumpRise:  table.PeakRise,
+			}
+
+			// A floor from x=-1 to x=4 with the column at x=2 cut clean out,
+			// so there is no way across but over.
+			blocks := world.NewBlocks()
+			blocks.Fill(geom.BlockPos{X: -1, Y: -1, Z: -1}, geom.BlockPos{X: 4, Y: -1, Z: 1}, geom.FullCube())
+			blocks.Fill(geom.BlockPos{X: -1, Y: 0, Z: -1}, geom.BlockPos{X: 4, Y: 3, Z: 1}, geom.EmptyShape())
+			blocks.Fill(geom.BlockPos{X: 2, Y: -1, Z: -1}, geom.BlockPos{X: 2, Y: -1, Z: 1}, geom.EmptyShape())
+
+			path, err := navigation.Find(
+				t.Context(), blocks, nil, capability,
+				geom.BlockPos{X: 1, Y: 0, Z: 0}, geom.BlockPos{X: 3, Y: 0, Z: 0},
+				navigation.Budget{Nodes: 10_000, Ceiling: 10_000},
+			)
+			if err != nil {
+				t.Fatalf("Find: %v", err)
+			}
+			if !path.Complete {
+				t.Fatalf("a reach of %v did not cross a one-block hole: %v",
+					table.HorizontalBlocks, path.Reason)
+			}
+			if !slices.ContainsFunc(path.Edges, func(e navigation.Edge) bool {
+				return e.Kind == navigation.EdgeJumpGap
+			}) {
+				t.Fatalf("crossed without a jump edge: %v", path.Edges)
+			}
+		})
 	}
 }
