@@ -32,11 +32,22 @@ func GroundFrictionBlock(box geom.AABB, pos geom.Vec3) geom.BlockPos {
 // different number in its last bits, and the difference compounds over a hundred
 // ticks into a position a server will correct.
 func Friction(slipperiness float32, onGround bool) float32 {
+	return FrictionWith(slipperiness, onGround, airFriction)
+}
+
+// FrictionWith is Friction for a family whose constant is not the player's.
+//
+// A dropped item multiplies the block's slipperiness by 0.98F where a player
+// multiplies it by 0.91F, and both games form the product at single width in
+// the same shape. The constant is a parameter rather than a second function
+// because the arithmetic is the thing worth having in one place: it is where
+// the width mistake would live.
+func FrictionWith(slipperiness float32, onGround bool, base float32) float32 {
 	if !onGround {
-		return airFriction
+		return base
 	}
 
-	return slipperiness * airFriction
+	return slipperiness * base
 }
 
 // Acceleration returns the ground acceleration for a friction.

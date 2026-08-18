@@ -112,3 +112,108 @@ func TestAFamilyWithNoConstantsFailsTheTick26(t *testing.T) {
 		t.Fatalf("Step = %v, want ErrUnknownFamily", err)
 	}
 }
+
+// TestTheItemsTwoDragsAreDifferentNumbers is the width difference this version
+// introduced, checked where it shows: multiply(friction, 0.98, friction) takes
+// a float on the horizontal axes and a double on the vertical one, so an item
+// falling and sliding is dragged by two different numbers in one tick.
+func TestTheItemsTwoDragsAreDifferentNumbers(t *testing.T) {
+	rules := built(t)
+	constants := requireFamily(t, rules, entity.FamilyItem)
+
+	if constants.HorizontalDrag == constants.VerticalDrag {
+		t.Fatalf("both drags are %v; 26.1 carries a float on one axis and a "+
+			"double on the other", constants.HorizontalDrag)
+	}
+
+	own := rules.(*profile)
+	shared := &scratch{bodies: []body{{
+		id:      1,
+		present: true,
+		state: entity.State{
+			Family: entity.FamilyItem,
+			Motion: geom.Vec3{X: 1, Y: 1, Z: 1},
+		},
+	}}}
+
+	if err := own.itemDrag(nil, shared); err != nil {
+		t.Fatalf("itemDrag: %v", err)
+	}
+
+	got := shared.bodies[0].state.Motion
+	if want := float64(float32(0.98)); got.X != want || got.Z != want {
+		t.Errorf("horizontal = %v/%v, want the float %v", got.X, got.Z, want)
+	}
+	if got.Y != 0.98 {
+		t.Errorf("vertical = %v, want the double 0.98", got.Y)
+	}
+}
+
+// TestTheBounceNeedsDownwardMotion is the other rule 26.1 changed. 1.8.9 halves
+// and inverts whatever vertical motion an item on the ground has; this version
+// leaves an upward one alone.
+func TestTheBounceNeedsDownwardMotion(t *testing.T) {
+	own := built(t).(*profile)
+
+	bounced := func(motion float64) float64 {
+		t.Helper()
+
+		shared := &scratch{bodies: []body{{
+			id:      1,
+			present: true,
+			state: entity.State{
+				Family:   entity.FamilyItem,
+				OnGround: true,
+				Motion:   geom.Vec3{Y: motion},
+			},
+		}}}
+		if err := own.itemBounce(shared); err != nil {
+			t.Fatalf("itemBounce: %v", err)
+		}
+
+		return shared.bodies[0].state.Motion.Y
+	}
+
+	if got := bounced(-0.3); got != 0.15 {
+		t.Errorf("a falling item bounced to %v, want 0.15", got)
+	}
+	if got := bounced(0.3); got != 0.3 {
+		t.Errorf("a rising item was changed to %v; this version tests the "+
+			"direction before it bounces", got)
+	}
+}
+
+// TestAnArrowsInertiaRunsBeforeItsGravity pins the order, which is the reverse
+// of the item's. An arrow that fell before it decayed would carry a different
+// number on every tick after the first.
+func TestAnArrowsInertiaRunsBeforeItsGravity(t *testing.T) {
+	rules := built(t)
+	constants := requireFamily(t, rules, entity.FamilyArrow)
+
+	own := rules.(*profile)
+	shared := &scratch{bodies: []body{{
+		id:      1,
+		present: true,
+		state: entity.State{
+			Family: entity.FamilyArrow,
+			Motion: geom.Vec3{X: 0.5},
+		},
+	}}}
+
+	if err := own.arrowInertia(shared); err != nil {
+		t.Fatalf("arrowInertia: %v", err)
+	}
+	if err := own.arrowGravity(shared); err != nil {
+		t.Fatalf("arrowGravity: %v", err)
+	}
+
+	got := shared.bodies[0].state.Motion
+	inertia := float64(float32(constants.HorizontalDrag))
+	if want := 0.5 * inertia; got.X != want {
+		t.Errorf("X = %v, want %v", got.X, want)
+	}
+	if want := -constants.Gravity; got.Y != want {
+		t.Errorf("Y = %v, want %v: the gravity is subtracted after the inertia, "+
+			"so a first tick from rest is undragged", got.Y, want)
+	}
+}

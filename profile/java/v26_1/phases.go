@@ -164,6 +164,12 @@ func (p *profile) buildPhases() []sim.Phase {
 		phase{id: "v26_1.apply-input", run: func(*sim.TickState) error {
 			return p.applyInput(shared)
 		}},
+		// ItemEntity.tick calls applyGravity before it moves, where a player
+		// falls after. One ordered list holds both because each phase skips
+		// the families it is not about.
+		phase{id: "v26_1.item-gravity", run: func(*sim.TickState) error {
+			return p.itemGravity(shared)
+		}},
 		phase{id: "v26_1.move", run: func(tick *sim.TickState) error {
 			return p.move(tick, shared)
 		}},
@@ -178,6 +184,18 @@ func (p *profile) buildPhases() []sim.Phase {
 		}},
 		phase{id: "v26_1.horizontal-drag", run: func(*sim.TickState) error {
 			return p.horizontalDrag(shared)
+		}},
+		phase{id: "v26_1.item-drag", run: func(tick *sim.TickState) error {
+			return p.itemDrag(tick, shared)
+		}},
+		phase{id: "v26_1.item-bounce", run: func(*sim.TickState) error {
+			return p.itemBounce(shared)
+		}},
+		phase{id: "v26_1.arrow-inertia", run: func(*sim.TickState) error {
+			return p.arrowInertia(shared)
+		}},
+		phase{id: "v26_1.arrow-gravity", run: func(*sim.TickState) error {
+			return p.arrowGravity(shared)
 		}},
 		phase{id: "v26_1.commit", run: func(tick *sim.TickState) error {
 			return p.commit(tick, shared)
@@ -217,6 +235,14 @@ func (p *profile) adoptInput(tick *sim.TickState, shared *scratch) error {
 			shared.bodies = append(shared.bodies, working)
 
 			continue
+		}
+
+		// A family with no constants is refused here rather than at the phase
+		// that first needs a number, because the phases are guarded by family
+		// and an unknown one would otherwise fall through all of them and
+		// commit unmoved.
+		if _, err := p.constantsFor(&body{id: id, state: state}); err != nil {
+			return err
 		}
 
 		working.state = state
@@ -265,6 +291,10 @@ func (p *profile) motionThreshold(shared *scratch) error {
 			continue
 		}
 
+		if working.state.Family != entity.FamilyPlayer {
+			continue
+		}
+
 		working.state.Motion = clampMotion(working.state.Motion)
 	}
 
@@ -296,6 +326,10 @@ func (p *profile) shapeInput(shared *scratch) error {
 			continue
 		}
 
+		if working.state.Family != entity.FamilyPlayer {
+			continue
+		}
+
 		working.strafe, working.forward = ShapeInput(
 			working.strafe, working.forward, working.loco.Sneaking,
 		)
@@ -314,6 +348,10 @@ func (p *profile) jump(shared *scratch) error {
 	for index := range shared.bodies {
 		working := &shared.bodies[index]
 		if !working.present {
+			continue
+		}
+
+		if working.state.Family != entity.FamilyPlayer {
 			continue
 		}
 
@@ -372,6 +410,10 @@ func (p *profile) friction(tick *sim.TickState, shared *scratch) error {
 			continue
 		}
 
+		if working.state.Family != entity.FamilyPlayer {
+			continue
+		}
+
 		working.blockFriction = airBlockFriction
 		if working.state.OnGround {
 			ref, lookup := tick.BlockState(blockBelow(working.state))
@@ -396,6 +438,10 @@ func (p *profile) acceleration(shared *scratch) error {
 	for index := range shared.bodies {
 		working := &shared.bodies[index]
 		if !working.present {
+			continue
+		}
+
+		if working.state.Family != entity.FamilyPlayer {
 			continue
 		}
 
@@ -425,6 +471,10 @@ func (p *profile) applyInput(shared *scratch) error {
 	for index := range shared.bodies {
 		working := &shared.bodies[index]
 		if !working.present {
+			continue
+		}
+
+		if working.state.Family != entity.FamilyPlayer {
 			continue
 		}
 
@@ -621,6 +671,10 @@ func (p *profile) blockSpeedFactor(shared *scratch) error {
 	for index := range shared.bodies {
 		working := &shared.bodies[index]
 		if !working.present {
+			continue
+		}
+
+		if working.state.Family != entity.FamilyPlayer {
 			continue
 		}
 
@@ -866,4 +920,139 @@ func (p *profile) constantsFor(working *body) (sim.MotionConstants, error) {
 	}
 
 	return constants, nil
+}
+
+// itemGravity applies a dropped item's fall, before it moves.
+//
+// ItemEntity.tick calls applyGravity at the top and a player falls after the
+// move, so the two families cannot share a phase however alike the arithmetic
+// looks. The gravity itself is a double literal in this version and a float
+// literal in 1.8.9, which is why the two datasets carry different numbers for
+// what reads as the same constant.
+func (p *profile) itemGravity(shared *scratch) error {
+	for index := range shared.bodies {
+		working := &shared.bodies[index]
+		if !working.present || working.state.Family != entity.FamilyItem {
+			continue
+		}
+
+		constants, err := p.constantsFor(working)
+		if err != nil {
+			return err
+		}
+
+		working.state.Motion = movement.ApplyGravity(working.state.Motion, constants.Gravity)
+	}
+
+	return nil
+}
+
+// itemDrag applies an item's two multipliers after it has moved.
+//
+// They are not the same number here. multiply(friction, 0.98, friction) takes a
+// float friction — the block's own times 0.98F, formed at single width — on the
+// horizontal axes and the double literal 0.98 on the vertical one. 1.8.9 uses
+// the float on all three.
+func (p *profile) itemDrag(tick *sim.TickState, shared *scratch) error {
+	for index := range shared.bodies {
+		working := &shared.bodies[index]
+		if !working.present || working.state.Family != entity.FamilyItem {
+			continue
+		}
+
+		constants, err := p.constantsFor(working)
+		if err != nil {
+			return err
+		}
+
+		slipperiness := airBlockFriction
+		if working.state.OnGround {
+			ref, lookup := tick.BlockState(blockBelow(working.state))
+			if lookup == world.LookupUnknown {
+				// The tick is already incomplete; the kernel drops its work.
+				continue
+			}
+			slipperiness = p.slipperiness(ref)
+		}
+
+		friction := movement.FrictionWith(
+			slipperiness, working.state.OnGround, float32(constants.HorizontalDrag),
+		)
+		working.state.Motion = movement.ApplyHorizontalDrag(working.state.Motion, friction)
+
+		// The vertical multiplier is applied at double width, because the
+		// literal is a double: narrowing it to a float first is a different
+		// number in the last bits and compounds over a fall.
+		working.state.Motion.Y *= constants.VerticalDrag
+	}
+
+	return nil
+}
+
+// itemBounce is the half-height hop an item takes off the ground.
+//
+// This version tests the direction — the motion has to be downward — where
+// 1.8.9 applies it on any contact. An item on the ground with upward motion
+// keeps it here and loses it there.
+func (p *profile) itemBounce(shared *scratch) error {
+	for index := range shared.bodies {
+		working := &shared.bodies[index]
+		if !working.present || working.state.Family != entity.FamilyItem {
+			continue
+		}
+		if !working.state.OnGround || working.state.Motion.Y >= 0 {
+			continue
+		}
+
+		working.state.Motion.Y *= itemBounceFactor
+	}
+
+	return nil
+}
+
+// itemBounceFactor is the multiplier an item's vertical motion takes on the
+// ground. It is a double literal in ItemEntity.tick.
+const itemBounceFactor = -0.5
+
+// arrowInertia applies an arrow's single multiplier to all three axes.
+//
+// AbstractArrow.applyInertia scales the whole vector, so this is one number on
+// three axes rather than the two a player carries, and it runs after the move.
+func (p *profile) arrowInertia(shared *scratch) error {
+	for index := range shared.bodies {
+		working := &shared.bodies[index]
+		if !working.present || working.state.Family != entity.FamilyArrow {
+			continue
+		}
+
+		constants, err := p.constantsFor(working)
+		if err != nil {
+			return err
+		}
+
+		inertia := float32(constants.HorizontalDrag)
+		working.state.Motion = movement.ApplyHorizontalDrag(working.state.Motion, inertia)
+		working.state.Motion = movement.ApplyVerticalDrag(working.state.Motion, inertia)
+	}
+
+	return nil
+}
+
+// arrowGravity applies an arrow's fall, after its inertia.
+func (p *profile) arrowGravity(shared *scratch) error {
+	for index := range shared.bodies {
+		working := &shared.bodies[index]
+		if !working.present || working.state.Family != entity.FamilyArrow {
+			continue
+		}
+
+		constants, err := p.constantsFor(working)
+		if err != nil {
+			return err
+		}
+
+		working.state.Motion = movement.ApplyGravity(working.state.Motion, constants.Gravity)
+	}
+
+	return nil
 }

@@ -39,10 +39,15 @@ func TestThePhaseListIsTheTickInOrder(t *testing.T) {
 		"v1_8.friction",
 		"v1_8.acceleration",
 		"v1_8.apply-input",
+		"v1_8.item-gravity",
 		"v1_8.move",
 		"v1_8.gravity",
 		"v1_8.vertical-drag",
 		"v1_8.horizontal-drag",
+		"v1_8.item-drag",
+		"v1_8.item-bounce",
+		"v1_8.arrow-inertia",
+		"v1_8.arrow-gravity",
 		"v1_8.commit",
 	}
 

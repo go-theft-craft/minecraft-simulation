@@ -71,23 +71,31 @@ func TestABodyFallsAtItsOwnFamilysRate(t *testing.T) {
 			player, item, arrow)
 	}
 
-	// And the numbers are the families' own, not merely different from one
-	// another: one tick of falling from rest is the gravity, dragged.
+	// And the numbers are the families' own, computed from each family's own
+	// order rather than from one shared formula. A player and an item both
+	// apply gravity and then their vertical drag, on opposite sides of the
+	// move; an arrow applies its inertia first and its gravity after, so one
+	// tick from rest is the gravity undragged.
 	for _, tc := range []struct {
 		name   string
 		family entity.Family
 		got    float64
+		want   func(sim.MotionConstants) float64
 	}{
-		{"player", entity.FamilyPlayer, player},
-		{"item", entity.FamilyItem, item},
-		{"arrow", entity.FamilyArrow, arrow},
+		{"player", entity.FamilyPlayer, player, draggedFall},
+		{"item", entity.FamilyItem, item, draggedFall},
+		{"arrow", entity.FamilyArrow, arrow, func(c sim.MotionConstants) float64 { return -c.Gravity }},
 	} {
-		constants := profile.Motion(tc.family)
-		want := -constants.Gravity * float64(float32(constants.VerticalDrag))
-		if tc.got != want {
+		if want := tc.want(profile.Motion(tc.family)); tc.got != want {
 			t.Errorf("%s fell to %v in one tick, want %v", tc.name, tc.got, want)
 		}
 	}
+}
+
+// draggedFall is one tick of falling from rest for a family that applies its
+// gravity before its vertical drag.
+func draggedFall(constants sim.MotionConstants) float64 {
+	return -constants.Gravity * float64(float32(constants.VerticalDrag))
 }
 
 // TestAFamilyWithNoConstantsFailsTheTick is the other half. A body nobody gave
@@ -111,5 +119,174 @@ func TestAFamilyWithNoConstantsFailsTheTick(t *testing.T) {
 	_, err = runner.Step(context.Background(), []sim.Command{movement.Input{Entity: 1}})
 	if !errors.Is(err, sim.ErrUnknownFamily) {
 		t.Fatalf("Step = %v, want ErrUnknownFamily", err)
+	}
+}
+
+// ticks runs one body of a family for several ticks over a stone floor and
+// returns the state after each, so a test can assert a whole trajectory rather
+// than one step of it.
+func ticks(t *testing.T, family entity.Family, from geom.Vec3, motion geom.Vec3, count int) []entity.State {
+	t.Helper()
+
+	profile := built(t)
+	store := standingWorld(t, profile, geom.Vec3{X: 0.5, Y: 1, Z: 0.5})
+
+	body, _ := store.Entities().Entity(1)
+	body.Family = family
+	// A quarter-block box, which is what both games give an item and an arrow.
+	body.Box = movement.Box(from, 0.25, 0.25)
+	body.Motion = motion
+	body.OnGround = false
+	body.StepHeight = 0
+	store.SetEntity(1, body)
+
+	kernel, err := sim.NewKernel(profile)
+	if err != nil {
+		t.Fatalf("NewKernel: %v", err)
+	}
+	runner := runtime.NewRunner(store, kernel)
+	runner.SetScope(sim.Scope{Entities: []entity.ID{1}})
+
+	states := make([]entity.State, 0, count)
+	for tick := range count {
+		result, err := runner.Step(context.Background(), nil)
+		if err != nil {
+			t.Fatalf("Step %d: %v", tick, err)
+		}
+		if !result.Completeness.Complete {
+			t.Fatalf("tick %d was incomplete: %+v", tick, result.Completeness.Missing)
+		}
+
+		state, ok := store.Entities().Entity(1)
+		if !ok {
+			t.Fatalf("the body is gone after tick %d", tick)
+		}
+		states = append(states, state)
+	}
+
+	return states
+}
+
+// TestADroppedItemFallsLandsAndBounces walks the whole trajectory, because the
+// constants alone do not settle it: the order gravity, the move, and the drags
+// run in is as much of the rule as the numbers, and only a trajectory shows it.
+func TestADroppedItemFallsLandsAndBounces(t *testing.T) {
+	states := ticks(t, entity.FamilyItem, geom.Vec3{X: 0.5, Y: 3, Z: 0.5}, geom.Vec3{}, 40)
+
+	// The first tick: gravity, then the move, then the drag. An item that
+	// applied its gravity after the move like a player would be one tick behind
+	// here forever.
+	constants := built(t).Motion(entity.FamilyItem)
+	if want := draggedFall(constants); states[0].Motion.Y != want {
+		t.Fatalf("after one tick the item's motion is %v, want %v", states[0].Motion.Y, want)
+	}
+	if states[0].Box.MinY >= 3 {
+		t.Fatalf("the item did not move on its first tick: %v", states[0].Box.MinY)
+	}
+
+	// It reaches the floor.
+	landed := -1
+	for index, state := range states {
+		if state.OnGround {
+			landed = index
+
+			break
+		}
+	}
+	if landed < 0 {
+		t.Fatal("the item never reached the floor")
+	}
+
+	// And it settles: by the end it is on the floor and has stopped.
+	last := states[len(states)-1]
+	if !last.OnGround {
+		t.Fatalf("the item is not resting after %d ticks: %+v", len(states), last)
+	}
+	if last.Motion.Y > 0 {
+		t.Fatalf("the item is still bouncing after %d ticks: %v", len(states), last.Motion.Y)
+	}
+	if got := last.Box.MinY; got != 1 {
+		t.Fatalf("the item came to rest at %v, want the floor at 1", got)
+	}
+}
+
+// TestAnArrowDecaysAndSticks is the arrow's shape: no bounce, no friction from
+// the block below, one multiplier on every axis, and a stop.
+func TestAnArrowDecaysAndSticks(t *testing.T) {
+	// Slow enough to stay inside the described room: a body that reached a cell
+	// nobody described would fail the tick as incomplete, which is a fact about
+	// the test's world rather than about the arrow.
+	const launch = 0.15
+
+	states := ticks(t, entity.FamilyArrow,
+		geom.Vec3{X: 0.5, Y: 4, Z: 0.5}, geom.Vec3{X: launch}, 20)
+
+	constants := built(t).Motion(entity.FamilyArrow)
+	inertia := float64(float32(constants.HorizontalDrag))
+
+	// The first tick, exactly: the arrow moves at its launch speed, then the
+	// inertia decays it, then gravity is subtracted. A family that applied
+	// gravity before the inertia would report a different number here.
+	if want := launch * inertia; states[0].Motion.X != want {
+		t.Fatalf("after one tick the arrow's X motion is %v, want %v", states[0].Motion.X, want)
+	}
+	if want := -constants.Gravity; states[0].Motion.Y != want {
+		t.Fatalf("after one tick the arrow's Y motion is %v, want %v", states[0].Motion.Y, want)
+	}
+
+	// It keeps decaying, and it is never dragged by the block it flies over.
+	if want := launch * inertia * inertia; states[1].Motion.X != want {
+		t.Fatalf("after two ticks the arrow's X motion is %v, want %v", states[1].Motion.X, want)
+	}
+
+	// It lands and stays there, with no bounce.
+	last := states[len(states)-1]
+	if !last.OnGround {
+		t.Fatalf("the arrow is not on the floor after %d ticks: %+v", len(states), last)
+	}
+	if last.Motion.Y > 0 {
+		t.Fatalf("the arrow bounced: %v", last.Motion.Y)
+	}
+}
+
+// TestTheItemBounceInvertsAndHalves reaches the phase directly, because a
+// falling item on flat ground never exercises it: the move zeroes the vertical
+// motion the moment the floor stops it, and a zero halved and inverted is
+// still zero. The rule matters where the move does not collide — an item that
+// is on the ground and still carrying downward motion — so that is what this
+// hands it.
+func TestTheItemBounceInvertsAndHalves(t *testing.T) {
+	built := built(t).(*profile)
+
+	shared := &scratch{bodies: []body{{
+		id:      1,
+		present: true,
+		state: entity.State{
+			Family:   entity.FamilyItem,
+			OnGround: true,
+			Motion:   geom.Vec3{X: 0.2, Y: -0.3, Z: 0.1},
+		},
+	}}}
+
+	if err := built.itemBounce(shared); err != nil {
+		t.Fatalf("itemBounce: %v", err)
+	}
+
+	got := shared.bodies[0].state.Motion
+	if got.Y != 0.15 {
+		t.Errorf("Y = %v, want 0.15: half the motion, inverted", got.Y)
+	}
+	if got.X != 0.2 || got.Z != 0.1 {
+		t.Errorf("horizontal motion = %v/%v, want it untouched", got.X, got.Z)
+	}
+
+	// An airborne item keeps everything: the rule is about contact.
+	shared.bodies[0].state.OnGround = false
+	shared.bodies[0].state.Motion = geom.Vec3{Y: -0.3}
+	if err := built.itemBounce(shared); err != nil {
+		t.Fatalf("itemBounce: %v", err)
+	}
+	if got := shared.bodies[0].state.Motion.Y; got != -0.3 {
+		t.Errorf("an airborne item's Y = %v, want -0.3", got)
 	}
 }

@@ -66,11 +66,16 @@ func TestThePhaseListIsThisVersionsOrder(t *testing.T) {
 		"v26_1.friction",
 		"v26_1.acceleration",
 		"v26_1.apply-input",
+		"v26_1.item-gravity",
 		"v26_1.move",
 		"v26_1.block-speed-factor",
 		"v26_1.gravity",
 		"v26_1.vertical-drag",
 		"v26_1.horizontal-drag",
+		"v26_1.item-drag",
+		"v26_1.item-bounce",
+		"v26_1.arrow-inertia",
+		"v26_1.arrow-gravity",
 		"v26_1.commit",
 	}
 
