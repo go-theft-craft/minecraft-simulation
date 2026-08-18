@@ -1,0 +1,161 @@
+{
+  "name": "an item dropped from sixty blocks",
+  "profile": {
+    "Edition": "java",
+    "GameVersion": "1.8.9",
+    "RulesRevision": "1"
+  },
+  "family": 2,
+  "source": "recording sha256 c005ca31a2f5a47634f23f90d87d2b28a7ab6839b11e4266a0aaee8f83589564, vanilla 1.8.9 server sha256 c18e4245073aaff580eb7359902f0251436568b1647a9e443a924cdb73fa8312, 2026-08-18, entities summoned from the server console through the capture proxy",
+  "world": {
+    "min": {
+      "X": -1482,
+      "Y": 2,
+      "Z": -44
+    },
+    "max": {
+      "X": -1475,
+      "Y": 62,
+      "Z": -37
+    },
+    "fill": "air",
+    "blocks": [
+      {
+        "pos": {
+          "X": -1482,
+          "Y": 3,
+          "Z": -44
+        },
+        "to": {
+          "X": -1475,
+          "Y": 3,
+          "Z": -37
+        },
+        "name": "grass"
+      }
+    ]
+  },
+  "spawn": {
+    "position": {
+      "X": -1478.5,
+      "Y": 60,
+      "Z": -40.5
+    },
+    "motion": {
+      "X": 0,
+      "Y": 0,
+      "Z": 0
+    },
+    "width": 0.25,
+    "height": 0.25
+  },
+  "interval": 60,
+  "tolerance": 0.03125,
+  "because": "Protocol 47 sends an entity's position as int32 fixed point in units of 1/32 of a block, so a captured checkpoint is the true position truncated to that grid and nothing finer is observable. The measured deviation on these trajectories is about half of it.",
+  "samples": [
+    {
+      "tick": 21,
+      "position": {
+        "X": -1478.5,
+        "Y": 51.875,
+        "Z": -40.5
+      }
+    },
+    {
+      "tick": 41,
+      "position": {
+        "X": -1478.5,
+        "Y": 33.1875,
+        "Z": -40.5
+      }
+    },
+    {
+      "tick": 61,
+      "position": {
+        "X": -1478.5,
+        "Y": 7.40625,
+        "Z": -40.5
+      }
+    },
+    {
+      "tick": 81,
+      "position": {
+        "X": -1478.5,
+        "Y": 4,
+        "Z": -40.5
+      }
+    },
+    {
+      "tick": 121,
+      "position": {
+        "X": -1478.5,
+        "Y": 4,
+        "Z": -40.5
+      }
+    },
+    {
+      "tick": 181,
+      "position": {
+        "X": -1478.5,
+        "Y": 4,
+        "Z": -40.5
+      }
+    },
+    {
+      "tick": 241,
+      "position": {
+        "X": -1478.5,
+        "Y": 4,
+        "Z": -40.5
+      }
+    },
+    {
+      "tick": 301,
+      "position": {
+        "X": -1478.5,
+        "Y": 4,
+        "Z": -40.5
+      }
+    },
+    {
+      "tick": 361,
+      "position": {
+        "X": -1478.5,
+        "Y": 4,
+        "Z": -40.5
+      }
+    },
+    {
+      "tick": 421,
+      "position": {
+        "X": -1478.5,
+        "Y": 4,
+        "Z": -40.5
+      }
+    },
+    {
+      "tick": 481,
+      "position": {
+        "X": -1478.5,
+        "Y": 4,
+        "Z": -40.5
+      }
+    },
+    {
+      "tick": 541,
+      "position": {
+        "X": -1478.5,
+        "Y": 4,
+        "Z": -40.5
+      }
+    },
+    {
+      "tick": 601,
+      "position": {
+        "X": -1478.5,
+        "Y": 4,
+        "Z": -40.5
+      }
+    }
+  ]
+}

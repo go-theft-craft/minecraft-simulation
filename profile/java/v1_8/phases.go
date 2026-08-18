@@ -118,6 +118,9 @@ func (p *profile) buildPhases() []sim.Phase {
 		phase{id: "v1_8.item-bounce", run: func(*sim.TickState) error {
 			return p.itemBounce(shared)
 		}},
+		phase{id: "v1_8.arrow-stick", run: func(*sim.TickState) error {
+			return p.arrowStick(shared)
+		}},
 		phase{id: "v1_8.arrow-inertia", run: func(*sim.TickState) error {
 			return p.arrowInertia(shared)
 		}},
@@ -621,6 +624,11 @@ func (p *profile) arrowInertia(shared *scratch) error {
 		if !working.present || working.state.Family != entity.FamilyArrow {
 			continue
 		}
+		if working.state.OnGround {
+			// An arrow in the ground does no motion at all: the tick takes the
+			// branch that ticks despawn and nothing else. See arrowStick.
+			continue
+		}
 
 		constants, err := p.constantsFor(working)
 		if err != nil {
@@ -642,6 +650,11 @@ func (p *profile) arrowGravity(shared *scratch) error {
 		if !working.present || working.state.Family != entity.FamilyArrow {
 			continue
 		}
+		if working.state.OnGround {
+			// An arrow in the ground does no motion at all: the tick takes the
+			// branch that ticks despawn and nothing else. See arrowStick.
+			continue
+		}
 
 		constants, err := p.constantsFor(working)
 		if err != nil {
@@ -649,6 +662,31 @@ func (p *profile) arrowGravity(shared *scratch) error {
 		}
 
 		working.state.Motion = movement.ApplyGravity(working.state.Motion, constants.Gravity)
+	}
+
+	return nil
+}
+
+// arrowStick stops an arrow that has hit the ground.
+//
+// The game's arrow does not move at all once it is in the ground: its tick
+// takes a branch that counts down a despawn and does nothing else, which is why
+// a capture of a landed arrow is a long run of zero deltas. What this cannot
+// reproduce is sticking into a wall: the game stops an arrow at the point a ray
+// cast hit, and this module moves a box by sweeping it, so an arrow that hits a
+// vertical face here slides to rest against it over a tick or two instead of
+// stopping in it. Both agree once the arrow is down.
+func (p *profile) arrowStick(shared *scratch) error {
+	for index := range shared.bodies {
+		working := &shared.bodies[index]
+		if !working.present || working.state.Family != entity.FamilyArrow {
+			continue
+		}
+		if !working.state.OnGround {
+			continue
+		}
+
+		working.state.Motion = geom.Vec3{}
 	}
 
 	return nil

@@ -1,0 +1,81 @@
+{
+  "name": "an arrow in flight from sixty blocks",
+  "profile": {
+    "Edition": "java",
+    "GameVersion": "1.8.9",
+    "RulesRevision": "1"
+  },
+  "family": 3,
+  "source": "recording sha256 c005ca31a2f5a47634f23f90d87d2b28a7ab6839b11e4266a0aaee8f83589564, vanilla 1.8.9 server sha256 c18e4245073aaff580eb7359902f0251436568b1647a9e443a924cdb73fa8312, 2026-08-18, entities summoned from the server console through the capture proxy",
+  "world": {
+    "min": {
+      "X": -1478,
+      "Y": 2,
+      "Z": -44
+    },
+    "max": {
+      "X": -1464,
+      "Y": 62,
+      "Z": -35
+    },
+    "fill": "air",
+    "blocks": [
+      {
+        "pos": {
+          "X": -1478,
+          "Y": 3,
+          "Z": -44
+        },
+        "to": {
+          "X": -1464,
+          "Y": 3,
+          "Z": -35
+        },
+        "name": "grass"
+      }
+    ]
+  },
+  "spawn": {
+    "position": {
+      "X": -1474.5,
+      "Y": 60,
+      "Z": -40.5
+    },
+    "motion": {
+      "X": 0.2,
+      "Y": 0,
+      "Z": 0.05
+    },
+    "width": 0.5,
+    "height": 0.5
+  },
+  "interval": 20,
+  "tolerance": 0.03125,
+  "because": "Protocol 47 sends an entity's position as int32 fixed point in units of 1/32 of a block, so a captured checkpoint is the true position truncated to that grid and nothing finer is observable. The measured deviation on these trajectories is about half of it.",
+  "samples": [
+    {
+      "tick": 1,
+      "position": {
+        "X": -1474.3125,
+        "Y": 60,
+        "Z": -40.46875
+      }
+    },
+    {
+      "tick": 21,
+      "position": {
+        "X": -1470.71875,
+        "Y": 50.125,
+        "Z": -39.5625
+      }
+    },
+    {
+      "tick": 41,
+      "position": {
+        "X": -1467.75,
+        "Y": 23.84375,
+        "Z": -38.8125
+      }
+    }
+  ]
+}

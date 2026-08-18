@@ -191,6 +191,9 @@ func (p *profile) buildPhases() []sim.Phase {
 		phase{id: "v26_1.item-bounce", run: func(*sim.TickState) error {
 			return p.itemBounce(shared)
 		}},
+		phase{id: "v26_1.arrow-stick", run: func(*sim.TickState) error {
+			return p.arrowStick(shared)
+		}},
 		phase{id: "v26_1.arrow-inertia", run: func(*sim.TickState) error {
 			return p.arrowInertia(shared)
 		}},
@@ -231,7 +234,11 @@ func (p *profile) adoptInput(tick *sim.TickState, shared *scratch) error {
 			continue
 		}
 		loco, ok := tick.Locomotion(id)
-		if !ok {
+		if !ok && state.Family == entity.FamilyPlayer {
+			// A player with no locomotion state is a body this tick cannot
+			// move: the jump counter, the facing, and the speed all live
+			// there. An item or an arrow has none of those by nature, so it is
+			// ticked with the zero value rather than skipped.
 			shared.bodies = append(shared.bodies, working)
 
 			continue
@@ -589,7 +596,7 @@ func (p *profile) move(tick *sim.TickState, shared *scratch) error {
 		askedLength := asked.X*asked.X + asked.Y*asked.Y + asked.Z*asked.Z
 		if length > movedThreshold || askedLength-length < movedThreshold {
 			working.state.Position = working.state.Position.Add(applied)
-			working.state.Box = playerBox(working.state.Position)
+			working.state.Box = bodyBox(working.state.Position, working.state.Box)
 		}
 		working.state.OnGround = result.OnGround
 		working.collided = result.CollidedHorizontally()
@@ -698,6 +705,10 @@ func (p *profile) gravity(shared *scratch) error {
 			continue
 		}
 
+		if working.state.Family != entity.FamilyPlayer {
+			continue
+		}
+
 		constants, err := p.constantsFor(working)
 		if err != nil {
 			return err
@@ -714,6 +725,10 @@ func (p *profile) verticalDrag(shared *scratch) error {
 	for index := range shared.bodies {
 		working := &shared.bodies[index]
 		if !working.present {
+			continue
+		}
+
+		if working.state.Family != entity.FamilyPlayer {
 			continue
 		}
 
@@ -735,6 +750,10 @@ func (p *profile) horizontalDrag(shared *scratch) error {
 	for index := range shared.bodies {
 		working := &shared.bodies[index]
 		if !working.present {
+			continue
+		}
+
+		if working.state.Family != entity.FamilyPlayer {
 			continue
 		}
 
@@ -898,6 +917,20 @@ func less(a, b geom.BlockPos) bool {
 	return a.X < b.X
 }
 
+// bodyBox rebuilds a body's box around a position, at the size the body already
+// had.
+//
+// The size is read back off the box rather than carried beside it, because a
+// box is exactly two dimensions and a position: the width and the height it was
+// built from survive the round trip through float32 unchanged, and a second
+// copy of them on the state would be a second thing to keep right. Until M9.2
+// this rebuilt every body at the player's 0.6 by 1.8 — which stood a dropped
+// item up eighteen tenths of a block tall and landed it a block early.
+func bodyBox(pos geom.Vec3, previous geom.AABB) geom.AABB {
+	return movement.Box(pos,
+		float32(previous.MaxX-previous.MinX), float32(previous.MaxY-previous.MinY))
+}
+
 // playerBox is the box the game builds around a position.
 //
 // The construction is movement.Box, which both versions provably share; the two
@@ -1024,6 +1057,11 @@ func (p *profile) arrowInertia(shared *scratch) error {
 		if !working.present || working.state.Family != entity.FamilyArrow {
 			continue
 		}
+		if working.state.OnGround {
+			// An arrow in the ground does no motion at all: the tick takes the
+			// branch that ticks despawn and nothing else. See arrowStick.
+			continue
+		}
 
 		constants, err := p.constantsFor(working)
 		if err != nil {
@@ -1045,6 +1083,11 @@ func (p *profile) arrowGravity(shared *scratch) error {
 		if !working.present || working.state.Family != entity.FamilyArrow {
 			continue
 		}
+		if working.state.OnGround {
+			// An arrow in the ground does no motion at all: the tick takes the
+			// branch that ticks despawn and nothing else. See arrowStick.
+			continue
+		}
 
 		constants, err := p.constantsFor(working)
 		if err != nil {
@@ -1052,6 +1095,31 @@ func (p *profile) arrowGravity(shared *scratch) error {
 		}
 
 		working.state.Motion = movement.ApplyGravity(working.state.Motion, constants.Gravity)
+	}
+
+	return nil
+}
+
+// arrowStick stops an arrow that has hit the ground.
+//
+// The game's arrow does not move at all once it is in the ground: its tick
+// takes a branch that counts down a despawn and does nothing else, which is why
+// a capture of a landed arrow is a long run of zero deltas. What this cannot
+// reproduce is sticking into a wall: the game stops an arrow at the point a ray
+// cast hit, and this module moves a box by sweeping it, so an arrow that hits a
+// vertical face here slides to rest against it over a tick or two instead of
+// stopping in it. Both agree once the arrow is down.
+func (p *profile) arrowStick(shared *scratch) error {
+	for index := range shared.bodies {
+		working := &shared.bodies[index]
+		if !working.present || working.state.Family != entity.FamilyArrow {
+			continue
+		}
+		if !working.state.OnGround {
+			continue
+		}
+
+		working.state.Motion = geom.Vec3{}
 	}
 
 	return nil

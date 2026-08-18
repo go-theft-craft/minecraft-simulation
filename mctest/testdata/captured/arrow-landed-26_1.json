@@ -1,0 +1,73 @@
+{
+  "name": "an arrow summoned with a tenth of a block of motion",
+  "profile": {
+    "Edition": "java",
+    "GameVersion": "26.1.2",
+    "RulesRevision": "1"
+  },
+  "family": 3,
+  "source": "recording sha256 65fa45c61d4667ff9c23de29a508a246e5224fe538d6779c4ea5c3f2709bbdde, vanilla 26.1.2 server sha256 4723380bd2a0a0206719b50f2e390383afdaf82b0a76a0d573baf788e6aa3e86, 2026-08-18. The arrows were summoned from the server console; the item is one this repository's own client dropped.",
+  "world": {
+    "min": {
+      "X": -8,
+      "Y": -62,
+      "Z": 6
+    },
+    "max": {
+      "X": 0,
+      "Y": -53,
+      "Z": 13
+    },
+    "fill": "air",
+    "blocks": [
+      {
+        "pos": {
+          "X": -8,
+          "Y": -61,
+          "Z": 6
+        },
+        "to": {
+          "X": 0,
+          "Y": -61,
+          "Z": 13
+        },
+        "name": "grass_block"
+      }
+    ]
+  },
+  "spawn": {
+    "position": {
+      "X": -4.5,
+      "Y": -55,
+      "Z": 9.5
+    },
+    "motion": {
+      "X": 0.1,
+      "Y": 0,
+      "Z": 0
+    },
+    "width": 0.5,
+    "height": 0.5
+  },
+  "interval": 45,
+  "tolerance": 0.0625,
+  "because": "Protocol 775 sends an entity's absolute position as float64 and its relative moves as int16 at 1/4096 of a block, so a checkpoint carries far more resolution than 1.8.9's. The bound here is the landing one rather than the wire's, because every checkpoint this capture holds is after the body came down: a tracker states an item's and an arrow's position once every twenty ticks, and these fell in sixteen and twenty. A landed projectile is compared at a looser bound than the wire's own, and this is the reason. The game stops an arrow where a ray cast hit and then backs it off along its own direction; this module sweeps a box and stops it against the floor, so the two disagree by up to one tick of the motion the arrow had left. Measured at 0.047 blocks on the 1.8.9 trajectory and 0.05 on the 26.1 ones, which is the backoff itself. The flight before the landing is compared at the wire's resolution; see the flight fixture beside this one.",
+  "samples": [
+    {
+      "tick": 16,
+      "position": {
+        "X": -3.154541015625,
+        "Y": -59.949951171875,
+        "Z": 9.5
+      }
+    },
+    {
+      "tick": 61,
+      "position": {
+        "X": -3.154541015625,
+        "Y": -59.949951171875,
+        "Z": 9.5
+      }
+    }
+  ]
+}

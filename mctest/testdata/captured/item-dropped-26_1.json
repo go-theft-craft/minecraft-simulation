@@ -1,0 +1,65 @@
+{
+  "name": "an item a player dropped",
+  "profile": {
+    "Edition": "java",
+    "GameVersion": "26.1.2",
+    "RulesRevision": "1"
+  },
+  "family": 2,
+  "source": "recording sha256 65fa45c61d4667ff9c23de29a508a246e5224fe538d6779c4ea5c3f2709bbdde, vanilla 26.1.2 server sha256 4723380bd2a0a0206719b50f2e390383afdaf82b0a76a0d573baf788e6aa3e86, 2026-08-18. The arrows were summoned from the server console; the item is one this repository's own client dropped.",
+  "world": {
+    "min": {
+      "X": -8,
+      "Y": -62,
+      "Z": 6
+    },
+    "max": {
+      "X": 0,
+      "Y": -56,
+      "Z": 15
+    },
+    "fill": "air",
+    "blocks": [
+      {
+        "pos": {
+          "X": -8,
+          "Y": -61,
+          "Z": 6
+        },
+        "to": {
+          "X": 0,
+          "Y": -61,
+          "Z": 15
+        },
+        "name": "grass_block"
+      }
+    ]
+  },
+  "spawn": {
+    "position": {
+      "X": -4.5594442025665245,
+      "Y": -58.68000000715256,
+      "Z": 9.402994037080985
+    },
+    "motion": {
+      "X": 0.1021,
+      "Y": 0.2,
+      "Z": 0.2027
+    },
+    "width": 0.25,
+    "height": 0.25
+  },
+  "interval": 15,
+  "tolerance": 0.125,
+  "because": "This is the weakest lane in the set and the bound says so. Every other capture here starts from a position and a motion the operator stated by summoning the entity; this one is an item the client dropped, so its start position is one accumulated from relative moves and its start velocity is one the server stated at a different instant. The two velocities the server reported for the first two ticks differ by 0.056 a tick, which over the fifteen ticks to the ground is eight tenths of a block of ambiguity in where it should land. The trajectory arrives within 0.092 of where the server put it, an order of magnitude inside that; 0.125 is the smallest round number above the measurement rather than anything derived from the wire. A summoned 26.1 item, captured the way the 1.8.9 ones were, would replace this with a lane worth the name.",
+  "samples": [
+    {
+      "tick": 15,
+      "position": {
+        "X": -3.3024712697633563,
+        "Y": -60,
+        "Z": 11.900170308996426
+      }
+    }
+  ]
+}
