@@ -4,8 +4,8 @@
 
 **Goal:** Deliver `profile/java/v26_1` for the player, so that the M8.4 scenario suite passes on Java Edition 26.1.2, and extend the ground-truth pipeline far enough to supply that version's constants.
 
-**Status:** Tasks 1, 2, 3, 4a, and 4 are done, and Task 5's tick order is
-established; what is left is the phase package, the gate, and the extraction.
+**Status:** Complete, 2026-08-18. Every task is done and the gate is the game:
+4,800 ticks of the six scenarios agree with a real 26.1.2 server bit for bit.
 Task 1's answer is in
 `docs/superpowers/notes/2026-08-17-v26-1-oracle-feasibility.md`. A jar-backed
 oracle is possible and cheaper than 1.8.9's, because Mojang ships this version
@@ -504,12 +504,46 @@ Answered ahead of this task by Task 4a: it differs, the variant landed as
 `collision.ResolveVoxel`, and the whole of it — including the step-up assembly —
 is checked against a real 26.1.2 server.
 
-- [ ] **Step 3 to 7: Test, implement, verify, commit**
+- [x] **Step 3 to 7: Test, implement, verify, commit**
 
 ```bash
 git add profile/java/v26_1/
 git commit -m "feat(profile): add the Java 26.1.2 player profile and its tick phases"
 ```
+
+**Done 2026-08-18**, as `5dadc97`. The tick came out as thirteen phases rather
+than the eleven statements, and three of the differences were found by the game
+rather than by the reading:
+
+- **Two phases have no counterpart in 1.8.9's list**: the input shaping and the
+  block speed factor. The second is in the order and answers 1 for every block,
+  because the dataset publishes slipperiness and no other movement property —
+  soul sand, honey, slime, and beds are ordinary here, and filling them in is a
+  dataset change rather than a reordering.
+- **Statement 3 was understated.** The shared entity tick decays both axes by
+  0.98F, but a client's own player replaces that with a decay, a sneaking-speed
+  factor, and a stretch of a diagonal onto the unit square — one method, and its
+  clamp discards the decay for any input that reaches it. So a keyboard diagonal
+  walks at the full input rather than at 0.98 of it, and the three steps cannot
+  be split across the tick boundary. It is `ShapeInput`, and it is the one rule
+  here no jar-backed test covers as a rule, because it lives in a class the
+  server jar does not carry.
+- **The box is rebuilt around the position, not offset.** This version moves the
+  position and derives the box from it and the body's dimensions; 1.8.9 moves the
+  box and derives the position. The two orders round differently, and the oracle
+  found it on the first tick of the first scenario. `entity.State` carries a
+  position for it.
+- **The supporting block is remembered, not derived.** Statement 6 said the block
+  below comes from "the supporting block the last collision recorded", and the
+  implementation recomputed it from the body's own box on the assumption that
+  nothing moves in between. It does not hold: a body that walks off the edge of a
+  slab is still standing, with nothing under it, and the game then re-probes
+  where it came from and keeps *that* block's column for a tick. Found at tick 67
+  of a sprint, as a body that kept ice friction where this module had switched to
+  stone. `entity.Support` carries it.
+
+Both additions to `entity.State` are written to a tick digest only when they are
+set, so every recording made before this milestone still verifies unchanged.
 
 ---
 
@@ -523,24 +557,56 @@ Which of these exist depends on Task 1.
 
 **If it is not:** build the fixtures from the behavioural statements in Task 5, and mark every one of them as unverified against the game in the fixture file itself, with a field that says so. Then M8.8's live check against a 26.1.2 server is the first real verification, and the master plan must say that this milestone's exit criterion is weaker than M8.4's. A fixture that records a belief and does not say so is the thing that makes a later failure hard to diagnose.
 
-- [ ] **Step 1: Build whichever gate Task 1 permits**
+- [x] **Step 1: Build whichever gate Task 1 permits**
 
-- [ ] **Step 2: Add recordings to the M8.6 matrix**
+The strong one. `internal/oracle/java/MovementOracle26.java` drives a whole tick
+through `LivingEntity.aiStep` on a real 26.1.2 server, and
+`TestMovementMatchesTheGame26` compares 4,800 ticks — six scenarios over eight
+random worlds each, a hundred ticks apiece — position, motion, and the collision
+flags, every tick rather than at the end.
 
-Generate `replay/testdata/26_1/*.json` covering this version's numerics, at least 200 ticks each. The matrix replays every file in `testdata` and each recording pins its own profile, so no workflow change is needed.
+The body is a living entity of the player type rather than a `Player`. The type
+is what the tick branches on and what carries the attribute supplier; the class
+adds an inventory, an entity pickup that needs a populated level, and a re-read
+of the speed attribute — and a server's `Player` is client-authoritative and does
+not travel at all, so the tick under test is the one a client runs for its own
+body. Four overrides remove what is not movement, one restores the player's
+airborne speed, and the file says which is which.
 
-- [ ] **Step 3: Confirm 1.8.9 is untouched**
+`mctest/testdata/26_1` then carries the same six scenarios as fixtures that
+replay with no JDK, generated from the harness rather than from this module.
+
+- [x] **Step 2: Add recordings to the M8.6 matrix**
+
+Four recordings, 220 to 260 ticks each: a sprinting diagonal through a full turn
+of yaw, a walk over three different ices, a hundred and thirty blocks of falling
+into repeated jumps, and a walk through a field of slabs and stairs. They are not
+the other version's five with a different profile — each reaches arithmetic this
+version has and 1.8.9 does not.
+
+There is no slime-and-soul-sand recording here, because both blocks act through
+per-block behaviour this profile cannot express yet, and a recording of them
+would pin an assumption rather than the game's arithmetic.
+
+The matrix needed no workflow change: the determinism task selects by test-name
+prefix, and the second version's test shares it.
+
+- [x] **Step 3: Confirm 1.8.9 is untouched**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- task determinism`
 
 Every 1.8.9 recording must still verify. If a shared extraction changed one, revert the extraction.
 
-- [ ] **Step 4 to 5: Verify, commit**
+- [x] **Step 4 to 5: Verify, commit**
 
 ```bash
 git add internal/oracle/ mctest/testdata/26_1/ replay/testdata/26_1/
 git commit -m "test(profile): gate the 26.1.2 player on the scenario suite"
 ```
+
+**Done 2026-08-18**, as `354b5db`. Every 1.8.9 recording still verifies, which is
+what says the two additions to the shared state and the digest changed nothing
+for the older profile.
 
 ---
 
@@ -548,20 +614,32 @@ git commit -m "test(profile): gate the 26.1.2 player on the scenario suite"
 
 **Files:** `movement/shared.go`, `README.md`, `CHANGELOG.md`
 
-- [ ] **Step 1: Extract, one function at a time**
+- [x] **Step 1: Extract, one function at a time**
 
 For each rule that is identical in both profiles — same constants, same widths, same position in the order — move it to `movement` and have both call it. After each extraction, run the determinism task. An extraction that changes any committed digest, of either version, is reverted rather than debugged, because a shared function that alters behaviour is not shared.
 
-- [ ] **Step 2: Record what stayed duplicated, and why**
+- [x] **Step 2: Record what stayed duplicated, and why**
 
 This is the milestone's most useful documentation. Two versions of a rule that look similar and are not identical are the trap every later mechanic will walk into, and the list of them is worth more than the abstraction that would have hidden them.
 
-- [ ] **Step 3: Changelog, verify, commit**
+- [x] **Step 3: Changelog, verify, commit**
 
 ```bash
 git add movement/shared.go README.md CHANGELOG.md
 git commit -m "docs: record M8.7, and what the two profiles actually share"
 ```
+
+**Done 2026-08-18**, as `bbd6afc`. The extraction is one function — `movement.Box`
+— and it landed in `movement/box.go` rather than the `shared.go` this plan named,
+because a file called shared is an invitation to put the next similar-looking
+rule in it.
+
+Three things are shared: that box construction, the four rules that were already
+shared when this milestone started (the jump countdown, gravity, and the two
+drags), and the trigonometry table's read. Nine are duplicated on purpose, and
+the README carries the table of which and why. The table is the deliverable: M9's
+mechanics land on both profiles from the start, and it is what tells each of them
+whether it is writing one implementation or two.
 
 ---
 
