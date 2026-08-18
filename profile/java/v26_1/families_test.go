@@ -12,21 +12,19 @@ import (
 	"github.com/go-theft-craft/minecraft-simulation/sim"
 )
 
-// requireFamily skips a check the pinned dataset cannot answer yet, and says
-// why rather than passing quietly.
+// requireFamily returns a family's constants, and fails when the profile has
+// none.
 //
-// 26.1's item and arrow constants were transcribed for M9.2 and land in a
-// minecraft-protocol release after v0.5.0. Until this module's dependency is
-// bumped past it, the profile carries the player alone. A skip with this reason
-// is distinguishable from a check nobody wrote, which is the whole discipline
-// M9.1b's two-lane harness exists to enforce.
+// It was a skip while 26.1's item and arrow constants were transcribed but
+// unreleased, so that a lane waiting on a dependency stayed distinguishable
+// from a check nobody wrote. They shipped in minecraft-protocol v0.6.0; a
+// missing family is now a defect.
 func requireFamily(t *testing.T, built sim.Profile, family entity.Family) sim.MotionConstants {
 	t.Helper()
 
 	constants := built.Motion(family)
 	if constants == (sim.MotionConstants{}) {
-		t.Skipf("the pinned dataset carries no %s motion constants for 26.1; "+
-			"they are transcribed and land in the next minecraft-protocol release", family)
+		t.Fatalf("the profile carries no %s motion constants", family)
 	}
 
 	return constants

@@ -51,13 +51,13 @@ func TestCapturedTrajectoriesReplay(t *testing.T) {
 					captured.Profile)
 			}
 			if profile.Motion(captured.Family) == (sim.MotionConstants{}) {
-				// 26.1's item and arrow constants were transcribed for M9.2 and
-				// land in a minecraft-protocol release after v0.5.0. Until this
-				// module's dependency is bumped past it, this lane cannot run —
-				// and it says so rather than passing quietly.
-				t.Skipf("the pinned dataset carries no %s constants for %s; they are "+
-					"transcribed and land in the next minecraft-protocol release",
-					captured.Family, captured.Profile)
+				// This was a skip while 26.1's item and arrow constants were
+				// transcribed but unreleased. They shipped in
+				// minecraft-protocol v0.6.0, so a family with no constants is
+				// now a defect in the dataset or the profile rather than a
+				// lane waiting on a release.
+				t.Fatalf("the profile carries no %s constants; this lane cannot run",
+					captured.Family)
 			}
 
 			worst, err := mctest.ReplayCaptured(profile, captured)
