@@ -14,10 +14,12 @@ type terrainView = world.View
 
 // EdgeKind names one way of getting from one cell to the next.
 //
-// The design also specifies Dig, Place, Support, and Collapse. They are absent
-// rather than stubbed: each needs work that has not landed, and a kind that
-// exists but is never produced is a kind a caller will switch on and be wrong
-// about.
+// The design also specifies Dig, Support, and Collapse. They are absent rather
+// than stubbed: each needs a number a milestone still owes — break times for
+// the first, placement legality and a falling-column trace for the other two —
+// and a kind that exists but is never produced is a kind a caller will switch
+// on and be wrong about. A body that mines at a plausible-looking wrong speed
+// is worse than one that refuses to mine.
 //
 // Values are appended, never inserted. A kind's number reaches a recorded path,
 // so renumbering one would make every recording taken before the change
@@ -56,6 +58,23 @@ const (
 	// The door is the edge's To cell, so a caller reading a path knows which
 	// one to work without the edge carrying a second position.
 	EdgeDoor
+	// EdgePlace bridges into a cell with nothing under it by putting a block
+	// there first.
+	//
+	// The block goes into the cell below the edge's To, which is why the edge
+	// carries no second position: a caller reading a path knows where the
+	// block goes from where the body ends up.
+	EdgePlace
+	// EdgePillar rises one block by placing a block into the cell the body is
+	// standing in, while the body is above it.
+	//
+	// It is not a special case of EdgePlace. Place puts a block into a cell the
+	// body will walk across; this one puts it into the cell the body just left,
+	// and the body arrives one block higher. The preconditions differ, the
+	// resulting node differs, and the failure modes differ.
+	//
+	// The block goes into the edge's From cell.
+	EdgePillar
 )
 
 // String returns the kind's name.
@@ -77,6 +96,10 @@ func (e EdgeKind) String() string {
 		return "climb"
 	case EdgeDoor:
 		return "door"
+	case EdgePlace:
+		return "place"
+	case EdgePillar:
+		return "pillar"
 	default:
 		return fmt.Sprintf("EdgeKind(%d)", uint8(e))
 	}

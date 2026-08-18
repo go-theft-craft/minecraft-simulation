@@ -37,6 +37,7 @@ import (
 	"fmt"
 
 	"github.com/go-theft-craft/minecraft-simulation/terrain"
+	"github.com/go-theft-craft/minecraft-simulation/world"
 )
 
 // Posture is how a body occupies a position.
@@ -56,12 +57,17 @@ const (
 	// different: a body already airborne cannot start a jump, which is the
 	// constraint this encodes and the reason the jump expansion refuses it.
 	//
-	// Nothing in this package produces it yet. The edge that does is Pillar,
-	// in the mutating-edge amendment, where the body is airborne at the moment
-	// it places the block under itself — that amendment names this posture as
-	// its one dependency on this one. It is defined here rather than there so
-	// that the posture set is settled before an edge needs it, and so the jump
-	// guard is written once.
+	// No edge arrives in it, and that is not an omission. Every node in this
+	// search is a place the body comes to rest, and a resting body is standing
+	// or swimming; being in the air is what happens between two nodes. The
+	// pillar edge was expected to produce it, on the argument that the body is
+	// airborne at the moment it places the block beneath itself — but it comes
+	// to rest on that block, so its node stands.
+	//
+	// It earns its place as the jump guard and as vocabulary. jumps refuses a
+	// body in this posture, which is the rule that a jump starts from the
+	// ground, and a follower reporting what the body is doing mid-arc has a
+	// name for it.
 	PostureFall
 	// PostureSneak is a body crouched, which is what crosses a ledge without
 	// being steered off it.
@@ -207,6 +213,44 @@ type Capability struct {
 	CanOpenDoors bool
 	// DoorTicks is the cost of opening a door and stepping into its cell.
 	DoorTicks float64
+	// CanPlace allows the placement edges. A mob is this value with it off,
+	// which is how one search serves a body with no inventory.
+	CanPlace bool
+	// PlaceTicks is the cost of putting one block down, in ticks.
+	PlaceTicks float64
+	// BlockBudget is how many placeable blocks the body carries. A path may not
+	// contain more placements than this.
+	BlockBudget int
+	// BlockTicks is what one placed block is worth, in ticks.
+	//
+	// Every cost here is in ticks so that "bridge the gap" and "walk around it"
+	// are compared in one unit rather than through a weighting nobody can
+	// justify. A body holding two blocks routes differently from one holding a
+	// stack, and this is the number that makes it so.
+	BlockTicks float64
+	// PlacedBlock is the handle the body puts down.
+	//
+	// It is carried because the overlay has to answer BlockState for a cell the
+	// body filled, and a handle means nothing outside the profile that minted
+	// it. The shape is assumed to be a full cube: a body bridging a gap carries
+	// something to stand on, and which placeables are legal where is M9.5's
+	// question rather than this one's.
+	PlacedBlock world.BlockRef
+	// VerticalEnvelope is how far above or below the start a search may expand,
+	// in blocks. Zero means no bound.
+	//
+	// It exists because placing makes every Y coordinate reachable from every
+	// position, and a search that can climb forever will spend its whole node
+	// budget doing so to reach a horizontal detour it should have walked. A
+	// body that wants the surface states the surface as its goal and sizes the
+	// envelope around it.
+	VerticalEnvelope int32
+	// MaxPillarHeight is how many pillar edges may stack in one column. Zero
+	// means no bound.
+	//
+	// It is the other half of the same problem: without it a search builds a
+	// tower to reach something it could have walked to.
+	MaxPillarHeight int
 	// CandidateLimit bounds one terrain query's collision sweep. A
 	// non-positive value means no limit.
 	CandidateLimit int
@@ -250,6 +294,18 @@ func (c Capability) perBlockFloor() float64 {
 	}
 	if c.CanOpenDoors && c.DoorTicks < lowest {
 		lowest = c.DoorTicks
+	}
+	// A placement closes one block for a placement's price plus what the block
+	// is worth, and a pillar closes one block of height for the same. Both
+	// enter the floor, and this is the reason the floor is recomputed rather
+	// than left alone whenever an edge is added: the moment placing is cheaper
+	// per block than walking, a floor that ignored it would overestimate, and
+	// the symptom is a route that is merely suboptimal — the hardest kind of
+	// wrongness to notice and to trace back here.
+	if c.CanPlace {
+		if placed := c.PlaceTicks + c.BlockTicks; placed < lowest {
+			lowest = placed
+		}
 	}
 	// A water drop of depth D closes 1+D blocks for FallTicks*D, which is the
 	// same rate the ordinary fall is priced at and is cheapest per block at

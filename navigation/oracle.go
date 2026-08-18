@@ -46,6 +46,13 @@ type oracle interface {
 	// passableThroughDoor classifies a cell as it would be with the door in it
 	// swung open.
 	passableThroughDoor(cell geom.BlockPos) (terrain.Passability, error)
+	// placeable reports whether a block may be put in a cell: the view
+	// describes it and nothing is there.
+	//
+	// Undescribed is not placeable. A body that filled a cell nobody had
+	// described would be planning a route through a chunk it cannot see, and
+	// the block it counted on might already be there.
+	placeable(cell geom.BlockPos) (bool, error)
 }
 
 // directOracle asks terrain every time, caching nothing.
@@ -114,6 +121,11 @@ func (d directOracle) passableThroughDoor(cell geom.BlockPos) (terrain.Passabili
 	return query.Passable(cell)
 }
 
+// placeable implements oracle.
+func (d directOracle) placeable(cell geom.BlockPos) (bool, error) {
+	return isPlaceable(d.query.View, cell)
+}
+
 // climbable implements oracle.
 func (d directOracle) climbable(cell geom.BlockPos) (bool, error) {
 	climbable, lookup, err := d.query.ClimbableAt(cell)
@@ -122,4 +134,19 @@ func (d directOracle) climbable(cell geom.BlockPos) (bool, error) {
 	}
 
 	return climbable, nil
+}
+
+// isPlaceable is the shared rule behind every oracle's placeable.
+//
+// A cell takes a block when the view knows what is in it and nothing is. A
+// fluid is deliberately not excluded here: placing into water is ordinary, and
+// whether a particular block may go into a particular fluid is a legality
+// question M9.5 owns.
+func isPlaceable(view world.View, cell geom.BlockPos) (bool, error) {
+	shape, lookup := view.CollisionShape(cell)
+	if lookup == world.LookupUnknown {
+		return false, nil
+	}
+
+	return shape.Len() == 0, nil
 }

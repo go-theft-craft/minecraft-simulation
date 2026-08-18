@@ -70,7 +70,60 @@ func Find(
 		crawlQuery: capability.crawling().query(view, facts),
 	}
 
-	return search(ctx, o, capability, from, goal, budget)
+	return plan(ctx, o, capability, view, facts, from, goal, budget)
+}
+
+// plan runs the search and, for a body that can change the world, the
+// re-run-and-ban loop that keeps the answer self-consistent.
+//
+// Find and Planner.Plan both go through here, which is what makes the planner's
+// documented promise true: the cache changes how long a route takes to find,
+// never what it says.
+func plan(
+	ctx context.Context,
+	o oracle,
+	capability Capability,
+	view terrainView,
+	facts terrain.Facts,
+	from, goal geom.BlockPos,
+	budget Budget,
+) (Path, error) {
+	// A body that cannot change the world produces no mutating edge, so its
+	// path cannot be self-inconsistent and there is nothing to validate. That
+	// is the read-only search, unchanged and un-slowed by any of this.
+	if !capability.mutates() {
+		return search(ctx, o, capability, from, goal, budget, nil)
+	}
+
+	// The re-run-and-ban loop the parent design specifies. The search expands
+	// nodes with no notion of which placements a route has already made, so a
+	// winning path can put a block in a cell one of its own later edges has to
+	// pass through — a conflict between two branches that were never compared.
+	// Validating the winner and banning the offending edge is what resolves it,
+	// and each round bans one edge, so it makes progress.
+	banned := make(map[Edge]struct{})
+	var last Path
+	for range maxValidationRounds {
+		path, err := search(ctx, o, capability, from, goal, budget, banned)
+		if err != nil {
+			return Path{}, err
+		}
+		last = path
+
+		offender, conflicted, err := capability.validate(view, facts, path)
+		if err != nil {
+			return Path{}, err
+		}
+		if !conflicted {
+			return path, nil
+		}
+		banned[offender] = struct{}{}
+	}
+
+	// The rounds ran out. Returning the last route beats refusing, for the same
+	// reason an exhausted search returns a partial path: a body that walks most
+	// of the way and searches again is better off than one that stands still.
+	return last, nil
 }
 
 // search is the A* both Find and Planner.Plan run. It is separate from Find so
@@ -81,6 +134,7 @@ func search(
 	capability Capability,
 	from, goal geom.BlockPos,
 	budget Budget,
+	banned map[Edge]struct{},
 ) (Path, error) {
 	start := node{Pos: from, Posture: PostureStand}
 
@@ -127,6 +181,15 @@ func search(
 		}
 
 		for _, move := range moves {
+			if _, refused := banned[move]; refused {
+				// Banned by an earlier validation round. Skipping it here is
+				// what makes the next search find a route that does not repeat
+				// the conflict.
+				continue
+			}
+			if !capability.withinEnvelope(from, move.To) {
+				continue
+			}
 			next := node{Pos: move.To, Posture: move.Posture}
 			through := cost[current] + move.Cost
 			if budget.Ceiling > 0 && through > budget.Ceiling {
@@ -299,8 +362,22 @@ func (c Capability) expand(o oracle, from node) ([]Edge, error) {
 	if err != nil {
 		return nil, err
 	}
+	edges = append(edges, doors...)
 
-	return append(edges, doors...), nil
+	// The mutating edges are last, so a body that cannot place expands exactly
+	// what it did before either of them existed, in exactly the order it did.
+	places, err := c.places(o, from)
+	if err != nil {
+		return nil, err
+	}
+	edges = append(edges, places...)
+
+	pillars, err := c.pillars(o, from)
+	if err != nil {
+		return nil, err
+	}
+
+	return append(edges, pillars...), nil
 }
 
 // arrival is what arriveAt decides: whether a body may come to rest in a cell,

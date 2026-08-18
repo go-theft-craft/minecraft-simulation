@@ -146,6 +146,12 @@ func arrivalIsLegal(o directOracle, edge Edge) (bool, error) {
 		passable, err := o.passableThroughDoor(edge.To)
 
 		return passable == terrainClear, err
+	case EdgePlace, EdgePillar:
+		// A mutating edge is legal against the world as its own route leaves
+		// it, not against the untouched one this property reads. Find has
+		// already validated it forward through an overlay, and
+		// TestAReturnedPathIsSelfConsistent is where that is asserted.
+		return true, nil
 	case EdgeWalk, EdgeStep, EdgeFall, EdgeSwim, EdgeJumpGap, EdgeWaterDrop:
 		passable, err := o.passable(edge.To)
 
@@ -252,6 +258,16 @@ func perBlockRates(c Capability) []rate {
 	if c.CanOpenDoors {
 		rates = append(rates, rate{name: "door", perBlock: c.DoorTicks})
 	}
+	if c.CanPlace && c.BlockBudget > 0 {
+		// A bridge closes one block across and a pillar closes one block up,
+		// and both are priced the same: a placement plus what the block is
+		// worth.
+		placed := c.PlaceTicks + c.BlockTicks
+		rates = append(rates,
+			rate{name: "place", perBlock: placed},
+			rate{name: "pillar", perBlock: placed},
+		)
+	}
 	// A water drop is priced at FallTicks per block dropped, which is the
 	// ordinary fall's rate and is already above.
 
@@ -292,6 +308,16 @@ func randomCapability(random *rand.Rand) Capability {
 		capability.CanOpenDoors = true
 		capability.DoorTicks = price()
 	}
+	if random.IntN(2) == 0 {
+		// Placement is drawn independently of its price so that the case the
+		// floor is wrong for — a placement cheaper per block than a walk — is
+		// actually generated rather than assumed impossible.
+		capability.CanPlace = true
+		capability.PlaceTicks = price()
+		capability.BlockTicks = random.Float64() * 5
+		capability.BlockBudget = 1 + random.IntN(64)
+		capability.MaxPillarHeight = random.IntN(32)
+	}
 
 	return capability
 }
@@ -323,6 +349,12 @@ func capabilities() []named {
 	full.CanOpenDoors = true
 	full.DoorTicks = 29
 	full.WaterLandingDepth = 2
+	full.CanPlace = true
+	full.PlaceTicks = 31
+	full.BlockTicks = 2
+	full.BlockBudget = 16
+	full.PlacedBlock = refStone
+	full.MaxPillarHeight = 8
 
 	return []named{
 		{name: "the shipped body", value: walker},

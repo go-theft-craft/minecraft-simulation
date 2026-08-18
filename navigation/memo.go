@@ -228,6 +228,11 @@ func (m *memoOracle) passableThroughDoor(cell geom.BlockPos) (terrain.Passabilit
 	return query.Passable(cell)
 }
 
+// placeable implements oracle. It is uncached for the reason fluidAt is.
+func (m *memoOracle) placeable(cell geom.BlockPos) (bool, error) {
+	return isPlaceable(m.recorder, cell)
+}
+
 // climbable implements oracle. It is uncached for the reason fluidAt is.
 func (m *memoOracle) climbable(cell geom.BlockPos) (bool, error) {
 	climbable, lookup, err := m.query.ClimbableAt(cell)

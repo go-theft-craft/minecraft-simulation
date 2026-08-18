@@ -34,6 +34,8 @@ type Options struct {
 type Planner struct {
 	capability Capability
 	memo       *memoOracle
+	view       world.View
+	facts      terrain.Facts
 }
 
 // NewPlanner returns a planner for one body over one view.
@@ -45,6 +47,13 @@ func NewPlanner(view world.View, facts terrain.Facts, capability Capability, opt
 	return &Planner{
 		capability: capability,
 		memo:       newMemoOracle(view, facts, capability, options.MemoCells),
+		// The base view and its facts are kept because a body that can place
+		// blocks needs its winning route validated against the world as it
+		// stands, and that validation reads the world directly rather than
+		// through the cache: it is asking about a world with pending
+		// placements in it, which is not the world the cache answers for.
+		view:  view,
+		facts: facts,
 	}, nil
 }
 
@@ -53,7 +62,7 @@ func NewPlanner(view world.View, facts terrain.Facts, capability Capability, opt
 // It returns what Find returns for the same inputs. The cache changes how long
 // that takes, never what it says.
 func (p *Planner) Plan(ctx context.Context, from, goal geom.BlockPos, budget Budget) (Path, error) {
-	return search(ctx, p.memo, p.capability, from, goal, budget)
+	return plan(ctx, p.memo, p.capability, p.view, p.facts, from, goal, budget)
 }
 
 // Observe reports cells whose block state changed, dropping every cached answer
