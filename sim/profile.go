@@ -2,6 +2,7 @@ package sim
 
 import (
 	"context"
+	"errors"
 
 	"github.com/go-theft-craft/minecraft-simulation/entity"
 	"github.com/go-theft-craft/minecraft-simulation/geom"
@@ -10,6 +11,13 @@ import (
 )
 
 // MotionConstants are the per-family movement constants a profile applies.
+//
+// The zero value means the profile has no rules for that family. It is not a
+// body that floats: every family the game has drags its motion by something,
+// so all-zero constants can only be a family nobody supplied. A tick that meets
+// one fails with ErrUnknownFamily rather than moving the body at a guessed
+// rate, because a dropped item falling at the player's gravity looks like a
+// physics bug in whatever consumes it and like nothing at all here.
 //
 // The fields mirror the generated dataset field for field rather than being
 // reshaped into something tidier. A quantity's float width is part of its value:
@@ -26,6 +34,10 @@ type MotionConstants struct {
 	// StepHeight is how far a body of this family may rise to clear an obstacle.
 	StepHeight float64
 }
+
+// ErrUnknownFamily reports a body whose family the profile has no constants
+// for. It is returned by the tick, at the phase that first needs a number.
+var ErrUnknownFamily = errors.New("sim: no motion constants for this family")
 
 // Profile supplies the rules one version of the game plays by.
 //

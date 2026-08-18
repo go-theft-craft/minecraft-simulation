@@ -31,3 +31,28 @@ func TestStateIsComparable(t *testing.T) {
 		t.Fatal("a copy of a state does not equal its original")
 	}
 }
+
+// TestTheFamiliesKeepTheirNumbers pins what a recording's digest depends on. A
+// family inserted rather than appended would renumber every family after it,
+// and every recording taken before the change would disagree with the build.
+func TestTheFamiliesKeepTheirNumbers(t *testing.T) {
+	t.Parallel()
+
+	for _, tc := range []struct {
+		family Family
+		number uint8
+		name   string
+	}{
+		{FamilyUnknown, 0, "unknown"},
+		{FamilyPlayer, 1, "player"},
+		{FamilyItem, 2, "item"},
+		{FamilyArrow, 3, "arrow"},
+	} {
+		if got := uint8(tc.family); got != tc.number {
+			t.Errorf("%s = %d, want %d", tc.name, got, tc.number)
+		}
+		if got := tc.family.String(); got != tc.name {
+			t.Errorf("String() = %q, want %q", got, tc.name)
+		}
+	}
+}

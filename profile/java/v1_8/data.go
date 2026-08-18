@@ -69,8 +69,20 @@ func computeDataDigest(blocks blockTable, table []float32, motion map[entity.Fam
 
 	// The motion constants, walked over the families this profile knows rather
 	// than over the map, because map order is not an order.
-	for _, family := range []entity.Family{entity.FamilyUnknown, entity.FamilyPlayer} {
-		constants := motion[family]
+	//
+	// A family the profile carries no constants for is skipped rather than
+	// hashed as zeroes. The digest says what the profile was built from, and a
+	// family that arrived in the code without arriving in the dataset changes
+	// nothing about the numbers a tick runs on — hashing it would invalidate
+	// every recording for a change that could not move a body.
+	for _, family := range []entity.Family{
+		entity.FamilyUnknown, entity.FamilyPlayer, entity.FamilyItem, entity.FamilyArrow,
+	} {
+		constants, carried := motion[family]
+		if !carried {
+			continue
+		}
+
 		writeUint(uint64(family))
 		writeFloat(constants.Gravity)
 		writeFloat(constants.HorizontalDrag)

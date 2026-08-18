@@ -29,7 +29,16 @@ const (
 	FamilyUnknown Family = iota
 	// FamilyPlayer is a player body.
 	FamilyPlayer
+	// FamilyItem is a dropped item.
+	FamilyItem
+	// FamilyArrow is an arrow in flight or stuck in a block.
+	FamilyArrow
 )
+
+// The numbers above are appended to, never inserted into. A family's number
+// goes into a recording's digest, so renumbering one would make every recording
+// taken before the change disagree with the build for a reason nothing in it
+// explains.
 
 // String returns the family's name.
 func (f Family) String() string {
@@ -38,6 +47,10 @@ func (f Family) String() string {
 		return "unknown"
 	case FamilyPlayer:
 		return "player"
+	case FamilyItem:
+		return "item"
+	case FamilyArrow:
+		return "arrow"
 	default:
 		return fmt.Sprintf("Family(%d)", uint8(f))
 	}

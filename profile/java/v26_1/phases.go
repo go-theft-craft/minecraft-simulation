@@ -636,13 +636,17 @@ func (p *profile) blockSpeedFactor(shared *scratch) error {
 	return nil
 }
 
-// gravity applies one tick of fall to every body.
+// gravity applies one tick of fall to every body, at its own family's rate.
 func (p *profile) gravity(shared *scratch) error {
-	constants := p.Motion(entity.FamilyPlayer)
 	for index := range shared.bodies {
 		working := &shared.bodies[index]
 		if !working.present {
 			continue
+		}
+
+		constants, err := p.constantsFor(working)
+		if err != nil {
+			return err
 		}
 
 		working.state.Motion = movement.ApplyGravity(working.state.Motion, constants.Gravity)
@@ -653,11 +657,15 @@ func (p *profile) gravity(shared *scratch) error {
 
 // verticalDrag applies the vertical multiplier.
 func (p *profile) verticalDrag(shared *scratch) error {
-	constants := p.Motion(entity.FamilyPlayer)
 	for index := range shared.bodies {
 		working := &shared.bodies[index]
 		if !working.present {
 			continue
+		}
+
+		constants, err := p.constantsFor(working)
+		if err != nil {
+			return err
 		}
 
 		working.state.Motion = movement.ApplyVerticalDrag(
@@ -843,4 +851,19 @@ func less(a, b geom.BlockPos) bool {
 // keeps this profile's box identical to the game's after a move.
 func playerBox(pos geom.Vec3) geom.AABB {
 	return movement.Box(pos, playerWidth, playerHeight)
+}
+
+// constantsFor returns the body's own motion constants.
+//
+// Every phase that needs a number reads it through here rather than naming a
+// family. Until M9.2 they all named entity.FamilyPlayer outright, so a dropped
+// item in the world fell at the player's gravity and nothing said so.
+func (p *profile) constantsFor(working *body) (sim.MotionConstants, error) {
+	constants := p.Motion(working.state.Family)
+	if constants == (sim.MotionConstants{}) {
+		return sim.MotionConstants{}, fmt.Errorf("%w: entity %d is a %s",
+			sim.ErrUnknownFamily, working.id, working.state.Family)
+	}
+
+	return constants, nil
 }

@@ -79,6 +79,28 @@ func New(set *data.Set) (sim.Profile, error) {
 			},
 		},
 	}
+
+	// The other families are taken when the dataset carries them and left out
+	// when it does not. Refusing to build would take the whole version down
+	// because one family is missing, and the tick already refuses a family it
+	// has no constants for — at the point of use, where the failure names the
+	// body it is about.
+	for family, name := range map[entity.Family]string{
+		entity.FamilyItem:  "item",
+		entity.FamilyArrow: "arrow",
+	} {
+		constants, carried := physics.EntityMotion[name]
+		if !carried {
+			continue
+		}
+
+		built.motion[family] = sim.MotionConstants{
+			Gravity:        constants.Gravity,
+			HorizontalDrag: constants.HorizontalDrag,
+			VerticalDrag:   constants.VerticalDrag,
+			StepHeight:     constants.StepHeight,
+		}
+	}
 	built.dataDigest = computeDataDigest(built.blocks, physics.SinTable, built.motion)
 
 	return built, nil
