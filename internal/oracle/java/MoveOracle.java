@@ -43,8 +43,14 @@ import net.minecraft.world.WorldProviderSurface;
 import net.minecraft.world.chunk.IChunkProvider;
 
 public final class MoveOracle {
-    /** StubWorld is a block lookup with every other world duty removed. */
-    static final class StubWorld extends World {
+    /**
+     * StubWorld is a block lookup with every other world duty removed.
+     *
+     * Not final: MiningOracle extends it to add the spawn point an EntityPlayer
+     * reads in its constructor. Extending is what keeps the collision, movement,
+     * and mining oracles from being able to disagree about what the world is.
+     */
+    static class StubWorld extends World {
         final Map<Long, IBlockState> blocks = new HashMap<>();
         IBlockState air;
 

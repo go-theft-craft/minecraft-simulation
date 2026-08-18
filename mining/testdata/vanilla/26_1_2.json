@@ -1,0 +1,494 @@
+{
+  "version": "26.1.2",
+  "source": "asked of a Java Edition 26.1.2 server jar through internal/oracle/java/MiningOracle26.java",
+  "dropped": [
+    "The full cross product is 11 blocks × 7 tools × 3 enchantment levels × 4 effect combinations × 4 player states = 3696 cases. This matrix takes 46.",
+    "Tool tiers between wooden and diamond (stone, iron, golden): the tier changes one number in a table the version already resolves, and the two ends bracket it.",
+    "Efficiency levels 2 through 4: the bonus is level² + 1 with no branch between levels, so 1 and 5 bracket every value of it.",
+    "Haste amplifiers above 1: the scaling is linear in the amplifier with no branch. Fatigue is the opposite and is taken at every amplifier it branches on.",
+    "Most block × tool pairs: what changes a break time is the material and the harvest legality, not the identity of either, so one pair per branch is taken.",
+    "The 26.1-only tools (copper, and the tier materials 1.8.9 has no counterpart for): a case a version cannot ask its counterpart is a one-version lane, and this stage refuses those."
+  ],
+  "cases": [
+    {
+      "name": "stone/bare-hand",
+      "block": "minecraft:stone",
+      "hardness": "0x1.8p0",
+      "speed": "0x1.0p0",
+      "harvestable": false,
+      "damage": "0x1.b4e81cp-8",
+      "ticks": 151
+    },
+    {
+      "name": "dirt/bare-hand",
+      "block": "minecraft:dirt",
+      "hardness": "0x1.0p-1",
+      "speed": "0x1.0p0",
+      "harvestable": true,
+      "damage": "0x1.111112p-4",
+      "ticks": 15
+    },
+    {
+      "name": "wood/bare-hand",
+      "block": "minecraft:oak_log",
+      "hardness": "0x1.0p1",
+      "speed": "0x1.0p0",
+      "harvestable": true,
+      "damage": "0x1.111112p-6",
+      "ticks": 61
+    },
+    {
+      "name": "leaves/bare-hand",
+      "block": "minecraft:oak_leaves",
+      "hardness": "0x1.99999ap-3",
+      "speed": "0x1.0p0",
+      "harvestable": true,
+      "damage": "0x1.555556p-3",
+      "ticks": 6
+    },
+    {
+      "name": "wool/bare-hand",
+      "block": "minecraft:white_wool",
+      "hardness": "0x1.99999ap-1",
+      "speed": "0x1.0p0",
+      "harvestable": true,
+      "damage": "0x1.555556p-5",
+      "ticks": 24
+    },
+    {
+      "name": "web/bare-hand",
+      "block": "minecraft:cobweb",
+      "hardness": "0x1.0p2",
+      "speed": "0x1.0p0",
+      "harvestable": false,
+      "damage": "0x1.47ae14p-9",
+      "ticks": 401
+    },
+    {
+      "name": "obsidian/bare-hand",
+      "block": "minecraft:obsidian",
+      "hardness": "0x1.9p5",
+      "speed": "0x1.0p0",
+      "harvestable": false,
+      "damage": "0x1.a36e2ep-13",
+      "ticks": 5001
+    },
+    {
+      "name": "bedrock/bare-hand",
+      "block": "minecraft:bedrock",
+      "hardness": "-0x1.0p0",
+      "speed": "0x1.0p0",
+      "harvestable": true,
+      "damage": "0x0.0p0",
+      "ticks": -1
+    },
+    {
+      "name": "glass/bare-hand",
+      "block": "minecraft:glass",
+      "hardness": "0x1.333334p-2",
+      "speed": "0x1.0p0",
+      "harvestable": true,
+      "damage": "0x1.c71c72p-4",
+      "ticks": 9
+    },
+    {
+      "name": "ore/bare-hand",
+      "block": "minecraft:gold_ore",
+      "hardness": "0x1.8p1",
+      "speed": "0x1.0p0",
+      "harvestable": false,
+      "damage": "0x1.b4e81cp-9",
+      "ticks": 301
+    },
+    {
+      "name": "grass/bare-hand",
+      "block": "minecraft:short_grass",
+      "hardness": "0x0.0p0",
+      "speed": "0x1.0p0",
+      "harvestable": true,
+      "damage": "Infinity",
+      "ticks": 1
+    },
+    {
+      "name": "stone/wooden_pickaxe",
+      "block": "minecraft:stone",
+      "held": "minecraft:wooden_pickaxe",
+      "hardness": "0x1.8p0",
+      "speed": "0x1.0p1",
+      "harvestable": true,
+      "damage": "0x1.6c16c2p-5",
+      "ticks": 23
+    },
+    {
+      "name": "stone/diamond_pickaxe",
+      "block": "minecraft:stone",
+      "held": "minecraft:diamond_pickaxe",
+      "hardness": "0x1.8p0",
+      "speed": "0x1.0p3",
+      "harvestable": true,
+      "damage": "0x1.6c16c2p-3",
+      "ticks": 6
+    },
+    {
+      "name": "stone/diamond_shovel",
+      "block": "minecraft:stone",
+      "held": "minecraft:diamond_shovel",
+      "hardness": "0x1.8p0",
+      "speed": "0x1.0p0",
+      "harvestable": false,
+      "damage": "0x1.b4e81cp-8",
+      "ticks": 151
+    },
+    {
+      "name": "stone/diamond_axe",
+      "block": "minecraft:stone",
+      "held": "minecraft:diamond_axe",
+      "hardness": "0x1.8p0",
+      "speed": "0x1.0p0",
+      "harvestable": false,
+      "damage": "0x1.b4e81cp-8",
+      "ticks": 151
+    },
+    {
+      "name": "stone/diamond_sword",
+      "block": "minecraft:stone",
+      "held": "minecraft:diamond_sword",
+      "hardness": "0x1.8p0",
+      "speed": "0x1.0p0",
+      "harvestable": false,
+      "damage": "0x1.b4e81cp-8",
+      "ticks": 151
+    },
+    {
+      "name": "stone/shears",
+      "block": "minecraft:stone",
+      "held": "minecraft:shears",
+      "hardness": "0x1.8p0",
+      "speed": "0x1.0p0",
+      "harvestable": false,
+      "damage": "0x1.b4e81cp-8",
+      "ticks": 151
+    },
+    {
+      "name": "dirt/diamond_shovel",
+      "block": "minecraft:dirt",
+      "held": "minecraft:diamond_shovel",
+      "hardness": "0x1.0p-1",
+      "speed": "0x1.0p3",
+      "harvestable": true,
+      "damage": "0x1.111112p-1",
+      "ticks": 2
+    },
+    {
+      "name": "wood/diamond_axe",
+      "block": "minecraft:oak_log",
+      "held": "minecraft:diamond_axe",
+      "hardness": "0x1.0p1",
+      "speed": "0x1.0p3",
+      "harvestable": true,
+      "damage": "0x1.111112p-3",
+      "ticks": 8
+    },
+    {
+      "name": "wool/shears",
+      "block": "minecraft:white_wool",
+      "held": "minecraft:shears",
+      "hardness": "0x1.99999ap-1",
+      "speed": "0x1.4p2",
+      "harvestable": true,
+      "damage": "0x1.aaaaaap-3",
+      "ticks": 5,
+      "divergence": "26.1's generated data gives shears a speed of 1 against leaves and wool; the jar's ShearsItem.createToolProperties overrides them at 15 and 5. Pinned by TestTheDatasetToolSpeedsThisVersionGetsWrong in profile/java/v26_1."
+    },
+    {
+      "name": "leaves/shears",
+      "block": "minecraft:oak_leaves",
+      "held": "minecraft:shears",
+      "hardness": "0x1.99999ap-3",
+      "speed": "0x1.ep3",
+      "harvestable": true,
+      "damage": "0x1.4p1",
+      "ticks": 1,
+      "divergence": "26.1's generated data gives shears a speed of 1 against leaves and wool; the jar's ShearsItem.createToolProperties overrides them at 15 and 5. Pinned by TestTheDatasetToolSpeedsThisVersionGetsWrong in profile/java/v26_1."
+    },
+    {
+      "name": "web/diamond_sword",
+      "block": "minecraft:cobweb",
+      "held": "minecraft:diamond_sword",
+      "hardness": "0x1.0p2",
+      "speed": "0x1.ep3",
+      "harvestable": true,
+      "damage": "0x1.0p-3",
+      "ticks": 8
+    },
+    {
+      "name": "web/shears",
+      "block": "minecraft:cobweb",
+      "held": "minecraft:shears",
+      "hardness": "0x1.0p2",
+      "speed": "0x1.ep3",
+      "harvestable": true,
+      "damage": "0x1.0p-3",
+      "ticks": 8
+    },
+    {
+      "name": "obsidian/wooden_pickaxe",
+      "block": "minecraft:obsidian",
+      "held": "minecraft:wooden_pickaxe",
+      "hardness": "0x1.9p5",
+      "speed": "0x1.0p1",
+      "harvestable": false,
+      "damage": "0x1.a36e2ep-12",
+      "ticks": 2500
+    },
+    {
+      "name": "obsidian/diamond_pickaxe",
+      "block": "minecraft:obsidian",
+      "held": "minecraft:diamond_pickaxe",
+      "hardness": "0x1.9p5",
+      "speed": "0x1.0p3",
+      "harvestable": true,
+      "damage": "0x1.5d867cp-8",
+      "ticks": 188
+    },
+    {
+      "name": "ore/wooden_pickaxe",
+      "block": "minecraft:gold_ore",
+      "held": "minecraft:wooden_pickaxe",
+      "hardness": "0x1.8p1",
+      "speed": "0x1.0p1",
+      "harvestable": false,
+      "damage": "0x1.b4e81cp-8",
+      "ticks": 151
+    },
+    {
+      "name": "ore/diamond_pickaxe",
+      "block": "minecraft:gold_ore",
+      "held": "minecraft:diamond_pickaxe",
+      "hardness": "0x1.8p1",
+      "speed": "0x1.0p3",
+      "harvestable": true,
+      "damage": "0x1.6c16c2p-4",
+      "ticks": 12
+    },
+    {
+      "name": "stone/diamond_pickaxe/efficiency1",
+      "block": "minecraft:stone",
+      "held": "minecraft:diamond_pickaxe",
+      "efficiency": 1,
+      "hardness": "0x1.8p0",
+      "speed": "0x1.0p3",
+      "harvestable": true,
+      "damage": "0x1.c71c72p-3",
+      "ticks": 5
+    },
+    {
+      "name": "stone/diamond_pickaxe/efficiency5",
+      "block": "minecraft:stone",
+      "held": "minecraft:diamond_pickaxe",
+      "efficiency": 5,
+      "hardness": "0x1.8p0",
+      "speed": "0x1.0p3",
+      "harvestable": true,
+      "damage": "0x1.82d82cp-1",
+      "ticks": 2
+    },
+    {
+      "name": "stone/bare-hand/efficiency5",
+      "block": "minecraft:stone",
+      "efficiency": 5,
+      "hardness": "0x1.8p0",
+      "speed": "0x1.0p0",
+      "harvestable": false,
+      "damage": "0x1.b4e81cp-8",
+      "ticks": 151
+    },
+    {
+      "name": "dirt/diamond_shovel/efficiency1",
+      "block": "minecraft:dirt",
+      "held": "minecraft:diamond_shovel",
+      "efficiency": 1,
+      "hardness": "0x1.0p-1",
+      "speed": "0x1.0p3",
+      "harvestable": true,
+      "damage": "0x1.555556p-1",
+      "ticks": 2
+    },
+    {
+      "name": "stone/diamond_pickaxe/haste1",
+      "block": "minecraft:stone",
+      "held": "minecraft:diamond_pickaxe",
+      "hasHaste": true,
+      "hardness": "0x1.8p0",
+      "speed": "0x1.0p3",
+      "harvestable": true,
+      "damage": "0x1.b4e81cp-3",
+      "ticks": 5
+    },
+    {
+      "name": "stone/diamond_pickaxe/haste2",
+      "block": "minecraft:stone",
+      "held": "minecraft:diamond_pickaxe",
+      "haste": 1,
+      "hasHaste": true,
+      "hardness": "0x1.8p0",
+      "speed": "0x1.0p3",
+      "harvestable": true,
+      "damage": "0x1.fdb976p-3",
+      "ticks": 5
+    },
+    {
+      "name": "stone/bare-hand/haste1",
+      "block": "minecraft:stone",
+      "hasHaste": true,
+      "hardness": "0x1.8p0",
+      "speed": "0x1.0p0",
+      "harvestable": false,
+      "damage": "0x1.0624dep-7",
+      "ticks": 125
+    },
+    {
+      "name": "stone/diamond_pickaxe/fatigue1",
+      "block": "minecraft:stone",
+      "held": "minecraft:diamond_pickaxe",
+      "hasFatigue": true,
+      "hardness": "0x1.8p0",
+      "speed": "0x1.0p3",
+      "harvestable": true,
+      "damage": "0x1.b4e81cp-5",
+      "ticks": 19
+    },
+    {
+      "name": "stone/diamond_pickaxe/fatigue2",
+      "block": "minecraft:stone",
+      "held": "minecraft:diamond_pickaxe",
+      "miningFatigue": 1,
+      "hasFatigue": true,
+      "hardness": "0x1.8p0",
+      "speed": "0x1.0p3",
+      "harvestable": true,
+      "damage": "0x1.0624dep-6",
+      "ticks": 63
+    },
+    {
+      "name": "stone/diamond_pickaxe/fatigue3",
+      "block": "minecraft:stone",
+      "held": "minecraft:diamond_pickaxe",
+      "miningFatigue": 2,
+      "hasFatigue": true,
+      "hardness": "0x1.8p0",
+      "speed": "0x1.0p3",
+      "harvestable": true,
+      "damage": "0x1.f75106p-12",
+      "ticks": 2084
+    },
+    {
+      "name": "stone/diamond_pickaxe/fatigue4",
+      "block": "minecraft:stone",
+      "held": "minecraft:diamond_pickaxe",
+      "miningFatigue": 3,
+      "hasFatigue": true,
+      "hardness": "0x1.8p0",
+      "speed": "0x1.0p3",
+      "harvestable": true,
+      "damage": "0x1.2dfd68p-13",
+      "ticks": 6945
+    },
+    {
+      "name": "stone/diamond_pickaxe/haste1+fatigue1",
+      "block": "minecraft:stone",
+      "held": "minecraft:diamond_pickaxe",
+      "hasHaste": true,
+      "hasFatigue": true,
+      "hardness": "0x1.8p0",
+      "speed": "0x1.0p3",
+      "harvestable": true,
+      "damage": "0x1.0624dep-4",
+      "ticks": 16
+    },
+    {
+      "name": "stone/diamond_pickaxe/underwater",
+      "block": "minecraft:stone",
+      "held": "minecraft:diamond_pickaxe",
+      "underwater": true,
+      "hardness": "0x1.8p0",
+      "speed": "0x1.0p3",
+      "harvestable": true,
+      "damage": "0x1.234568p-5",
+      "ticks": 29
+    },
+    {
+      "name": "stone/diamond_pickaxe/airborne",
+      "block": "minecraft:stone",
+      "held": "minecraft:diamond_pickaxe",
+      "airborne": true,
+      "hardness": "0x1.8p0",
+      "speed": "0x1.0p3",
+      "harvestable": true,
+      "damage": "0x1.234568p-5",
+      "ticks": 29
+    },
+    {
+      "name": "stone/diamond_pickaxe/underwater+airborne",
+      "block": "minecraft:stone",
+      "held": "minecraft:diamond_pickaxe",
+      "underwater": true,
+      "airborne": true,
+      "hardness": "0x1.8p0",
+      "speed": "0x1.0p3",
+      "harvestable": true,
+      "damage": "0x1.d208a4p-8",
+      "ticks": 141
+    },
+    {
+      "name": "stone/bare-hand/underwater",
+      "block": "minecraft:stone",
+      "underwater": true,
+      "hardness": "0x1.8p0",
+      "speed": "0x1.0p0",
+      "harvestable": false,
+      "damage": "0x1.5d867ep-10",
+      "ticks": 750
+    },
+    {
+      "name": "dirt/diamond_shovel/airborne",
+      "block": "minecraft:dirt",
+      "held": "minecraft:diamond_shovel",
+      "airborne": true,
+      "hardness": "0x1.0p-1",
+      "speed": "0x1.0p3",
+      "harvestable": true,
+      "damage": "0x1.b4e81cp-4",
+      "ticks": 10
+    },
+    {
+      "name": "stone/diamond_pickaxe/everything",
+      "block": "minecraft:stone",
+      "held": "minecraft:diamond_pickaxe",
+      "efficiency": 5,
+      "haste": 1,
+      "hasHaste": true,
+      "hasFatigue": true,
+      "underwater": true,
+      "airborne": true,
+      "hardness": "0x1.8p0",
+      "speed": "0x1.0p3",
+      "harvestable": true,
+      "damage": "0x1.9fef66p-7",
+      "ticks": 79
+    },
+    {
+      "name": "obsidian/bare-hand/never-breaks",
+      "block": "minecraft:obsidian",
+      "miningFatigue": 3,
+      "hasFatigue": true,
+      "underwater": true,
+      "airborne": true,
+      "hardness": "0x1.9p5",
+      "speed": "0x1.0p0",
+      "harvestable": false,
+      "damage": "0x1.bd4d5cp-28",
+      "ticks": -1
+    }
+  ]
+}

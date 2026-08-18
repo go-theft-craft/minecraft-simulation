@@ -217,3 +217,46 @@ func TestKnownVanillaBreakTimes(t *testing.T) {
 		})
 	}
 }
+
+func TestTheDatasetToolSpeedsThisVersionGetsWrong(t *testing.T) {
+	t.Parallel()
+
+	// This is a record of an upstream defect, not a behaviour this profile
+	// wants. Every number on the right is read off 1.8.9's own jar — through
+	// internal/oracle's mining harness, which is where the disagreement was
+	// found — and every number the dataset gives instead is on the left. While
+	// these differ, the break times this profile computes for the named
+	// combinations are wrong, and no amount of testing on this side will make
+	// them right: the fix is in the data.
+	//
+	// The 26.1 profile carries the same test for the same reason, and the two
+	// versions get the same two combinations wrong. Whatever generated these
+	// tables kept ItemShears's rule about which blocks shears mine and dropped
+	// its rule about how fast, on both versions.
+	//
+	// Pinned rather than worked around. Overriding a dataset value with a
+	// constant typed into the profile is the one thing this module does not do,
+	// and pinned, the day upstream fixes one of these, this test fails and the
+	// exception goes.
+	for name, test := range map[string]struct {
+		block, held  string
+		dataset, jar float64
+	}{
+		// ItemShears.getStrVsBlock answers 15 for leaves and for cobweb, 5 for
+		// anything whose material is cloth, and defers otherwise. The dataset
+		// carries the cobweb 15 and gets the other two wrong.
+		"shears on leaves": {"leaves", "shears", 6, 15},
+		"shears on wool":   {"wool", "shears", 4.8, 5},
+	} {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			if got := conditions(t, test.block, test.held).Speed; got != test.dataset {
+				t.Fatalf("%s has speed %v, and this test records the dataset as "+
+					"saying %v — the dataset changed, so check it against the "+
+					"jar's %v and delete this case if it is now right",
+					name, got, test.dataset, test.jar)
+			}
+		})
+	}
+}

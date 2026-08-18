@@ -69,7 +69,8 @@ func newOracle26(t *testing.T) *oracle {
 	classes := t.TempDir()
 	build := exec.Command(javac, "-nowarn",
 		"-cp", strings.Join(classpath, string(os.PathListSeparator)),
-		"-d", classes, "java/ShapeOracle26.java", "java/MoveOracle26.java", "java/MovementOracle26.java")
+		"-d", classes, "java/ShapeOracle26.java", "java/MoveOracle26.java", "java/MovementOracle26.java",
+		"java/MiningOracle26.java")
 	if out, err := build.CombinedOutput(); err != nil {
 		t.Fatalf("compile the 26.1.2 harness: %v\n%s", err, out)
 	}
