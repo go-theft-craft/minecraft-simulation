@@ -170,7 +170,8 @@ func (p *profile) Conditions(
 ) (mining.Conditions, error) {
 	if p.mining.speeds == nil {
 		return mining.Conditions{}, fmt.Errorf(
-			"%w: the data set carries no materials, so no tool has a speed", ErrInvalidProfile)
+			"%w: the data set carries no materials, so no tool has a speed", ErrInvalidProfile,
+		)
 	}
 
 	block, ok := p.mining.blocks[p.blocks.name(ref)]

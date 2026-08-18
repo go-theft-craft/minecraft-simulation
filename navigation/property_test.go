@@ -263,7 +263,8 @@ func perBlockRates(c Capability) []rate {
 		// and both are priced the same: a placement plus what the block is
 		// worth.
 		placed := c.PlaceTicks + c.BlockTicks
-		rates = append(rates,
+		rates = append(
+			rates,
 			rate{name: "place", perBlock: placed},
 			rate{name: "pillar", perBlock: placed},
 		)

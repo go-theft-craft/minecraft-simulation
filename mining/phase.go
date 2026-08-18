@@ -153,7 +153,8 @@ func apply(tick *sim.TickState, dig Dig) (sim.CommandOutcome, bool) {
 	}
 
 	conditions, err := classifier.Conditions(
-		ref, dig.Held, dig.Effects, dig.Underwater, airborne(tick, dig.Entity))
+		ref, dig.Held, dig.Effects, dig.Underwater, airborne(tick, dig.Entity),
+	)
 	if err != nil {
 		return rejected(err.Error()), false
 	}

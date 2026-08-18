@@ -65,7 +65,8 @@ func placementMatrix() []placementQuestion {
 			item: "stairs", face: 1, cursor: [3]float64{0.5, 1, 0.5}, yaw: yaw,
 		})
 	}
-	matrix = append(matrix,
+	matrix = append(
+		matrix,
 		placementQuestion{
 			name: "stairs/underside", item: "stairs",
 			face: 0, cursor: [3]float64{0.5, 0, 0.5},
@@ -87,7 +88,8 @@ func placementMatrix() []placementQuestion {
 	)
 
 	// A slab takes only the half, by the same rule.
-	matrix = append(matrix,
+	matrix = append(
+		matrix,
 		placementQuestion{name: "slab/top-face", item: "slab", face: 1, cursor: [3]float64{0.5, 1, 0.5}},
 		placementQuestion{name: "slab/underside", item: "slab", face: 0, cursor: [3]float64{0.5, 0, 0.5}},
 		placementQuestion{name: "slab/side-low", item: "slab", face: 3, cursor: [3]float64{0.5, 0.2, 1}},
@@ -167,7 +169,8 @@ func TestGeneratePlacementCorpus(t *testing.T) {
 				Version: lane.version,
 				Source: fmt.Sprintf(
 					"asked of a Java Edition %s server jar through internal/oracle/java/%s.java",
-					lane.version, lane.class),
+					lane.version, lane.class,
+				),
 				Covers:  placementCovers,
 				Dropped: placementDropped,
 			}

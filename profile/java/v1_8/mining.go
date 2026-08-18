@@ -92,7 +92,8 @@ func (p *profile) Conditions(
 ) (mining.Conditions, error) {
 	if p.mining.speeds == nil {
 		return mining.Conditions{}, fmt.Errorf(
-			"%w: the data set carries no materials, so no tool has a speed", ErrInvalidProfile)
+			"%w: the data set carries no materials, so no tool has a speed", ErrInvalidProfile,
+		)
 	}
 
 	name := p.blocks.name(ref)
@@ -105,7 +106,8 @@ func (p *profile) Conditions(
 	if !ok && block.material != "" {
 		return mining.Conditions{}, fmt.Errorf(
 			"%w: block %q names material %q, which the data set does not hold",
-			ErrInvalidProfile, name, block.material)
+			ErrInvalidProfile, name, block.material,
+		)
 	}
 
 	return mining.Conditions{

@@ -100,13 +100,16 @@ func LoadCaptured(path string) (Captured, error) {
 		switch {
 		case len(captured.Samples) == 0:
 			return Captured{}, fmt.Errorf(
-				"%w %s: it holds no samples and no reason for having none", ErrFixture, path)
+				"%w %s: it holds no samples and no reason for having none", ErrFixture, path,
+			)
 		case captured.Interval <= 0:
 			return Captured{}, fmt.Errorf(
-				"%w %s: its sample interval is %d ticks", ErrFixture, path, captured.Interval)
+				"%w %s: its sample interval is %d ticks", ErrFixture, path, captured.Interval,
+			)
 		case captured.Because == "":
 			return Captured{}, fmt.Errorf(
-				"%w %s: its tolerance has no recorded derivation", ErrFixture, path)
+				"%w %s: its tolerance has no recorded derivation", ErrFixture, path,
+			)
 		}
 	}
 
