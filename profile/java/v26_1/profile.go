@@ -143,6 +143,7 @@ type profile struct {
 	blocks    blockTable
 	mining    miningTable
 	placement placementTable
+	fighting  fighting
 	table     movement.Table
 	motion    map[entity.Family]sim.MotionConstants
 	// dataDigest hashes the numbers above. It is computed once, because the
@@ -187,6 +188,7 @@ func New(set *data.Set) (sim.Profile, error) {
 		blocks:    blocks,
 		mining:    mining,
 		placement: placing,
+		fighting:  newFighting(set),
 		table:     table,
 		motion: map[entity.Family]sim.MotionConstants{
 			entity.FamilyPlayer: {
