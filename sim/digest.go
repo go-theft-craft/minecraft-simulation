@@ -3,6 +3,9 @@ package sim
 import (
 	"crypto/sha256"
 	"encoding/hex"
+
+	"github.com/go-theft-craft/minecraft-simulation/entity"
+	"github.com/go-theft-craft/minecraft-simulation/geom"
 )
 
 // Digest is a canonical hash of one tick result.
@@ -55,6 +58,19 @@ func (r TickResult) computeDigest(id ProfileID) Digest {
 		e.vec(op.State.Motion)
 		e.bool(op.State.OnGround)
 		e.float64(op.State.StepHeight)
+		// Written only when there is one. See tagPosition: a body whose version
+		// derives its position from its box has none, and the bytes it encodes
+		// must not change because another version does.
+		if op.State.Position != (geom.Vec3{}) {
+			e.tag(tagPosition)
+			e.vec(op.State.Position)
+		}
+		if op.State.Support != (entity.Support{}) {
+			e.tag(tagSupport)
+			e.blockPos(op.State.Support.Block)
+			e.bool(op.State.Support.Present)
+			e.bool(op.State.Support.NoBlocks)
+		}
 		e.blockPos(op.Block)
 		e.uint32(uint32(op.Ref))
 		e.tag(tagLocomotion)

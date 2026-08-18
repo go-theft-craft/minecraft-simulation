@@ -67,3 +67,18 @@ func (t Table) Cos(angle float32) float32 {
 	// it, and a fused index is a different table entry.
 	return t.entries[int32(float32(angle*tableScale)+float32(cosineOffset))&(TableSize-1)]
 }
+
+// At returns the entry at an index, wrapped into the table.
+//
+// It exists because the two versions this module carries compute the index
+// differently and read the same table: 1.8.9 multiplies at single width and
+// truncates through an int, and 26.1.2 multiplies at double width and truncates
+// through a long. The mask is the one part they share, so the index is the
+// caller's and the wrap is here.
+//
+// The table itself is measured per version rather than shared. That it is
+// byte-identical between these two is a fact about both of them, not a promise
+// about the next one.
+func (t Table) At(index int64) float32 {
+	return t.entries[index&(TableSize-1)]
+}

@@ -37,6 +37,16 @@ const (
 	// tag's value is part of every digest ever recorded, so the list grows at
 	// the end and never in the middle.
 	tagLocomotion
+	// tagPosition arrived with M8.7, for a version that keeps a body's position
+	// as well as its box. It is appended for the same reason, and it is written
+	// only when the position is non-zero — so a profile that has none encodes
+	// exactly the bytes it encoded before this tag existed, and every recording
+	// made before M8.7 still verifies.
+	tagPosition
+	// tagSupport arrived with M8.7 too, for the block a version records as
+	// holding a body up. Written only when there is one, for the same reason
+	// tagPosition is.
+	tagSupport
 )
 
 // canonicalNaN is the single pattern every NaN encodes as. NaN payloads are not

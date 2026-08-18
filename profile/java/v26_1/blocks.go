@@ -1,22 +1,6 @@
-// Package v26_1 supplies the Java Edition 26.1.2 rules: the constants, the
-// widths they are computed at, the block table, and the order the tick's phases
-// run in.
-//
-// It is one of the two packages in this module that import game data, and it is
-// deliberately not a copy of the 1.8.9 one. Everything below it — geom, world,
-// entity, collision, sim, runtime, and movement — is version neutral, and a rule
-// that needed a 26.1.2 number receives it from here.
-//
-// Where this version and 1.8.9 hold the same quantity at the same width, the two
-// packages say so with the same type. Where they do not, the type is this
-// version's: the block friction is a float in both, so it is a float32 here as
-// it is there, while the input vector this version normalizes at double width
-// has no float32 in it at all. A signature carrying float32 is stating the width
-// the product is formed at, and it is stating it about this version only.
 package v26_1
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/go-theft-craft/minecraft-protocol/data"
@@ -24,9 +8,6 @@ import (
 	"github.com/go-theft-craft/minecraft-simulation/geom"
 	"github.com/go-theft-craft/minecraft-simulation/world"
 )
-
-// ErrInvalidProfile reports a data set this profile cannot be built from.
-var ErrInvalidProfile = errors.New("v26_1: invalid profile data")
 
 // blockTable turns the dataset's block, shape, and physics tables into the
 // opaque handles world.BlockRef promises.
