@@ -64,3 +64,51 @@ func (b AABB) Intersects(other AABB) bool {
 		b.MinY < other.MaxY && b.MaxY > other.MinY &&
 		b.MinZ < other.MaxZ && b.MaxZ > other.MinZ
 }
+
+// Nearest returns the point of b closest to p, which is p itself when p is
+// inside b.
+//
+// It is the point every reach check measures to. The game measures reach to a
+// target's box rather than to its centre, so a client that measures to the
+// centre refuses attacks the server would have accepted, and the taller the
+// target the wider the disagreement.
+func (b AABB) Nearest(p Vec3) Vec3 {
+	return Vec3{
+		X: clamp(p.X, b.MinX, b.MaxX),
+		Y: clamp(p.Y, b.MinY, b.MaxY),
+		Z: clamp(p.Z, b.MinZ, b.MaxZ),
+	}
+}
+
+// Reaches reports whether eye is within reach of b's nearest point.
+//
+// The eye is a position rather than a body and an offset because eye height is
+// a per-version, per-posture number: 1.62 standing in 1.8.9, and something the
+// profile supplies in 26.1.2 where a crouched body is shorter. The caller that
+// knows which is which passes the point.
+//
+// The reach distance is an argument for the same reason. The two versions
+// disagree about it and it differs by what is being reached for; nothing here
+// asserts a value.
+//
+// The comparison is squared on both sides, so it never takes a root and never
+// disagrees with itself about a target exactly on the limit.
+func (b AABB) Reaches(eye Vec3, reach float64) bool {
+	d := b.Nearest(eye).Sub(eye)
+
+	return d.X*d.X+d.Y*d.Y+d.Z*d.Z <= reach*reach
+}
+
+// clamp confines a value to a range. It is not exported: geom's callers want
+// Nearest, and a bare clamp is the kind of helper that ends up duplicated in
+// three packages.
+func clamp(value, low, high float64) float64 {
+	if value < low {
+		return low
+	}
+	if value > high {
+		return high
+	}
+
+	return value
+}
