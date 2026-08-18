@@ -4,6 +4,14 @@ This file records notable user-visible changes. It follows [Keep a Changelog](ht
 
 ## Unreleased
 
+## 0.1.0 - 2026-08-18
+
+The first release. Everything below is what the module is on the day it is
+published: a deterministic tick over a tri-state block view, collision for two
+Java Edition versions, two player profiles gated on those versions' own servers,
+route search over the same world model, and the recording and replay that keep
+all of it reproducible across six platforms.
+
 ### Added
 
 - `profile/java/v26_1`: Java Edition 26.1.2 for a player on land — the block
