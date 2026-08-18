@@ -4,6 +4,62 @@ This file records notable user-visible changes. It follows [Keep a Changelog](ht
 
 ## Unreleased
 
+## 0.3.0 - 2026-08-18
+
+### Added
+
+- `combat`: what one swing does, gated on both jars. `InReach` measures to the
+  nearest point of the target's box — measuring to the centre makes a tall
+  entity unhittable at its feet — and each profile declares its own attack and
+  interact distances: 1.8.9's are the client's, transcribed from
+  `EntityRenderer.getMouseOver` and `PlayerControllerMP` because the server's
+  6-block tolerance is slack a vanilla client never uses, and 26.1.2's come
+  from the generated interaction-range attributes plus the two creative
+  modifiers `ServerPlayer` adds.
+
+- `combat.Cooldown`: the attack cooldown, and 1.8.9's absence of one as a
+  value with a required reason rather than a nil — so shared damage code needs
+  no version branch and a conformance report can tell "verified absent" from
+  "never checked". The 26.1.2 charge curve runs at float32 width, as the
+  game's does, and matches its jar exactly at every sampled tick.
+
+- `combat.Damage` and `combat.Knockback`: one formula serves both versions
+  because 1.8.9's charge is always 1, at which 26.1.2's scale factor is
+  exactly 1 in float32. Knockback is an impulse the next movement tick
+  resolves through collision, never a position write, at the games' own float
+  widths — the distance is `MathHelper.sqrt_double`'s float widened, and the
+  0.4 constants are Java floats, not 0.4. Zero distance does not produce the
+  NaN the kernel would reject.
+
+- `combat.Attack` and `combat.Phase`: the kernel phase for reach, cooldown,
+  damage, knockback, and death. One death event per death, and the body goes
+  with it; an out-of-reach attack is refused with a reason and no change set;
+  an attack naming a body the tick cannot see reports an incomplete tick
+  rather than a refusal.
+
+- `entity.Vitals`: a body's health and the tick of its last swing, encoded
+  under an appended digest tag only when non-zero — so every recording made
+  before combat existed still verifies.
+
+- `sim.TickState.MissingEntities`: the entity counterpart of `MissingBlocks`,
+  for a command that names a body the tick cannot read.
+
+- `mctest.CombatCorpus` and the `CombatOracle` harnesses: the 1.8.9 lane holds
+  full strikes answered by `EntityPlayer.attackTargetEntityWithCurrentItem`
+  over a stub world and compared exactly wherever no bonus rides the
+  attacker's yaw; the 26.1.2 lane holds the charge curve and the base impulse,
+  because `Entity.hurtOrSimulate` takes the server branch only over a real
+  `ServerLevel`, and its corpus's `Dropped` list says so rather than
+  presenting the two lanes as equivalent.
+
+### Fixed
+
+- `navigation`: a jump starts from the ground, not from water.
+
+### Changed
+
+- The module consumes `minecraft-protocol` v0.8.0.
+
 ## 0.2.0 - 2026-08-18
 
 ### Added
