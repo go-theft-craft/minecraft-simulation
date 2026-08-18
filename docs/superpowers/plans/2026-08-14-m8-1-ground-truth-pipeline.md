@@ -5,8 +5,8 @@
 > (`b463b3e`, `961702d`). The tool it built became the released
 > `minecraft-reference` repository, and this repository consumes it by version
 > through `MCREFERENCE_VERSION` in `Taskfile.yml` rather than from `main`. The
-> checkboxes below were never ticked and are not evidence; do not re-run this
-> plan.
+> boxes below are ticked by outcome, checked against this repository on
+> 2026-08-18. Do not re-run this plan.
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -90,7 +90,7 @@ Repository: `minecraft-reference`. This task is pure Go with no jar, no JDK, and
 
 The sin table is base64-encoded little-endian IEEE-754 float32. It is not a JSON number array. Two reasons: 65,536 JSON numbers is roughly 800 KB of text against roughly 350 KB of base64, and the manifest validator requires every source file to end in `.json`, so a sidecar binary file is not an option.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```go
 package physics
@@ -189,13 +189,13 @@ func TestDecodeSinTableRejectsPartialFloat(t *testing.T) {
 }
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-reference && go test ./internal/reference/physics/ -run 'TestMarshalCanonical|TestParseDocument|TestSinTable|TestDecodeSinTable' -v`
 
 Expected: FAIL to build, with `undefined: Document` and `undefined: EncodeSinTable`.
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 ```go
 // Package physics extracts and encodes Minecraft physics constants.
@@ -302,19 +302,19 @@ func (t *trimReader) Read(destination []byte) (int, error) {
 
 Add `"io"` to the import block.
 
-- [ ] **Step 4: Run the test to verify it passes**
+- [x] **Step 4: Run the test to verify it passes**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-reference && go test ./internal/reference/physics/ -v`
 
 Expected: PASS, four tests.
 
-- [ ] **Step 5: Run the repository checks**
+- [x] **Step 5: Run the repository checks**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-reference && devbox run -- task fmt && devbox run -- task verify`
 
 Expected: all tasks pass.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-reference
@@ -337,7 +337,7 @@ Repository: `minecraft-reference`. This task produces reviewed notes, not code. 
 
 This task requires a JDK and network access once. It writes nothing into the committed tree except the notes file. The generated workspace under `reference/work/` stays ignored.
 
-- [ ] **Step 1: Prepare the 1.8.9 server reference workspace**
+- [x] **Step 1: Prepare the 1.8.9 server reference workspace**
 
 Run:
 
@@ -348,7 +348,7 @@ devbox run -- task reference:prepare VERSIONS=1.8.9 SIDES=server
 
 Expected: the command finishes and `reference/work/index/1.8.9/server/symbols.jsonl` exists.
 
-- [ ] **Step 2: Find every identity the dumper needs**
+- [x] **Step 2: Find every identity the dumper needs**
 
 Run each command and keep its output. Every record is one JSON object with `owner`, `kind`, `name`, and `descriptor`.
 
@@ -374,7 +374,7 @@ grep -iE '"owner":"[^"]*Bootstrap"' "$index"
 
 Expected: at least one record per command. If any command returns nothing, widen it by dropping the `owner` constraint and inspecting the results by hand. Do not proceed with an identity the index did not produce.
 
-- [ ] **Step 3: Write the notes file**
+- [x] **Step 3: Write the notes file**
 
 Create `reference/notes/physics-symbols-1.8.9.md` and record each identity exactly as the matching `symbols.jsonl` record spells it:
 
@@ -429,7 +429,7 @@ No decompiled source is reproduced here. These are identities only.
 
 Replace each `<...>` with the value read from the index. Do not guess a value that the index did not produce.
 
-- [ ] **Step 4: Verify the notes contain no placeholder text**
+- [x] **Step 4: Verify the notes contain no placeholder text**
 
 Run:
 
@@ -440,13 +440,13 @@ cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-reference
 
 Expected: exit status 0, meaning no placeholder markers remain.
 
-- [ ] **Step 5: Confirm the workspace stayed ignored**
+- [x] **Step 5: Confirm the workspace stayed ignored**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-reference && git status --porcelain`
 
 Expected: only `reference/notes/physics-symbols-1.8.9.md` appears. If anything under `reference/work/` appears, stop and fix `.gitignore` before continuing.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-reference
@@ -477,7 +477,7 @@ Repository: `minecraft-reference`.
 
 This subcommand needs `javac`, which `mcreference` does not currently require. `prepare` checks only `java` and `javap`. The `dump` subcommand adds its own check and does not change `prepare`'s requirements.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```go
 package physics
@@ -573,13 +573,13 @@ func shellQuote(value string) string {
 }
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-reference && go test ./internal/reference/physics/ -run TestDump -v`
 
 Expected: FAIL to build, with `undefined: Dump` and `undefined: namedJarPath`.
 
-- [ ] **Step 3: Write the Java dumper program**
+- [x] **Step 3: Write the Java dumper program**
 
 Create `internal/reference/physics/java/Dump1_8.java`.
 
@@ -677,7 +677,7 @@ public final class Dump1_8 {
 
 The bootstrap call matters more than it looks. Without it the block registry is empty and the dumper reports zero blocks rather than failing. If Step 8 prints a block count of zero, the bootstrap identity is wrong; re-check it against the index before changing anything else.
 
-- [ ] **Step 4: Write the Go dumper**
+- [x] **Step 4: Write the Go dumper**
 
 Create `internal/reference/physics/dumper.go`:
 
@@ -828,13 +828,13 @@ func fileDigest(path string) (string, error) {
 
 `ParseDocument` uses `DisallowUnknownFields`, and the Java program emits only the three keys it computes, so the decode succeeds and the Go side stamps identity afterward.
 
-- [ ] **Step 5: Run the test to verify it passes**
+- [x] **Step 5: Run the test to verify it passes**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-reference && go test ./internal/reference/physics/ -v`
 
 Expected: PASS, seven tests.
 
-- [ ] **Step 6: Wire the subcommand**
+- [x] **Step 6: Wire the subcommand**
 
 In `cmd/mcreference/main.go`, add `"github.com/go-theft-craft/minecraft-reference/internal/reference/physics"` to the import block, add a `dump` case to the `switch` in `run` immediately after the `prepare` case:
 
@@ -916,7 +916,7 @@ Examples:
 }
 ```
 
-- [ ] **Step 7: Verify the subcommand is reachable**
+- [x] **Step 7: Verify the subcommand is reachable**
 
 Run:
 
@@ -929,7 +929,7 @@ go run ./cmd/mcreference dump 2>&1 | grep -q 'required' && echo "argument valida
 
 Expected: the usage block prints, then `argument validation works`, then `no unreplaced tokens`. If the last check fails, an identity from Task 2 was never substituted and the dumper would fail at runtime with `ClassNotFoundException`.
 
-- [ ] **Step 8: Produce the real document**
+- [x] **Step 8: Produce the real document**
 
 Run:
 
@@ -955,7 +955,7 @@ print('sin table floats:', len(base64.b64decode(d['sinTableBase64'])) // 4)
 
 Expected: a few hundred blocks, `ice` above the default, and a sin table length that is a power of two. If the sin table length is zero, the field identity in Task 2 is wrong.
 
-- [ ] **Step 9: Run the repository checks and commit**
+- [x] **Step 9: Run the repository checks and commit**
 
 ```bash
 cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-reference
@@ -979,7 +979,7 @@ Repository: `minecraft-reference`. Notes only, no code.
 
 These constants are literals inside method bodies. Reflection cannot reach them, so a maintainer reads them in the local decompiled workspace and records each with its source identity. Nothing is copied except numbers.
 
-- [ ] **Step 1: Locate the three motion methods**
+- [x] **Step 1: Locate the three motion methods**
 
 Run:
 
@@ -992,7 +992,7 @@ grep -rln 'class EntityArrow' reference/work/sources/1.8.9/server/ --include=*.j
 
 Expected: one file path per entity family, plus the shared living-entity movement method.
 
-- [ ] **Step 2: Record each constant with its source**
+- [x] **Step 2: Record each constant with its source**
 
 Create `reference/notes/physics-motion-1.8.9.md` with this structure, filling every value from the located files:
 
@@ -1032,7 +1032,7 @@ Ranges are checked by `TestPhysicsDocumentRanges` in minecraft-protocol.
 
 Where an entity family applies the same drag on both axes, record the same number twice rather than omitting a field.
 
-- [ ] **Step 3: Verify no placeholder remains**
+- [x] **Step 3: Verify no placeholder remains**
 
 Run:
 
@@ -1043,7 +1043,7 @@ cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-reference
 
 Expected: exit status 0.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-reference
@@ -1073,7 +1073,7 @@ Repository: `minecraft-protocol`. Pure Go, mirrors `data/collision_shape.go`.
   - `func (s *Set) Physics() Physics`
   - `SetOptions.Physics Physics`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```go
 package data
@@ -1131,13 +1131,13 @@ func TestSetPhysicsReturnsCallerOwnedValue(t *testing.T) {
 }
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-protocol && go test ./data/ -run TestPhysics -v && go test ./data/ -run TestSetPhysics -v`
 
 Expected: FAIL to build, with `undefined: Physics`.
 
-- [ ] **Step 3: Write `data/physics.go`**
+- [x] **Step 3: Write `data/physics.go`**
 
 ```go
 package data
@@ -1195,7 +1195,7 @@ func (p Physics) Clone() Physics {
 }
 ```
 
-- [ ] **Step 4: Wire `Physics` into `Set`**
+- [x] **Step 4: Wire `Physics` into `Set`**
 
 In `data/set.go`, make three edits that mirror the existing `CollisionShapes` handling exactly:
 
@@ -1224,13 +1224,13 @@ In `data/set.go`, make three edits that mirror the existing `CollisionShapes` ha
 func (s *Set) Physics() Physics { return s.physics.Clone() }
 ```
 
-- [ ] **Step 5: Run the test to verify it passes**
+- [x] **Step 5: Run the test to verify it passes**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-protocol && go test ./data/ -v -run 'Physics'`
 
 Expected: PASS, two tests.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-protocol
@@ -1257,7 +1257,7 @@ Repository: `minecraft-protocol`.
 
 The existing `files` map has one repository, revision, path, and license for every entry. `physics.json` has Mojang provenance, so it cannot join that map. It gets a parallel group with its own provenance block. The existing validation is unchanged, which keeps every current error message intact.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Append to `internal/codegen/generator/generator_test.go`:
 
@@ -1351,13 +1351,13 @@ func writeMinimalSource(t *testing.T, directory string, mutate func(map[string]a
 
 Ensure `encoding/json`, `os`, and `path/filepath` are in the test file's import block.
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-protocol && go test ./internal/codegen/generator/ -run TestLoadVerifiedSource -v`
 
 Expected: FAIL. `TestLoadVerifiedSourceProvidesPhysics` reports that `physics.json` is missing, because the file and the manifest entries do not exist yet.
 
-- [ ] **Step 3: Create `source/java/1.8/physics.json`**
+- [x] **Step 3: Create `source/java/1.8/physics.json`**
 
 Start from the extracted document and add the transcribed section:
 
@@ -1378,7 +1378,7 @@ Then edit `source/java/1.8/physics.json` so that its `entityMotion` object conta
 
 Replace every `0.0` with the recorded value. Keys stay sorted. The file keeps the key order that `MarshalCanonical` produced: `version`, `side`, `jarSha256`, `defaultSlipperiness`, `blockSlipperiness`, `sinTableBase64`, `entityMotion`.
 
-- [ ] **Step 4: Add the manifest entries**
+- [x] **Step 4: Add the manifest entries**
 
 Compute the digest:
 
@@ -1403,7 +1403,7 @@ Then add two top-level keys to `source/java/1.8/manifest.json`, after the existi
   }
 ```
 
-- [ ] **Step 5: Implement the validation**
+- [x] **Step 5: Implement the validation**
 
 In `internal/codegen/generator/manifest.go`, add the constant beside the existing ones:
 
@@ -1504,13 +1504,13 @@ with:
 
 Add `"maps"` and `"slices"` to the import block.
 
-- [ ] **Step 6: Run the tests to verify they pass**
+- [x] **Step 6: Run the tests to verify they pass**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-protocol && go test ./internal/codegen/generator/ -v`
 
 Expected: PASS, including the three new tests and every pre-existing generator test.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-protocol
@@ -1537,7 +1537,7 @@ Repository: `minecraft-protocol`.
 
 The sin table is emitted as a base64 constant plus a decode function, not as a 65,536-element array literal. A literal that size would make `physics.go` roughly 700 KB and slow every compile of the package.
 
-- [ ] **Step 1: Write the template**
+- [x] **Step 1: Write the template**
 
 Create `internal/codegen/generator/templates/physics.go.tmpl`:
 
@@ -1585,7 +1585,7 @@ func newPhysics() data.Physics {
 }
 ```
 
-- [ ] **Step 2: Add the loader and register the file**
+- [x] **Step 2: Add the loader and register the file**
 
 In `internal/codegen/generator/generator.go`, add `"physics.go"` to `generatedFileNames`, immediately after `"particles.go"` so the list stays alphabetical.
 
@@ -1667,11 +1667,11 @@ Add the render-plan entry to the `specialGenerators` slice in `buildRenderPlan`,
 			{"physics.json", "physics.go.tmpl", "physics.go", func(raw []byte) (any, error) { return loadPhysics(raw) }},
 ```
 
-- [ ] **Step 3: Pass physics into the set**
+- [x] **Step 3: Pass physics into the set**
 
 In `internal/codegen/generator/templates/gamedata.go.tmpl`, add `Physics: newPhysics(),` to the `data.SetOptions` literal, immediately after the `CollisionShapes:` entry.
 
-- [ ] **Step 4: Generate and inspect**
+- [x] **Step 4: Generate and inspect**
 
 Run:
 
@@ -1683,7 +1683,7 @@ git status --porcelain generated/java/v1_8/
 
 Expected: `physics.go` is new and `gamedata.go` is modified. No other generated file changes. If another file changed, the template edit was wrong.
 
-- [ ] **Step 5: Write the range and integrity test**
+- [x] **Step 5: Write the range and integrity test**
 
 Append to `generated/java/v1_8/data_test.go`. This file is a preserved hand-written exception that the generator does not overwrite.
 
@@ -1764,7 +1764,7 @@ Ensure `"math"` is in that file's import block.
 
 `TestSinTableMatchesSine` is the integrity check that a wrong field identity, a byte-order mistake, or a truncated table would fail. It compares against `math.Sin` at a tolerance of 1e-4 rather than exactly, because the table is `float32` and the point is to detect corruption, not to assert bit-exactness.
 
-- [ ] **Step 6: Run the tests**
+- [x] **Step 6: Run the tests**
 
 Run:
 
@@ -1776,7 +1776,7 @@ devbox run -- task generate:check
 
 Expected: three tests PASS, and `generate:check` reports the package is current.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-protocol
@@ -1800,7 +1800,7 @@ Repository: `minecraft-protocol`.
 - Consumes: everything above.
 - Produces: no code.
 
-- [ ] **Step 1: Add the notices entry**
+- [x] **Step 1: Add the notices entry**
 
 Append a section to `THIRD_PARTY_NOTICES.md`. Place it after the existing PrismarineJS section so the reader sees the two provenances separately:
 
@@ -1820,7 +1820,7 @@ is a product of Mojang AB. This project is not an official Minecraft product
 and is not approved by or associated with Mojang or Microsoft.
 ```
 
-- [ ] **Step 2: Update the support table and built-ins section**
+- [x] **Step 2: Update the support table and built-ins section**
 
 In `README.md`, in the "Built-in game-data sources" section, add this paragraph after the paragraph that describes `source/java/1.8/manifest.json`:
 
@@ -1835,7 +1835,7 @@ the `mcreference dump` command; verifying the checked-in output does not.
 
 In the support-status table, change the Java 1.8 row's status cell to end with `, physics constants` before the closing pipe.
 
-- [ ] **Step 3: Add the changelog entry**
+- [x] **Step 3: Add the changelog entry**
 
 Add to the `## [Unreleased]` section of `CHANGELOG.md`, under an `### Added` heading, creating the heading if it does not exist:
 
@@ -1845,7 +1845,7 @@ Add to the `## [Unreleased]` section of `CHANGELOG.md`, under an `### Added` hea
   reachable through `data.Set.Physics`.
 ```
 
-- [ ] **Step 4: Run the full verification**
+- [x] **Step 4: Run the full verification**
 
 Run:
 
@@ -1856,7 +1856,7 @@ devbox run -- task verify
 
 Expected: `generate:check`, `lint`, `secrets`, `test`, `vuln`, and `build` all pass.
 
-- [ ] **Step 5: Confirm the M8.1 exit criterion**
+- [x] **Step 5: Confirm the M8.1 exit criterion**
 
 Run:
 
@@ -1900,7 +1900,7 @@ env PATH=/usr/bin:/bin go run ./cmd/mcdata-gen -check -source ./source/java/1.8 
 
 Expected: `mcdata-gen: checked source/java/1.8 -> generated/java/v1_8`.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-protocol

@@ -3,8 +3,8 @@
 > **Status: complete, 2026-08-18.** Shipped as M8.2: `geom`, `world`, and
 > `collision`, with the three exit properties and a differential harness that
 > agrees with a real 1.8.9 server bit for bit across 2,872 whole moves. The
-> checkboxes below were never ticked and are not evidence; do not re-run this
-> plan.
+> boxes below are ticked by outcome, checked against this repository on
+> 2026-08-18. Do not re-run this plan.
 >
 > One thing here has been superseded rather than completed: M8.4 measured what
 > this plan's prose statements about vanilla were worth and found two of the
@@ -92,7 +92,7 @@ minecraft-simulation/
 
 `Floor` rounds toward negative infinity, which is what block coordinates need: the block containing `-0.5` is `-1`, not `0`. Go's integer conversion truncates toward zero, so a plain cast is wrong for negative coordinates and would place an entity in the wrong block on the negative side of the origin.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```go
 package geom
@@ -162,13 +162,13 @@ func TestIsZero(t *testing.T) {
 }
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./geom/`
 
 Expected: FAIL to build, with `undefined: Floor` and `undefined: Vec3`.
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 ```go
 // Package geom holds the value types the simulation measures space with:
@@ -230,19 +230,19 @@ func BlockPosOf(v Vec3) BlockPos {
 }
 ```
 
-- [ ] **Step 4: Run the test to verify it passes**
+- [x] **Step 4: Run the test to verify it passes**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./geom/ -v`
 
 Expected: PASS, five tests.
 
-- [ ] **Step 5: Run the repository checks**
+- [x] **Step 5: Run the repository checks**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- task fmt && devbox run -- task verify`
 
 Expected: all tasks pass.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation
@@ -269,7 +269,7 @@ git commit -m "feat(geom): add vectors and block positions"
 
 `Stretch` is the sweep expansion: it grows the box in the direction of motion only, leaving the opposite face where it was, so the result covers every cell the box can reach this tick. Vanilla calls this `addCoord`; the name here says what it does.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```go
 package geom
@@ -345,13 +345,13 @@ func TestIntersectsIsStrictAndSymmetric(t *testing.T) {
 
 Touching faces must not count as intersecting. An entity standing exactly on a floor shares a plane with it every tick, and a non-strict test would report a permanent collision.
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./geom/ -run 'TestBlockAABB|TestOffset|TestStretch|TestIntersects'`
 
 Expected: FAIL to build, with `undefined: AABB`.
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 ```go
 package geom
@@ -422,17 +422,17 @@ func (b AABB) Intersects(other AABB) bool {
 }
 ```
 
-- [ ] **Step 4: Run the test to verify it passes**
+- [x] **Step 4: Run the test to verify it passes**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./geom/ -v`
 
 Expected: PASS.
 
-- [ ] **Step 5: Run the repository checks**
+- [x] **Step 5: Run the repository checks**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- task fmt && devbox run -- task verify`
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation
@@ -459,7 +459,7 @@ The receiver is the blocking box and `mover` is the entity box, matching vanilla
 
 There is no epsilon. 1.8.9 compares far edges with `<=` and `>=` and stops there. Adding a tolerance would change contact positions by a measurable amount and break the M8.4 exit criterion, which requires a vanilla server to send zero corrections.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```go
 package geom
@@ -541,13 +541,13 @@ func TestClampNeverReversesMotion(t *testing.T) {
 
 The last case matters: vanilla only clamps when the mover is strictly on the approaching side (`mover.MaxX <= b.MinX` for positive motion). An already-overlapping box returns the motion untouched rather than ejecting the entity. Resolution of overlap is not collision's job.
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./geom/ -run TestClamp`
 
 Expected: FAIL to build, with `b.ClampX undefined`.
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 ```go
 package geom
@@ -629,17 +629,17 @@ func (b AABB) ClampZ(mover AABB, motion float64) float64 {
 }
 ```
 
-- [ ] **Step 4: Run the test to verify it passes**
+- [x] **Step 4: Run the test to verify it passes**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./geom/ -v -run TestClamp`
 
 Expected: PASS, six tests.
 
-- [ ] **Step 5: Run the repository checks**
+- [x] **Step 5: Run the repository checks**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- task fmt && devbox run -- task verify`
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation
@@ -670,7 +670,7 @@ A shape is stated in block-local coordinates, where the cell spans 0 to 1 on eac
 
 `Shape` copies its input in `NewShape` and never exposes the slice, so a caller cannot mutate a shape it already handed over. Shapes are shared across every cell of a block type and must stay immutable.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```go
 package geom
@@ -747,13 +747,13 @@ func TestShapeLen(t *testing.T) {
 }
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./geom/ -run 'TestFullCube|TestEmptyShape|TestBoxesAt|TestNewShape|TestShapeLen'`
 
 Expected: FAIL to build, with `undefined: FullCube`.
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 ```go
 package geom
@@ -809,17 +809,17 @@ func (s Shape) BoxesAt(pos BlockPos, dst []AABB) []AABB {
 }
 ```
 
-- [ ] **Step 4: Run the test to verify it passes**
+- [x] **Step 4: Run the test to verify it passes**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./geom/ -v`
 
 Expected: PASS.
 
-- [ ] **Step 5: Run the repository checks**
+- [x] **Step 5: Run the repository checks**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- task fmt && devbox run -- task verify`
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation
@@ -852,7 +852,7 @@ git commit -m "feat(geom): add per-block voxel shapes"
 
 The tri-state lookup is the parent design's rule: a view distinguishes known air, a known block state, and unknown. The kernel never fabricates state, so `collision` must be able to tell "nothing is there" from "nobody told me". `Blocks` defaults to `LookupUnknown` for anything never set, which makes the unknown path the one a test gets for free rather than the one it has to arrange.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```go
 package world
@@ -945,13 +945,13 @@ func TestLookupString(t *testing.T) {
 var _ BlockView = (*Blocks)(nil)
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./world/`
 
 Expected: FAIL to build, with `undefined: NewBlocks`.
 
-- [ ] **Step 3: Write `world/view.go`**
+- [x] **Step 3: Write `world/view.go`**
 
 ```go
 // Package world declares the read-only views the simulation looks at the world
@@ -1005,7 +1005,7 @@ type BlockView interface {
 }
 ```
 
-- [ ] **Step 4: Write `world/fake.go`**
+- [x] **Step 4: Write `world/fake.go`**
 
 ```go
 package world
@@ -1069,17 +1069,17 @@ func (b *Blocks) CollisionShape(pos geom.BlockPos) (geom.Shape, Lookup) {
 
 `Fill` has no test of its own in this task; Task 6 uses it heavily and covers it.
 
-- [ ] **Step 5: Run the test to verify it passes**
+- [x] **Step 5: Run the test to verify it passes**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./world/ -v`
 
 Expected: PASS, six tests.
 
-- [ ] **Step 6: Run the repository checks**
+- [x] **Step 6: Run the repository checks**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- task fmt && devbox run -- task verify`
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation
@@ -1108,7 +1108,7 @@ The cell range runs from `Floor(min)` to `Floor(max)` inclusive. A region whose 
 
 `limit` bounds the number of cells visited, satisfying the parent design's deterministic work limit for collision candidates. A non-positive limit means unlimited.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```go
 package collision
@@ -1232,13 +1232,13 @@ func TestGatherOnAnEmptyViewAllocatesNoBoxes(t *testing.T) {
 }
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./collision/`
 
 Expected: FAIL to build, with `undefined: Gather`.
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 ```go
 // Package collision resolves swept axis-aligned motion against the blocks of a
@@ -1316,17 +1316,17 @@ func Gather(view world.BlockView, region geom.AABB, limit int) (Candidates, erro
 }
 ```
 
-- [ ] **Step 4: Run the test to verify it passes**
+- [x] **Step 4: Run the test to verify it passes**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./collision/ -v`
 
 Expected: PASS, six tests.
 
-- [ ] **Step 5: Run the repository checks**
+- [x] **Step 5: Run the repository checks**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- task fmt && devbox run -- task verify`
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation
@@ -1354,7 +1354,7 @@ This task implements the Y, X, Z passes and the collision flags. Step-up is Task
 
 When `Gather` reports unknown cells, `Resolve` returns a result with `Unknown` populated, the body unmoved, and no applied motion. The caller decides what an incomplete tick means; collision does not guess.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```go
 package collision
@@ -1523,13 +1523,13 @@ func TestResolveZeroMotionIsAFixedPoint(t *testing.T) {
 }
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./collision/ -run TestResolve`
 
 Expected: FAIL to build, with `undefined: Resolve`.
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 ```go
 package collision
@@ -1625,17 +1625,17 @@ func Resolve(view world.BlockView, move Move) (Result, error) {
 
 Note the import style: two separate single-import lines will be merged into one block by `gofumpt`. Run `task fmt` before reading the file back.
 
-- [ ] **Step 4: Run the test to verify it passes**
+- [x] **Step 4: Run the test to verify it passes**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./collision/ -v -run TestResolve`
 
 Expected: PASS, seven tests.
 
-- [ ] **Step 5: Run the repository checks**
+- [x] **Step 5: Run the repository checks**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- task fmt && devbox run -- task verify`
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation
@@ -1666,7 +1666,7 @@ The winner is whichever travels further horizontally, comparing `x*x + z*z`; a t
 
 Both candidates are needed because neither wins in every geometry, and the order of the comparison matters: settling first and comparing second is what lets a step that gained height but no ground lose to the plain move.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```go
 // slab is a half-height block. A 0.6 step height clears one of these and
@@ -1808,13 +1808,13 @@ func TestResolveStepHeightZeroNeverSteps(t *testing.T) {
 }
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./collision/ -run TestResolveStep`
 
 Expected: FAIL. `TestResolveStepsOntoASlab` reports `Resolve did not step`, because `StepHeight` is still unused.
 
-- [ ] **Step 3: Extract the axis passes**
+- [x] **Step 3: Extract the axis passes**
 
 Replace the three inline loops in `Resolve` with a helper, so the step-up path can run the same passes on a different body. Add to `collision/resolve.go`:
 
@@ -1851,13 +1851,13 @@ and rewrite the middle of `Resolve` to use it:
 	body, applied := applyAxes(candidates.Boxes, move.Body, move.Body, move.Motion)
 ```
 
-- [ ] **Step 4: Run the tests to confirm the extraction changed nothing**
+- [x] **Step 4: Run the tests to confirm the extraction changed nothing**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./collision/ -run TestResolve`
 
 Expected: the Task 7 tests still pass; the five step tests still fail.
 
-- [ ] **Step 5: Implement stepping**
+- [x] **Step 5: Implement stepping**
 
 Add to `collision/resolve.go`:
 
@@ -1941,17 +1941,17 @@ and set the flags from the final values:
 
 An entity that stepped is standing on the surface it climbed, so `OnGround` is true even though its Y motion was not downward.
 
-- [ ] **Step 6: Run the tests to verify they pass**
+- [x] **Step 6: Run the tests to verify they pass**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./collision/ -v`
 
 Expected: PASS, thirteen tests.
 
-- [ ] **Step 7: Run the repository checks**
+- [x] **Step 7: Run the repository checks**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- task fmt && devbox run -- task verify`
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation
@@ -1974,7 +1974,7 @@ git commit -m "feat(collision): add step-up over low obstacles"
 
 These three properties are M8.2's exit criterion. They are written as randomized tests over a fixed seed list rather than as `testing/quick` calls, so a failure names the exact case and reruns identically on any machine. No test may call `math/rand` without an explicit seed: a nondeterministic failure in a determinism project is worse than no test.
 
-- [ ] **Step 1: Write the property tests**
+- [x] **Step 1: Write the property tests**
 
 ```go
 package collision
@@ -2151,13 +2151,13 @@ func TestResolveIsDeterministic(t *testing.T) {
 }
 ```
 
-- [ ] **Step 2: Run the property tests**
+- [x] **Step 2: Run the property tests**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- go test ./collision/ -v -run 'TestSwept|TestStepUpRespects|TestZeroMotion|TestResolveIsDeterministic'`
 
 Expected: PASS, four tests. A failure here names the seed and step; reproduce it by narrowing `seeds` to that one value.
 
-- [ ] **Step 3: Record the packages in the README**
+- [x] **Step 3: Record the packages in the README**
 
 Add this section to `README.md`, after whatever introduction the file already has:
 
@@ -2180,7 +2180,7 @@ after each axis, and a blocked horizontal move retries with a step-up whose
 winner is the outcome that travels further in the horizontal plane.
 ```
 
-- [ ] **Step 4: Add the changelog entry**
+- [x] **Step 4: Add the changelog entry**
 
 If `CHANGELOG.md` does not exist, create it with this content. If it exists, add only the `### Added` bullet under `## Unreleased`.
 
@@ -2198,13 +2198,13 @@ This file records notable user-visible changes. It follows [Keep a Changelog](ht
   distinguishes known air from unknown regions.
 ```
 
-- [ ] **Step 5: Run the full verification**
+- [x] **Step 5: Run the full verification**
 
 Run: `cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation && devbox run -- task fmt && devbox run -- task verify`
 
 Expected: `lint`, `secrets`, `test`, `vuln`, and `build` all pass.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 cd /home/ocharnyshevich/pet.projects/go-theft-craft/minecraft-simulation
