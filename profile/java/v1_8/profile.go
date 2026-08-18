@@ -36,10 +36,11 @@ const defaultJumpFactor float32 = 0.02
 
 // profile implements sim.Profile for Java Edition 1.8.9.
 type profile struct {
-	blocks blockTable
-	mining miningTable
-	table  movement.Table
-	motion map[entity.Family]sim.MotionConstants
+	blocks    blockTable
+	mining    miningTable
+	placement placementTable
+	table     movement.Table
+	motion    map[entity.Family]sim.MotionConstants
 	// dataDigest hashes the numbers above. It is computed once, because the
 	// trigonometry table alone is a quarter of a megabyte and a replay asks for
 	// this per recording.
@@ -73,10 +74,16 @@ func New(set *data.Set) (sim.Profile, error) {
 		return nil, err
 	}
 
+	placing, err := newPlacementTable(set)
+	if err != nil {
+		return nil, err
+	}
+
 	built := &profile{
-		blocks: blocks,
-		mining: mining,
-		table:  table,
+		blocks:    blocks,
+		mining:    mining,
+		placement: placing,
+		table:     table,
 		motion: map[entity.Family]sim.MotionConstants{
 			entity.FamilyPlayer: {
 				Gravity:        player.Gravity,
@@ -170,6 +177,38 @@ func Ref(built sim.Profile, name string) (world.BlockRef, bool) {
 	}
 
 	return owner.Ref(name)
+}
+
+// RefState resolves a block name and a metadata value against a profile this
+// package built.
+//
+// It is how a caller holding a state this version addresses as a block and four
+// bits — a placement corpus, a chunk read off the wire — reaches the handle for
+// it. sim.BlockNames cannot carry it: a metadata is this version's own
+// vocabulary, and 26.1.2 has no such thing.
+func RefState(built sim.Profile, name string, metadata int) (world.BlockRef, bool) {
+	owner, ok := built.(*profile)
+	if !ok {
+		return 0, false
+	}
+
+	return owner.blocks.refState(name, metadata)
+}
+
+// MetadataOf returns the metadata a handle carries, for a caller comparing a
+// handle against a state this version stated as four bits.
+func MetadataOf(built sim.Profile, ref world.BlockRef) (string, int, bool) {
+	owner, ok := built.(*profile)
+	if !ok {
+		return "", 0, false
+	}
+
+	name := owner.blocks.name(ref)
+	if name == "" {
+		return "", 0, false
+	}
+
+	return name, owner.blocks.metadata(ref), true
 }
 
 // Spawn returns the body and locomotion state of a player standing at a

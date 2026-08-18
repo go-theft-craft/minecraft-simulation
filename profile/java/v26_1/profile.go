@@ -140,10 +140,11 @@ var Identity = sim.ProfileID{Edition: "java", GameVersion: "26.1.2", RulesRevisi
 
 // profile implements sim.Profile for Java Edition 26.1.2.
 type profile struct {
-	blocks blockTable
-	mining miningTable
-	table  movement.Table
-	motion map[entity.Family]sim.MotionConstants
+	blocks    blockTable
+	mining    miningTable
+	placement placementTable
+	table     movement.Table
+	motion    map[entity.Family]sim.MotionConstants
 	// dataDigest hashes the numbers above. It is computed once, because the
 	// trigonometry table alone is a quarter of a megabyte and a replay asks for
 	// this per recording.
@@ -177,10 +178,16 @@ func New(set *data.Set) (sim.Profile, error) {
 		return nil, err
 	}
 
+	placing, err := newPlacementTable(set)
+	if err != nil {
+		return nil, err
+	}
+
 	built := &profile{
-		blocks: blocks,
-		mining: mining,
-		table:  table,
+		blocks:    blocks,
+		mining:    mining,
+		placement: placing,
+		table:     table,
 		motion: map[entity.Family]sim.MotionConstants{
 			entity.FamilyPlayer: {
 				Gravity:        player.Gravity,

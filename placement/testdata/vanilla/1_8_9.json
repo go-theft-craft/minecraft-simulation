@@ -1,0 +1,594 @@
+{
+  "version": "1.8.9",
+  "source": "asked of a Java Edition 1.8.9 server jar through internal/oracle/java/PlacementOracle.java",
+  "covers": [
+    "blocks with no orientation, which take their default state",
+    "stairs: facing from the player's yaw, half from the face and the cursor",
+    "slabs: half from the face and the cursor",
+    "logs and pillars: axis from the face"
+  ],
+  "dropped": [
+    "Every other orientable family — doors, torches, buttons, levers, ladders, beds, chests, furnaces, pistons, repeaters, rails. The rule answers a default state for each, which is right for none of them, and a stage that adds one adds its cases here.",
+    "Blocks that orient themselves in onBlockPlacedBy rather than onBlockPlaced (1.8.9) — a bed, a piston, a chest. The harness asks the placement call only, so a corpus of them would record a state the game replaces a tick later.",
+    "Neighbour-dependent shapes: a stair's inner and outer corners, a fence's connections, a redstone wire's arms. The clicked cell's surroundings are one stone block and nothing else, so every answer here is the shape a placement takes before its neighbours are consulted.",
+    "Waterlogging, which is decided by the fluid in the placed cell and the cell in this harness is air."
+  ],
+  "cases": [
+    {
+      "name": "stone/top",
+      "item": "minecraft:stone",
+      "clicked": [
+        0,
+        64,
+        0
+      ],
+      "face": 1,
+      "cursor": [
+        0.5,
+        1,
+        0.5
+      ],
+      "yaw": 0,
+      "pitch": 0,
+      "player": [
+        0.5,
+        65,
+        3.5
+      ],
+      "block": "minecraft:stone",
+      "state": 0
+    },
+    {
+      "name": "stone/bottom",
+      "item": "minecraft:stone",
+      "clicked": [
+        0,
+        64,
+        0
+      ],
+      "face": 0,
+      "cursor": [
+        0.5,
+        0,
+        0.5
+      ],
+      "yaw": 0,
+      "pitch": 0,
+      "player": [
+        0.5,
+        65,
+        3.5
+      ],
+      "block": "minecraft:stone",
+      "state": 0
+    },
+    {
+      "name": "stone/side",
+      "item": "minecraft:stone",
+      "clicked": [
+        0,
+        64,
+        0
+      ],
+      "face": 5,
+      "cursor": [
+        1,
+        0.5,
+        0.5
+      ],
+      "yaw": 137,
+      "pitch": 0,
+      "player": [
+        0.5,
+        65,
+        3.5
+      ],
+      "block": "minecraft:stone",
+      "state": 0
+    },
+    {
+      "name": "stairs/yaw0",
+      "item": "minecraft:oak_stairs",
+      "clicked": [
+        0,
+        64,
+        0
+      ],
+      "face": 1,
+      "cursor": [
+        0.5,
+        1,
+        0.5
+      ],
+      "yaw": 0,
+      "pitch": 0,
+      "player": [
+        0.5,
+        65,
+        3.5
+      ],
+      "block": "minecraft:oak_stairs",
+      "state": 2
+    },
+    {
+      "name": "stairs/yaw90",
+      "item": "minecraft:oak_stairs",
+      "clicked": [
+        0,
+        64,
+        0
+      ],
+      "face": 1,
+      "cursor": [
+        0.5,
+        1,
+        0.5
+      ],
+      "yaw": 90,
+      "pitch": 0,
+      "player": [
+        0.5,
+        65,
+        3.5
+      ],
+      "block": "minecraft:oak_stairs",
+      "state": 1
+    },
+    {
+      "name": "stairs/yaw180",
+      "item": "minecraft:oak_stairs",
+      "clicked": [
+        0,
+        64,
+        0
+      ],
+      "face": 1,
+      "cursor": [
+        0.5,
+        1,
+        0.5
+      ],
+      "yaw": 180,
+      "pitch": 0,
+      "player": [
+        0.5,
+        65,
+        3.5
+      ],
+      "block": "minecraft:oak_stairs",
+      "state": 3
+    },
+    {
+      "name": "stairs/yaw270",
+      "item": "minecraft:oak_stairs",
+      "clicked": [
+        0,
+        64,
+        0
+      ],
+      "face": 1,
+      "cursor": [
+        0.5,
+        1,
+        0.5
+      ],
+      "yaw": 270,
+      "pitch": 0,
+      "player": [
+        0.5,
+        65,
+        3.5
+      ],
+      "block": "minecraft:oak_stairs",
+      "state": 0
+    },
+    {
+      "name": "stairs/yaw45",
+      "item": "minecraft:oak_stairs",
+      "clicked": [
+        0,
+        64,
+        0
+      ],
+      "face": 1,
+      "cursor": [
+        0.5,
+        1,
+        0.5
+      ],
+      "yaw": 45,
+      "pitch": 0,
+      "player": [
+        0.5,
+        65,
+        3.5
+      ],
+      "block": "minecraft:oak_stairs",
+      "state": 1
+    },
+    {
+      "name": "stairs/yaw359",
+      "item": "minecraft:oak_stairs",
+      "clicked": [
+        0,
+        64,
+        0
+      ],
+      "face": 1,
+      "cursor": [
+        0.5,
+        1,
+        0.5
+      ],
+      "yaw": 359,
+      "pitch": 0,
+      "player": [
+        0.5,
+        65,
+        3.5
+      ],
+      "block": "minecraft:oak_stairs",
+      "state": 2
+    },
+    {
+      "name": "stairs/underside",
+      "item": "minecraft:oak_stairs",
+      "clicked": [
+        0,
+        64,
+        0
+      ],
+      "face": 0,
+      "cursor": [
+        0.5,
+        0,
+        0.5
+      ],
+      "yaw": 0,
+      "pitch": 0,
+      "player": [
+        0.5,
+        65,
+        3.5
+      ],
+      "block": "minecraft:oak_stairs",
+      "state": 6
+    },
+    {
+      "name": "stairs/side-low",
+      "item": "minecraft:oak_stairs",
+      "clicked": [
+        0,
+        64,
+        0
+      ],
+      "face": 5,
+      "cursor": [
+        1,
+        0.2,
+        0.5
+      ],
+      "yaw": 0,
+      "pitch": 0,
+      "player": [
+        0.5,
+        65,
+        3.5
+      ],
+      "block": "minecraft:oak_stairs",
+      "state": 2
+    },
+    {
+      "name": "stairs/side-high",
+      "item": "minecraft:oak_stairs",
+      "clicked": [
+        0,
+        64,
+        0
+      ],
+      "face": 5,
+      "cursor": [
+        1,
+        0.8,
+        0.5
+      ],
+      "yaw": 0,
+      "pitch": 0,
+      "player": [
+        0.5,
+        65,
+        3.5
+      ],
+      "block": "minecraft:oak_stairs",
+      "state": 6
+    },
+    {
+      "name": "stairs/side-exactly-half",
+      "item": "minecraft:oak_stairs",
+      "clicked": [
+        0,
+        64,
+        0
+      ],
+      "face": 5,
+      "cursor": [
+        1,
+        0.5,
+        0.5
+      ],
+      "yaw": 0,
+      "pitch": 0,
+      "player": [
+        0.5,
+        65,
+        3.5
+      ],
+      "block": "minecraft:oak_stairs",
+      "state": 2
+    },
+    {
+      "name": "slab/top-face",
+      "item": "minecraft:stone_slab",
+      "clicked": [
+        0,
+        64,
+        0
+      ],
+      "face": 1,
+      "cursor": [
+        0.5,
+        1,
+        0.5
+      ],
+      "yaw": 0,
+      "pitch": 0,
+      "player": [
+        0.5,
+        65,
+        3.5
+      ],
+      "block": "minecraft:stone_slab",
+      "state": 0
+    },
+    {
+      "name": "slab/underside",
+      "item": "minecraft:stone_slab",
+      "clicked": [
+        0,
+        64,
+        0
+      ],
+      "face": 0,
+      "cursor": [
+        0.5,
+        0,
+        0.5
+      ],
+      "yaw": 0,
+      "pitch": 0,
+      "player": [
+        0.5,
+        65,
+        3.5
+      ],
+      "block": "minecraft:stone_slab",
+      "state": 8
+    },
+    {
+      "name": "slab/side-low",
+      "item": "minecraft:stone_slab",
+      "clicked": [
+        0,
+        64,
+        0
+      ],
+      "face": 3,
+      "cursor": [
+        0.5,
+        0.2,
+        1
+      ],
+      "yaw": 0,
+      "pitch": 0,
+      "player": [
+        0.5,
+        65,
+        3.5
+      ],
+      "block": "minecraft:stone_slab",
+      "state": 0
+    },
+    {
+      "name": "slab/side-high",
+      "item": "minecraft:stone_slab",
+      "clicked": [
+        0,
+        64,
+        0
+      ],
+      "face": 3,
+      "cursor": [
+        0.5,
+        0.8,
+        1
+      ],
+      "yaw": 0,
+      "pitch": 0,
+      "player": [
+        0.5,
+        65,
+        3.5
+      ],
+      "block": "minecraft:stone_slab",
+      "state": 8
+    },
+    {
+      "name": "slab/side-exactly-half",
+      "item": "minecraft:stone_slab",
+      "clicked": [
+        0,
+        64,
+        0
+      ],
+      "face": 3,
+      "cursor": [
+        0.5,
+        0.5,
+        1
+      ],
+      "yaw": 0,
+      "pitch": 0,
+      "player": [
+        0.5,
+        65,
+        3.5
+      ],
+      "block": "minecraft:stone_slab",
+      "state": 0
+    },
+    {
+      "name": "log/face0",
+      "item": "minecraft:log",
+      "clicked": [
+        0,
+        64,
+        0
+      ],
+      "face": 0,
+      "cursor": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "yaw": 41,
+      "pitch": 0,
+      "player": [
+        0.5,
+        65,
+        3.5
+      ],
+      "block": "minecraft:log",
+      "state": 0
+    },
+    {
+      "name": "log/face1",
+      "item": "minecraft:log",
+      "clicked": [
+        0,
+        64,
+        0
+      ],
+      "face": 1,
+      "cursor": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "yaw": 41,
+      "pitch": 0,
+      "player": [
+        0.5,
+        65,
+        3.5
+      ],
+      "block": "minecraft:log",
+      "state": 0
+    },
+    {
+      "name": "log/face2",
+      "item": "minecraft:log",
+      "clicked": [
+        0,
+        64,
+        0
+      ],
+      "face": 2,
+      "cursor": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "yaw": 41,
+      "pitch": 0,
+      "player": [
+        0.5,
+        65,
+        3.5
+      ],
+      "block": "minecraft:log",
+      "state": 8
+    },
+    {
+      "name": "log/face3",
+      "item": "minecraft:log",
+      "clicked": [
+        0,
+        64,
+        0
+      ],
+      "face": 3,
+      "cursor": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "yaw": 41,
+      "pitch": 0,
+      "player": [
+        0.5,
+        65,
+        3.5
+      ],
+      "block": "minecraft:log",
+      "state": 8
+    },
+    {
+      "name": "log/face4",
+      "item": "minecraft:log",
+      "clicked": [
+        0,
+        64,
+        0
+      ],
+      "face": 4,
+      "cursor": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "yaw": 41,
+      "pitch": 0,
+      "player": [
+        0.5,
+        65,
+        3.5
+      ],
+      "block": "minecraft:log",
+      "state": 4
+    },
+    {
+      "name": "log/face5",
+      "item": "minecraft:log",
+      "clicked": [
+        0,
+        64,
+        0
+      ],
+      "face": 5,
+      "cursor": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "yaw": 41,
+      "pitch": 0,
+      "player": [
+        0.5,
+        65,
+        3.5
+      ],
+      "block": "minecraft:log",
+      "state": 4
+    }
+  ]
+}
