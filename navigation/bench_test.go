@@ -57,3 +57,68 @@ func BenchmarkFindMaze(b *testing.B) {
 		}
 	}
 }
+
+func BenchmarkPlanCold(b *testing.B) {
+	blocks := corridor(64)
+	goal := geom.BlockPos{X: 60, Y: 0, Z: 0}
+
+	b.ReportAllocs()
+	for b.Loop() {
+		planner, err := NewPlanner(blocks, nil, walker, Options{})
+		if err != nil {
+			b.Fatalf("NewPlanner returned an error: %v", err)
+		}
+		if _, err := planner.Plan(context.Background(),
+			geom.BlockPos{X: 0, Y: 0, Z: 0}, goal, benchBudget); err != nil {
+			b.Fatalf("Plan returned an error: %v", err)
+		}
+	}
+}
+
+func BenchmarkPlanWarm(b *testing.B) {
+	blocks := corridor(64)
+	goal := geom.BlockPos{X: 60, Y: 0, Z: 0}
+	from := geom.BlockPos{X: 0, Y: 0, Z: 0}
+
+	planner, err := NewPlanner(blocks, nil, walker, Options{})
+	if err != nil {
+		b.Fatalf("NewPlanner returned an error: %v", err)
+	}
+	if _, err := planner.Plan(context.Background(), from, goal, benchBudget); err != nil {
+		b.Fatalf("warming Plan returned an error: %v", err)
+	}
+
+	b.ResetTimer()
+	b.ReportAllocs()
+	for b.Loop() {
+		if _, err := planner.Plan(context.Background(), from, goal, benchBudget); err != nil {
+			b.Fatalf("Plan returned an error: %v", err)
+		}
+	}
+}
+
+// The replanning case: one block changes, the planner is told, and it routes
+// again. This is what a follower does when the world moves under it.
+func BenchmarkPlanAfterChange(b *testing.B) {
+	blocks := corridor(64)
+	goal := geom.BlockPos{X: 60, Y: 0, Z: 0}
+	from := geom.BlockPos{X: 0, Y: 0, Z: 0}
+	changed := []geom.BlockPos{{X: 30, Y: 0, Z: 1}}
+
+	planner, err := NewPlanner(blocks, nil, walker, Options{})
+	if err != nil {
+		b.Fatalf("NewPlanner returned an error: %v", err)
+	}
+	if _, err := planner.Plan(context.Background(), from, goal, benchBudget); err != nil {
+		b.Fatalf("warming Plan returned an error: %v", err)
+	}
+
+	b.ResetTimer()
+	b.ReportAllocs()
+	for b.Loop() {
+		planner.Observe(changed)
+		if _, err := planner.Plan(context.Background(), from, goal, benchBudget); err != nil {
+			b.Fatalf("Plan returned an error: %v", err)
+		}
+	}
+}

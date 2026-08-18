@@ -14,7 +14,7 @@ persistence, rendering, and AI remain outside this repository.
 | `world` | The tri-state block view and a deterministic in-memory implementation |
 | `collision` | Swept candidate gathering and vanilla-order axis resolution with step-up |
 | `terrain` | Static predicates over a world view: fit, ground, passability, hazards, fluids |
-| `navigation` | The edge vocabulary, a body's capability, and a bounded deterministic route search |
+| `navigation` | The edge vocabulary, a body's capability, a bounded deterministic route search, and a planner that caches terrain across searches |
 | `entity` | Entity identity, physics families, and the body state a tick moves |
 | `sim` | The tick contract: input, result, canonical digest, profile, phases, kernel |
 | `movement` | The movement rules a profile's phases call: friction, heading, jump, gravity, drags |

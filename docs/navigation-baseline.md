@@ -160,3 +160,90 @@ hit rate cannot remove more than the ~68% that terrain reading costs, and it
 adds a map lookup and a dependency list of its own on every answer. The claim to
 test in Task 8 is a large constant-factor win on a warm cache, not an order of
 magnitude.
+
+---
+
+# After: the Planner
+
+Same machine, same Go, same commands, measured on the commit that added the
+planner benchmarks.
+
+```
+BenchmarkFindShort-32          	   54958	     22668 ns/op	   20264 B/op	     152 allocs/op
+BenchmarkFindShort-32          	   58054	     20176 ns/op	   20264 B/op	     152 allocs/op
+BenchmarkFindShort-32          	   61866	     19570 ns/op	   20264 B/op	     152 allocs/op
+BenchmarkFindShort-32          	   62317	     19426 ns/op	   20264 B/op	     152 allocs/op
+BenchmarkFindShort-32          	   62042	     19443 ns/op	   20264 B/op	     152 allocs/op
+BenchmarkFindLong-32           	     312	   3772904 ns/op	 2094809 B/op	   21264 allocs/op
+BenchmarkFindLong-32           	     320	   3753762 ns/op	 2094792 B/op	   21264 allocs/op
+BenchmarkFindLong-32           	     316	   3771895 ns/op	 2094792 B/op	   21264 allocs/op
+BenchmarkFindLong-32           	     318	   3769645 ns/op	 2094792 B/op	   21264 allocs/op
+BenchmarkFindLong-32           	     316	   3774741 ns/op	 2094792 B/op	   21264 allocs/op
+BenchmarkFindMaze-32           	    6560	    178084 ns/op	  167448 B/op	    1971 allocs/op
+BenchmarkFindMaze-32           	    6889	    180835 ns/op	  167448 B/op	    1971 allocs/op
+BenchmarkFindMaze-32           	    6570	    178393 ns/op	  167448 B/op	    1971 allocs/op
+BenchmarkFindMaze-32           	    6374	    179559 ns/op	  167448 B/op	    1971 allocs/op
+BenchmarkFindMaze-32           	    6656	    179455 ns/op	  167448 B/op	    1971 allocs/op
+BenchmarkPlanCold-32           	     247	   4916001 ns/op	 6775296 B/op	   60417 allocs/op
+BenchmarkPlanCold-32           	     231	   5080928 ns/op	 6775272 B/op	   60417 allocs/op
+BenchmarkPlanCold-32           	     240	   4917664 ns/op	 6775319 B/op	   60417 allocs/op
+BenchmarkPlanCold-32           	     234	   5011198 ns/op	 6775764 B/op	   60417 allocs/op
+BenchmarkPlanCold-32           	     248	   4890483 ns/op	 6775272 B/op	   60417 allocs/op
+BenchmarkPlanWarm-32           	     658	   1787718 ns/op	 1518648 B/op	    9263 allocs/op
+BenchmarkPlanWarm-32           	     667	   1794637 ns/op	 1518648 B/op	    9263 allocs/op
+BenchmarkPlanWarm-32           	     668	   1785400 ns/op	 1518648 B/op	    9263 allocs/op
+BenchmarkPlanWarm-32           	     669	   1777192 ns/op	 1518648 B/op	    9263 allocs/op
+BenchmarkPlanWarm-32           	     657	   1781360 ns/op	 1518648 B/op	    9263 allocs/op
+BenchmarkPlanAfterChange-32    	     664	   1763192 ns/op	 1519332 B/op	    9271 allocs/op
+BenchmarkPlanAfterChange-32    	     679	   1763106 ns/op	 1519328 B/op	    9271 allocs/op
+BenchmarkPlanAfterChange-32    	     676	   1755719 ns/op	 1519572 B/op	    9271 allocs/op
+BenchmarkPlanAfterChange-32    	     674	   1775525 ns/op	 1519330 B/op	    9271 allocs/op
+BenchmarkPlanAfterChange-32    	     637	   1803153 ns/op	 1519340 B/op	    9271 allocs/op
+```
+
+| Benchmark | ns/op | B/op | allocs/op | vs `FindLong` |
+| --- | --- | --- | --- | --- |
+| `BenchmarkFindLong` | ~3,770,000 | 2,094,792 | 21,264 | — |
+| `BenchmarkPlanCold` | ~4,930,000 | 6,775,300 | 60,417 | **1.31× slower** |
+| `BenchmarkPlanWarm` | ~1,785,000 | 1,518,648 | 9,263 | **2.11× faster** |
+| `BenchmarkPlanAfterChange` | ~1,772,000 | 1,519,340 | 9,271 | **2.13× faster** |
+
+`FindShort` and `FindMaze` are unchanged from the baseline within noise, which
+is the point: nothing about `Find` moved.
+
+## The assessment
+
+**A warm plan is 2.1× faster than a fresh `Find`**, on half the allocations and
+27% less memory. That is a real win and it is the case a routing body is
+actually in: it plans, walks a few blocks, and plans again through terrain it
+has already asked about.
+
+**A cold plan is 1.3× *slower*.** Filling the memo costs 39,000 allocations that
+`Find` never makes — one dependency slice per answer, plus the reverse index
+entries. A caller that plans once and throws the planner away should call `Find`
+and skip all of it. This is worth stating plainly because the API makes the
+wrong choice easy: `NewPlanner` followed by one `Plan` is strictly worse than
+`Find`, and only the second search onward pays the first one back.
+
+**Invalidation is not the expensive part.** `BenchmarkPlanAfterChange` reports
+one changed cell to `Observe` on every iteration and comes out level with the
+warm case — 1.77 ms against 1.79 ms, inside the noise. Walking the reverse index
+from one cell to the handful of answers that read it, and recomputing exactly
+those, costs nothing measurable against the search around it. The design's claim
+that dropping precisely what changed beats dropping everything holds: a `Reset`
+in that benchmark would have cost the full cold 4.9 ms.
+
+## Against the ceiling the baseline predicted
+
+The baseline said terrain reading was about 68% of the search and that no memo
+could remove more than that. A perfect cache would therefore reach about
+1/(1−0.68) ≈ **3.1×**, and the measured warm figure is **2.1×** — roughly 70% of
+the theoretical maximum.
+
+The gap is where it should be. The memo replaces a `collision.Gather` sweep with
+a map lookup, but every hit still pays that lookup, and the search's own
+machinery is untouched: `cameFrom`, `cost`, the frontier heap, and the edge
+slices are still built from scratch on every `Plan`. Warm planning still
+allocates 1.5 MB and 9,263 times per search, and none of that is terrain. That
+residue is what the cluster graph is for — it attacks the number of cells
+examined, which is the term this memo deliberately does not touch.

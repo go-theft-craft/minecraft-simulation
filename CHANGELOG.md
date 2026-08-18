@@ -6,6 +6,10 @@ This file records notable user-visible changes. It follows [Keep a Changelog](ht
 
 ### Fixed
 
+- `navigation`: the search heuristic scaled Manhattan distance by the cheapest
+  single edge, but a step and a fall each close two blocks of distance for one
+  edge's cost, so it overestimated and the search could return a route that was
+  not shortest. It now scales by the lowest cost per block closed.
 - `collision`: `Gather` no longer offers a shape the sweep only reaches the cell
   of. The game collects a block's collider where the sweep overlaps the block in
   a volume, and sharing a face is not overlapping; collecting per cell instead
@@ -23,6 +27,10 @@ This file records notable user-visible changes. It follows [Keep a Changelog](ht
 
 ### Added
 
+- `navigation.Planner`: a per-body cache of terrain answers, invalidated by the
+  cells a caller reports through `Observe`. Where it runs the concrete search it
+  returns byte-identically what `Find` returns; the cache changes how long an
+  answer takes, never what it says.
 - `internal/oracle`: a 26.1.2 harness that drives the game's whole
   `Entity.collide`, so the step-up assembly around the pieces — the grounded box,
   the probe the candidate rises come from, the first improving rise, and the drop
