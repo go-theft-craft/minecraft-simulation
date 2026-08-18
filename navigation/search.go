@@ -60,7 +60,11 @@ func Find(
 		return Path{}, ErrNoBody
 	}
 
-	query := capability.query(view, facts)
+	// Declared as the interface, not as directOracle, so the conversion happens
+	// once. The value is wider than a word, and converting it at every expand
+	// call cost one heap allocation per node expanded — 3,000 of them on
+	// BenchmarkFindLong.
+	var o oracle = directOracle{query: capability.query(view, facts), capability: capability}
 	start := node{Pos: from, Posture: PostureStand}
 
 	cameFrom := make(map[node]link)
@@ -100,7 +104,7 @@ func Find(
 			best, bestScore = current, score
 		}
 
-		moves, err := capability.expand(query, current)
+		moves, err := capability.expand(o, current)
 		if err != nil {
 			return Path{}, err
 		}
@@ -181,20 +185,20 @@ func (c Capability) heuristic(from, goal geom.BlockPos) float64 {
 }
 
 // expand returns every edge leaving a node, in the fixed neighbour order.
-func (c Capability) expand(query terrain.Query, from node) ([]Edge, error) {
+func (c Capability) expand(o oracle, from node) ([]Edge, error) {
 	edges := make([]Edge, 0, len(steps))
 
 	for _, step := range steps {
 		neighbour := geom.BlockPos{X: from.Pos.X + step.X, Y: from.Pos.Y, Z: from.Pos.Z + step.Z}
 
-		passable, err := query.Passable(neighbour)
+		passable, err := o.passable(neighbour)
 		if err != nil {
 			return nil, err
 		}
 
 		switch passable {
 		case terrain.Clear:
-			edge, ok, err := c.enter(query, from.Pos, neighbour)
+			edge, ok, err := c.enter(o, from.Pos, neighbour)
 			if err != nil {
 				return nil, err
 			}
@@ -203,7 +207,7 @@ func (c Capability) expand(query terrain.Query, from node) ([]Edge, error) {
 			}
 		case terrain.Steppable:
 			above := geom.BlockPos{X: neighbour.X, Y: neighbour.Y + 1, Z: neighbour.Z}
-			arr, err := c.arriveAt(query, above)
+			arr, err := o.arriveAt(above)
 			if err != nil {
 				return nil, err
 			}
@@ -214,7 +218,7 @@ func (c Capability) expand(query terrain.Query, from node) ([]Edge, error) {
 				})
 			}
 		case terrain.Blocked:
-			fall, ok, err := c.fall(query, from.Pos, neighbour)
+			fall, ok, err := c.fall(o, from.Pos, neighbour)
 			if err != nil {
 				return nil, err
 			}
@@ -242,7 +246,7 @@ type arrival struct {
 // refused is the empty arrival every rejection returns.
 var refused = arrival{}
 
-// arriveAt is the one gate on a body coming to rest in a cell.
+// arrivalAt is the one gate on a body coming to rest in a cell.
 //
 // Neither a fluid nor a fire carries a collision shape, so Passable calls all
 // of them Clear on geometry alone. This is the only place Facts is consulted,
@@ -253,7 +257,7 @@ var refused = arrival{}
 // An unknown lookup from either fact refuses the arrival: unknown is never
 // guessed safe. Any hazard refuses it. Water is accepted only for a swimmer,
 // and then in PostureSwim; open air is accepted in PostureStand.
-func (c Capability) arriveAt(query terrain.Query, cell geom.BlockPos) (arrival, error) {
+func (c Capability) arrivalAt(query terrain.Query, cell geom.BlockPos) (arrival, error) {
 	hazard, lookup, err := query.HazardAt(cell)
 	if err != nil {
 		return refused, err
@@ -296,8 +300,8 @@ func (c Capability) arriveAt(query terrain.Query, cell geom.BlockPos) (arrival, 
 
 // enter decides how a body crosses into an adjacent cell it geometrically fits
 // in: a walk on the level, or a swim through water.
-func (c Capability) enter(query terrain.Query, from, to geom.BlockPos) (Edge, bool, error) {
-	arr, err := c.arriveAt(query, to)
+func (c Capability) enter(o oracle, from, to geom.BlockPos) (Edge, bool, error) {
+	arr, err := o.arriveAt(to)
 	if err != nil {
 		return Edge{}, false, err
 	}
@@ -327,7 +331,7 @@ func (c Capability) enter(query terrain.Query, from, to geom.BlockPos) (Edge, bo
 // nothing holds the body up there. A wall gives the same answer and finds no
 // landing, which is why the column walk stops at the first cell the body does
 // not fit through.
-func (c Capability) fall(query terrain.Query, from, neighbour geom.BlockPos) (Edge, bool, error) {
+func (c Capability) fall(o oracle, from, neighbour geom.BlockPos) (Edge, bool, error) {
 	bound := int32(math.Ceil(c.SafeFall))
 	if bound < maxFallSearch {
 		bound = maxFallSearch
@@ -340,7 +344,7 @@ func (c Capability) fall(query terrain.Query, from, neighbour geom.BlockPos) (Ed
 
 		landing := geom.BlockPos{X: neighbour.X, Y: neighbour.Y - drop, Z: neighbour.Z}
 
-		passable, err := query.Passable(landing)
+		passable, err := o.passable(landing)
 		if err != nil {
 			return Edge{}, false, err
 		}
@@ -351,7 +355,7 @@ func (c Capability) fall(query terrain.Query, from, neighbour geom.BlockPos) (Ed
 			// water, the fall is refused rather than deferred: nothing below
 			// this cell is reachable, so there is no safer landing to descend
 			// to.
-			arr, err := c.arriveAt(query, landing)
+			arr, err := o.arriveAt(landing)
 			if err != nil {
 				return Edge{}, false, err
 			}
