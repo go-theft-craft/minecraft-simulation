@@ -47,6 +47,11 @@ const (
 	// holding a body up. Written only when there is one, for the same reason
 	// tagPosition is.
 	tagSupport
+	// tagVitals arrived with M9.6, for a body whose health or last attack is
+	// tracked. Written only when the record is non-zero, so a body nobody
+	// fights encodes exactly the bytes it encoded before combat existed, and
+	// every recording made before M9.6 still verifies.
+	tagVitals
 )
 
 // canonicalNaN is the single pattern every NaN encodes as. NaN payloads are not

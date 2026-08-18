@@ -245,6 +245,20 @@ func (t *TickState) MissingBlocks(positions []geom.BlockPos) {
 	}
 }
 
+// MissingEntities declares bodies the tick needed and could not read.
+//
+// Entity is the counterpart of MissingBlocks, not of BlockState: Entity itself
+// treats absence as an answer, because a movement rule that finds no body has
+// nothing to simulate. A combat rule handed a command that names a body is
+// different — the caller asserted the body exists, so the tick is incomplete
+// rather than the attack refused, and the caller's move is to load the entity
+// and step again.
+func (t *TickState) MissingEntities(ids ...entity.ID) {
+	for _, id := range ids {
+		t.missing = append(t.missing, Dependency{Kind: DependencyEntity, Entity: id})
+	}
+}
+
 // SetEntity writes a body.
 func (t *TickState) SetEntity(id entity.ID, state entity.State) {
 	if !t.spend(&t.entitySteps, t.limits.EntitySteps) {

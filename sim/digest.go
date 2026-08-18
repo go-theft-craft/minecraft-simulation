@@ -71,6 +71,15 @@ func (r TickResult) computeDigest(id ProfileID) Digest {
 			e.bool(op.State.Support.Present)
 			e.bool(op.State.Support.NoBlocks)
 		}
+		// Written only when the body carries one, for the same reason
+		// tagPosition and tagSupport are.
+		if op.State.Vitals != (entity.Vitals{}) {
+			e.tag(tagVitals)
+			e.float32(op.State.Vitals.Health)
+			e.bool(op.State.Vitals.Tracked)
+			e.uint64(op.State.Vitals.LastAttack)
+			e.bool(op.State.Vitals.Attacked)
+		}
 		e.blockPos(op.Block)
 		e.uint32(uint32(op.Ref))
 		e.tag(tagLocomotion)

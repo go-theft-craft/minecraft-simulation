@@ -91,6 +91,12 @@ func TestDigestNoticesEveryField(t *testing.T) {
 			r.Changes.Ops[2].Locomotion.Yaw = 90.00001
 		},
 		"completeness": func(r *TickResult) { r.Completeness = Completeness{} },
+		"vitals": func(r *TickResult) {
+			r.Changes.Ops[0].State.Vitals = entity.Vitals{Health: 20, Tracked: true}
+		},
+		"a last attack": func(r *TickResult) {
+			r.Changes.Ops[0].State.Vitals = entity.Vitals{LastAttack: 7, Attacked: true}
+		},
 	} {
 		t.Run(name, func(t *testing.T) {
 			result := sampleResult()

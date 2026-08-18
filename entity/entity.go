@@ -97,6 +97,36 @@ type State struct {
 	// responsible for putting the widened value here; see the note on
 	// collision.Move.StepHeight.
 	StepHeight float64
+	// Vitals is the body's combat record, for a caller that tracks one.
+	//
+	// The zero value means "not tracked": a body nobody fights carries no
+	// health, and the combat phase leaves it alone rather than inventing a
+	// number for it. It is a struct rather than bare fields for the same
+	// reason Support is — its fields are one rule between them.
+	Vitals Vitals
+}
+
+// Vitals is a body's combat record: its health, and when it last attacked.
+//
+// Health is tracked explicitly rather than inferred from zero, because zero
+// health is a dead body and an absent record is a body nobody described —
+// and the combat phase must tell those apart.
+type Vitals struct {
+	// Health is in half-hearts, the unit both Java versions store it in. A
+	// player spawns with 20.
+	Health float32
+	// Tracked says Health means anything.
+	Tracked bool
+	// LastAttack is the tick number of this body's last accepted attack,
+	// meaningful when Attacked is true. It is what the 26.1.2 attack cooldown
+	// charges from; 1.8.9 has no cooldown and never reads it.
+	//
+	// It is a plain uint64 rather than sim.Tick because sim imports this
+	// package, and the value is the same either way.
+	LastAttack uint64
+	// Attacked says LastAttack means anything. A body that has never swung
+	// attacks at full charge.
+	Attacked bool
 }
 
 // Support is what a move recorded about the block a body stands on.
