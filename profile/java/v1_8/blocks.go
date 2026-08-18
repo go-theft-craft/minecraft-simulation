@@ -19,11 +19,28 @@ import (
 	"github.com/go-theft-craft/minecraft-simulation/world"
 )
 
+// metadataValues is how many values this version's metadata can take.
+//
+// Four bits, because that is what the wire carries beside a block id and what
+// Block.getMetaFromState produces. Every block gets a run of that many handles
+// whether or not it uses them, so that a handle's metadata is arithmetic rather
+// than a second table to keep in step.
+const metadataValues = 16
+
 // blockTable turns the dataset's block, shape, and physics tables into the
 // opaque handles world.BlockRef promises.
 //
-// A handle is an index into this table plus one, so the zero handle stays
-// meaningless and only the profile that minted a handle can say what it names.
+// A handle names a block *state*: one block and one metadata value. This
+// version addresses a state as a block id and four bits, and a table with one
+// handle per block cannot express a top slab, a stair facing west, or a log
+// lying along X — the placement rules have nowhere to put their answer, and the
+// collision shape a top slab resolves to would be the bottom slab's.
+//
+// The layout is a run of metadataValues handles per block, in dataset order,
+// starting at one so the zero handle stays meaningless. A name resolves to the
+// run's first handle, which is metadata zero, so everything that names a block
+// — a fixture, a scene, a test — resolves exactly what it resolved before this
+// table learned about metadata.
 type blockTable struct {
 	// names is the block each handle names, in handle order.
 	names []string
@@ -58,47 +75,64 @@ func newBlockTable(set *data.Set) (blockTable, error) {
 	}
 
 	table := blockTable{byName: make(map[string]world.BlockRef, len(blocks))}
-	// Handle zero is reserved, so the first block takes handle one. A slot is
-	// kept for it so that a handle indexes directly.
+	// Handle zero is reserved, so the first block's metadata zero takes handle
+	// one. A slot is kept for it so that a handle indexes directly.
 	table.names = append(table.names, "")
 	table.shapes = append(table.shapes, geom.EmptyShape())
 	table.frictions = append(table.frictions, float32(physics.DefaultSlipperiness))
 
 	for _, block := range blocks {
-		shape, err := shapeOf(shapes, block.Name)
-		if err != nil {
-			return blockTable{}, err
-		}
-
 		table.byName[block.Name] = world.BlockRef(len(table.names))
-		table.names = append(table.names, block.Name)
-		table.shapes = append(table.shapes, shape)
+
 		// Narrowed once, here at the boundary. The friction product is a float
 		// product in the game, and blocks_test asserts that every value in the
-		// dataset survives the narrowing.
-		table.frictions = append(table.frictions, float32(physics.Slipperiness(block.Name)))
+		// dataset survives the narrowing. It is the block's rather than the
+		// state's: the game holds slipperiness on the block, so every metadata
+		// value answers alike.
+		friction := float32(physics.Slipperiness(block.Name))
+
+		for metadata := range metadataValues {
+			shape, err := shapeOf(shapes, block.Name, metadata)
+			if err != nil {
+				return blockTable{}, err
+			}
+
+			table.names = append(table.names, block.Name)
+			table.shapes = append(table.shapes, shape)
+			table.frictions = append(table.frictions, friction)
+		}
 	}
 
 	return table, nil
 }
 
-// shapeOf builds one block's collision shape from the dataset.
+// shapeOf builds one block state's collision shape from the dataset.
 //
-// A block with several state shapes uses the first, because 1.8.9 carries
-// metadata variants rather than the flattened states later versions have and this
-// milestone simulates the land tick over full blocks. A block the shape index
-// does not mention has no collision, which is what air is.
-func shapeOf(shapes data.CollisionShapes, name string) (geom.Shape, error) {
+// The dataset indexes a block's shapes by metadata where they differ and
+// carries a single one where they do not: stone_slab lists sixteen — the
+// bottom half for the low eight and the top half for the high eight — and
+// stone lists one. A block the shape index does not mention has no collision,
+// which is what air is.
+//
+// A metadata beyond what the block lists takes the block's first shape. Those
+// are the values the game never produces for that block, and answering with
+// the shape it does produce is closer to true than answering with none.
+func shapeOf(shapes data.CollisionShapes, name string, metadata int) (geom.Shape, error) {
 	ids, ok := shapes.Blocks[name]
 	if !ok || len(ids) == 0 {
 		return geom.EmptyShape(), nil
 	}
 
-	boxes, ok := shapes.Shapes[ids[0]]
+	id := ids[0]
+	if metadata < len(ids) {
+		id = ids[metadata]
+	}
+
+	boxes, ok := shapes.Shapes[id]
 	if !ok {
 		return geom.EmptyShape(), fmt.Errorf(
 			"%w: block %q names collision shape %d, which the data set does not hold",
-			ErrInvalidProfile, name, ids[0],
+			ErrInvalidProfile, name, id,
 		)
 	}
 	if len(boxes) == 0 {
@@ -142,6 +176,31 @@ func (t blockTable) ref(name string) (world.BlockRef, bool) {
 	ref, ok := t.byName[name]
 
 	return ref, ok
+}
+
+// refState resolves a block name and a metadata value to their handle.
+//
+// It is what a placement rule answers with: the rule computes the metadata the
+// game would, and this turns that into a handle the world can hold. A metadata
+// outside four bits is refused rather than wrapped, because a wrapped one names
+// a different state and would place a different block.
+func (t blockTable) refState(name string, metadata int) (world.BlockRef, bool) {
+	base, ok := t.byName[name]
+	if !ok || metadata < 0 || metadata >= metadataValues {
+		return 0, false
+	}
+
+	return base + world.BlockRef(metadata), true
+}
+
+// metadata returns the metadata a handle carries, or zero for one this table
+// did not mint.
+func (t blockTable) metadata(ref world.BlockRef) int {
+	if ref == 0 || int(ref) >= len(t.names) {
+		return 0
+	}
+
+	return int((ref - 1) % metadataValues)
 }
 
 // name returns the block a handle names, for diagnostics.

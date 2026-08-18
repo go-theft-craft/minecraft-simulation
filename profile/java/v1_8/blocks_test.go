@@ -5,6 +5,8 @@ import (
 
 	"github.com/go-theft-craft/minecraft-protocol/data"
 	gen "github.com/go-theft-craft/minecraft-protocol/generated/java/v1_8"
+
+	"github.com/go-theft-craft/minecraft-simulation/geom"
 )
 
 // dataset returns the 1.8.9 game data every test here is built from.
@@ -155,5 +157,61 @@ func TestHandlesAreUniqueAndNameTheirBlock(t *testing.T) {
 			t.Fatalf("%s appears twice", name)
 		}
 		seen[name] = true
+	}
+}
+
+func TestAHandleNamesAStateRatherThanABlock(t *testing.T) {
+	built := table(t)
+
+	// The defect this table learned metadata to fix. A stone slab's two halves
+	// are one block and two states, and they do not stand in the same volume:
+	// the dataset lists the bottom half for metadata 0 through 7 and the top
+	// half for 8 through 15. A table with one handle per block answered the
+	// bottom half for both, so a body walking under a top slab walked through
+	// it.
+	bottom, ok := built.refState("stone_slab", 0)
+	if !ok {
+		t.Fatal("the table does not know stone_slab")
+	}
+	top, ok := built.refState("stone_slab", 8)
+	if !ok {
+		t.Fatal("the table has no metadata 8 for stone_slab")
+	}
+
+	bottomShape, ok := built.shape(bottom)
+	if !ok {
+		t.Fatal("the bottom slab's handle resolves no shape")
+	}
+	topShape, ok := built.shape(top)
+	if !ok {
+		t.Fatal("the top slab's handle resolves no shape")
+	}
+	if bottomShape.BoxesAt(geom.BlockPos{}, nil)[0] == topShape.BoxesAt(geom.BlockPos{}, nil)[0] {
+		t.Fatal("a top slab and a bottom slab resolve the same box")
+	}
+
+	// A name still resolves what it always resolved: the state the game calls
+	// this block's default. Every fixture, scene, and trace names blocks, and
+	// none of them was rewritten when the table grew.
+	if plain, _ := built.ref("stone_slab"); plain != bottom {
+		t.Fatalf("stone_slab resolves handle %d, want metadata zero's %d", plain, bottom)
+	}
+	if got := built.metadata(top); got != 8 {
+		t.Fatalf("the top slab's handle carries metadata %d, want 8", got)
+	}
+	if got := built.name(top); got != "stone_slab" {
+		t.Fatalf("the top slab's handle names %q", got)
+	}
+}
+
+func TestMetadataOutsideFourBitsIsRefused(t *testing.T) {
+	built := table(t)
+
+	// A wrapped metadata names a different state, and a placement rule that
+	// computed one would place a different block rather than fail.
+	for _, metadata := range []int{-1, 16, 32} {
+		if _, ok := built.refState("stone_slab", metadata); ok {
+			t.Errorf("metadata %d resolved a handle", metadata)
+		}
 	}
 }

@@ -24,11 +24,10 @@
 //     ItemStack.forEachModifier and adds each modifier as a transient one,
 //     which is what that method does with them. The values are the jar's; only
 //     the moment they are applied is this file's.
-//   * **The vanilla data pack is loaded.** 26.1 keeps a tool's speeds in an
-//     item component and its enchantments in a data-driven registry, and a
-//     server binds both when it loads its pack. The harness runs that load in
-//     the order WorldLoader.load runs it, so both come from the pack rather
-//     than from a constant typed here.
+//   * **The vanilla data pack is loaded**, by Loaded26. 26.1 keeps a tool's
+//     speeds in an item component and its enchantments in a data-driven
+//     registry, and a server binds both when it loads its pack, so both come
+//     from the pack rather than from a constant typed here.
 //
 //   * **The submerged flag is stated rather than observed.** The game decides
 //     it by tracking fluids across a tick, and its tracker reads a loaded chunk
@@ -59,41 +58,25 @@
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
-import java.util.List;
 import java.util.UUID;
 
 import com.mojang.authlib.GameProfile;
 
 import net.minecraft.SharedConstants;
-import net.minecraft.util.Util;
-import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
-import net.minecraft.core.LayeredRegistryAccess;
-import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
-import net.minecraft.resources.RegistryDataLoader;
 import net.minecraft.server.Bootstrap;
-import net.minecraft.server.RegistryLayer;
 import net.minecraft.server.ReloadableServerResources;
-import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.repository.PackRepository;
-import net.minecraft.server.packs.repository.ServerPacksSource;
-import net.minecraft.server.packs.resources.CloseableResourceManager;
-import net.minecraft.server.packs.resources.MultiPackResourceManager;
-import net.minecraft.server.permissions.PermissionSet;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.TagKey;
-import net.minecraft.tags.TagLoader;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ResolvableProfile;
@@ -151,42 +134,11 @@ public final class MiningOracle26 {
         SharedConstants.tryDetectVersion();
         Bootstrap.bootStrap();
 
-        // The server's own data load, in the order WorldLoader.load runs it.
-        //
-        // 26.1 keeps a tool's speeds in an item component, and an item's
-        // components are not bound by bootstrapping: a server binds them when it
-        // loads its data pack, and until it does, constructing any ItemStack
-        // throws "Components not bound yet". Binding them against the built-in
-        // registries alone is not enough either — an item component reads
-        // damage-type tags, which come from the pack. So the harness loads the
-        // vanilla pack, exactly as a starting server does, and the enchantment
-        // registry it needs for Efficiency arrives on the same load rather than
-        // from a second source that could disagree with it.
-        PackRepository packs = ServerPacksSource.createVanillaTrustedRepository();
-        packs.reload();
-        // The vanilla pack alone. reload discovers and selects nothing, and the
-        // three experimental packs it discovers beside it — minecart
-        // improvements, redstone experiments, trade rebalance — are not the game
-        // a player is playing.
-        packs.setSelected(List.of("vanilla"));
-        CloseableResourceManager resources =
-                new MultiPackResourceManager(PackType.SERVER_DATA, packs.openAllSelected());
-
-        LayeredRegistryAccess<RegistryLayer> layers = RegistryLayer.createRegistryAccess();
-        List<Registry.PendingTags<?>> pendingTags = TagLoader.loadTagsForExistingRegistries(
-                resources, layers.getLayer(RegistryLayer.STATIC));
-        RegistryAccess.Frozen worldgen = RegistryDataLoader.load(
-                resources,
-                TagLoader.buildUpdatedLookups(layers.getAccessForLoading(RegistryLayer.WORLDGEN), pendingTags),
-                RegistryDataLoader.WORLDGEN_REGISTRIES,
-                Util.backgroundExecutor()).join();
-        layers = layers.replaceFrom(RegistryLayer.WORLDGEN, worldgen);
-
-        ReloadableServerResources loaded = ReloadableServerResources.loadResources(
-                resources, layers, pendingTags, FeatureFlags.DEFAULT_FLAGS,
-                Commands.CommandSelection.DEDICATED, PermissionSet.ALL_PERMISSIONS,
-                Util.backgroundExecutor(), Runnable::run).join();
-        loaded.updateComponentsAndStaticRegistryTags();
+        // The server's own data load, which Loaded26 runs in WorldLoader's
+        // order. This version cannot answer a question about a tool without it:
+        // a tool's speeds live in an item component, and components are bound
+        // when a server loads its pack rather than when the game bootstraps.
+        ReloadableServerResources loaded = Loaded26.load();
 
         Holder<Enchantment> efficiencyEnchantment = loaded.fullRegistries()
                 .lookup()
