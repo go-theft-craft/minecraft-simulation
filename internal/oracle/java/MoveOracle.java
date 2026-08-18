@@ -87,6 +87,15 @@ public final class MoveOracle {
             return false;
         }
 
+        // A world with no chunk provider has no loaded chunk, and saying so is
+        // what lets an entity lookup return nothing instead of dereferencing
+        // the provider that is not there. Nothing that only moves a body asks
+        // this; a dropped item does, when it looks for another to merge with.
+        @Override
+        protected boolean isChunkLoaded(int chunkX, int chunkZ, boolean allowEmpty) {
+            return false;
+        }
+
         @Override
         public boolean isFlammableWithin(AxisAlignedBB region) {
             return false;
