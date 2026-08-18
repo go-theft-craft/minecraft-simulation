@@ -3,6 +3,12 @@
 /.idea/
 /.task/
 /coverage.out
+# A Go workspace is for editing this module and minecraft-protocol together. It
+# never belongs in a commit: CI resolves what go.mod pins, and a workspace that
+# reached the runner would build a neighbouring working tree instead of the
+# released version, so a stale pin would pass here and ship.
+/go.work
+/go.work.sum
 /reference/work/
 *.jar
 *.class
