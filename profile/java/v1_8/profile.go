@@ -37,6 +37,7 @@ const defaultJumpFactor float32 = 0.02
 // profile implements sim.Profile for Java Edition 1.8.9.
 type profile struct {
 	blocks blockTable
+	mining miningTable
 	table  movement.Table
 	motion map[entity.Family]sim.MotionConstants
 	// dataDigest hashes the numbers above. It is computed once, because the
@@ -67,8 +68,14 @@ func New(set *data.Set) (sim.Profile, error) {
 		return nil, fmt.Errorf("%w: the data set carries no player motion constants", ErrInvalidProfile)
 	}
 
+	mining, err := newMiningTable(set)
+	if err != nil {
+		return nil, err
+	}
+
 	built := &profile{
 		blocks: blocks,
+		mining: mining,
 		table:  table,
 		motion: map[entity.Family]sim.MotionConstants{
 			entity.FamilyPlayer: {
