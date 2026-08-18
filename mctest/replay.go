@@ -38,6 +38,7 @@ func Replay(profile sim.Profile, fixture Fixture) error {
 	store.SetEntity(replayEntity, entity.State{
 		Family:     entity.FamilyPlayer,
 		Box:        fixture.Body.Box,
+		Position:   fixture.Body.Position,
 		Motion:     fixture.Body.Motion,
 		OnGround:   fixture.Body.OnGround,
 		StepHeight: fixture.Body.StepHeight,

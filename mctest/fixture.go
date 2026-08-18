@@ -59,6 +59,11 @@ type Body struct {
 	Pitch      float32   `json:"pitch"`
 	MoveSpeed  float32   `json:"move_speed"`
 	JumpFactor float32   `json:"jump_factor"`
+	// Position is where the body stands, for a version whose move rebuilds the
+	// box around it rather than offsetting the box. A fixture recorded under a
+	// version that keeps no position omits this, and the field is absent from
+	// every fixture written before one did.
+	Position geom.Vec3 `json:"position,omitzero"`
 }
 
 // Tick is one tick's intent and the result the recording expects from it.

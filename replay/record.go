@@ -60,6 +60,7 @@ func start(profile sim.Profile, setup Recording) (*runtime.Runner, error) {
 		store.SetEntity(body.ID, entity.State{
 			Family:     body.Family,
 			Box:        body.Box,
+			Position:   body.Position,
 			Motion:     body.Motion,
 			OnGround:   body.OnGround,
 			StepHeight: body.StepHeight,

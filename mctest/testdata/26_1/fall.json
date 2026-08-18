@@ -1,0 +1,1253 @@
+{
+  "name": "fall",
+  "profile": {
+    "Edition": "java",
+    "GameVersion": "26.1.2",
+    "RulesRevision": "1"
+  },
+  "source": "generated from a Java Edition 26.1.2 server jar by internal/oracle",
+  "world": {
+    "min": {
+      "X": -7,
+      "Y": -3,
+      "Z": -7
+    },
+    "max": {
+      "X": 7,
+      "Y": 11,
+      "Z": 7
+    },
+    "fill": "air",
+    "blocks": [
+      {
+        "pos": {
+          "X": -6,
+          "Y": 0,
+          "Z": -6
+        },
+        "to": {
+          "X": 6,
+          "Y": 0,
+          "Z": 6
+        },
+        "name": "stone"
+      },
+      {
+        "pos": {
+          "X": -5,
+          "Y": 1,
+          "Z": -5
+        },
+        "to": {
+          "X": 5,
+          "Y": 6,
+          "Z": -5
+        },
+        "name": "stone"
+      },
+      {
+        "pos": {
+          "X": -5,
+          "Y": 1,
+          "Z": 5
+        },
+        "to": {
+          "X": 5,
+          "Y": 6,
+          "Z": 5
+        },
+        "name": "stone"
+      },
+      {
+        "pos": {
+          "X": -5,
+          "Y": 1,
+          "Z": -5
+        },
+        "to": {
+          "X": -5,
+          "Y": 6,
+          "Z": 5
+        },
+        "name": "stone"
+      },
+      {
+        "pos": {
+          "X": 5,
+          "Y": 1,
+          "Z": -5
+        },
+        "to": {
+          "X": 5,
+          "Y": 6,
+          "Z": 5
+        },
+        "name": "stone"
+      },
+      {
+        "pos": {
+          "X": -2,
+          "Y": 0,
+          "Z": -3
+        },
+        "name": "ice"
+      },
+      {
+        "pos": {
+          "X": 3,
+          "Y": 0,
+          "Z": 3
+        },
+        "name": "blue_ice"
+      },
+      {
+        "pos": {
+          "X": 0,
+          "Y": 0,
+          "Z": 1
+        },
+        "name": "packed_ice"
+      },
+      {
+        "pos": {
+          "X": 4,
+          "Y": 0,
+          "Z": -3
+        },
+        "name": "ice"
+      },
+      {
+        "pos": {
+          "X": 1,
+          "Y": 0,
+          "Z": 2
+        },
+        "name": "packed_ice"
+      },
+      {
+        "pos": {
+          "X": -2,
+          "Y": 0,
+          "Z": 2
+        },
+        "name": "ice"
+      },
+      {
+        "pos": {
+          "X": 3,
+          "Y": 0,
+          "Z": -1
+        },
+        "name": "blue_ice"
+      },
+      {
+        "pos": {
+          "X": -3,
+          "Y": 0,
+          "Z": 2
+        },
+        "name": "blue_ice"
+      },
+      {
+        "pos": {
+          "X": -1,
+          "Y": 0,
+          "Z": 0
+        },
+        "name": "ice"
+      },
+      {
+        "pos": {
+          "X": -2,
+          "Y": 0,
+          "Z": 0
+        },
+        "name": "blue_ice"
+      },
+      {
+        "pos": {
+          "X": 2,
+          "Y": 0,
+          "Z": -3
+        },
+        "name": "packed_ice"
+      },
+      {
+        "pos": {
+          "X": 4,
+          "Y": 0,
+          "Z": 0
+        },
+        "name": "ice"
+      },
+      {
+        "pos": {
+          "X": -2,
+          "Y": 1,
+          "Z": -3
+        },
+        "name": "smooth_stone_slab"
+      },
+      {
+        "pos": {
+          "X": -3,
+          "Y": 1,
+          "Z": -4
+        },
+        "name": "smooth_stone_slab"
+      },
+      {
+        "pos": {
+          "X": 1,
+          "Y": 1,
+          "Z": 2
+        },
+        "name": "stone"
+      },
+      {
+        "pos": {
+          "X": 0,
+          "Y": 1,
+          "Z": 3
+        },
+        "name": "stone"
+      },
+      {
+        "pos": {
+          "X": 3,
+          "Y": 1,
+          "Z": -3
+        },
+        "name": "smooth_stone_slab"
+      },
+      {
+        "pos": {
+          "X": -3,
+          "Y": 1,
+          "Z": 2
+        },
+        "name": "stone"
+      },
+      {
+        "pos": {
+          "X": 4,
+          "Y": 2,
+          "Z": -1
+        },
+        "name": "smooth_stone_slab"
+      },
+      {
+        "pos": {
+          "X": 3,
+          "Y": 2,
+          "Z": 4
+        },
+        "name": "stone"
+      },
+      {
+        "pos": {
+          "X": -1,
+          "Y": 2,
+          "Z": -3
+        },
+        "name": "stone"
+      },
+      {
+        "pos": {
+          "X": -3,
+          "Y": 1,
+          "Z": 4
+        },
+        "name": "stone"
+      }
+    ]
+  },
+  "body": {
+    "box": {
+      "MinX": 0.19999998807907104,
+      "MinY": 8,
+      "MinZ": 0.19999998807907104,
+      "MaxX": 0.800000011920929,
+      "MaxY": 9.799999952316284,
+      "MaxZ": 0.800000011920929
+    },
+    "motion": {
+      "X": 0,
+      "Y": 0,
+      "Z": 0
+    },
+    "on_ground": false,
+    "step_height": 0.6000000238418579,
+    "yaw": 356.3471,
+    "pitch": 0,
+    "move_speed": 0.1,
+    "jump_factor": 0,
+    "position": {
+      "X": 0.5,
+      "Y": 8,
+      "Z": 0.5
+    }
+  },
+  "ticks": [
+    {
+      "strafe": 0,
+      "forward": 1,
+      "yaw": 356.3471,
+      "pitch": 0,
+      "jump": false,
+      "sprint": false,
+      "sneak": false,
+      "box": {
+        "MinX": 0.20124876081582743,
+        "MinY": 8,
+        "MinZ": 0.21956016584944305,
+        "MaxX": 0.8012487846576853,
+        "MaxY": 9.799999952316284,
+        "MaxZ": 0.819560189691301
+      },
+      "motion": {
+        "X": 0.0011363832231986641,
+        "Y": -0.0784000015258789,
+        "Z": 0.01779976228402463
+      },
+      "on_ground": false,
+      "collided": false
+    },
+    {
+      "strafe": 0,
+      "forward": 1,
+      "yaw": 356.3471,
+      "pitch": 0,
+      "jump": false,
+      "sprint": false,
+      "sneak": false,
+      "box": {
+        "MinX": 0.20363391677578246,
+        "MinY": 7.921599998474121,
+        "MinZ": 0.25692010590383974,
+        "MaxX": 0.8036339406176404,
+        "MaxY": 9.721599950790406,
+        "MaxZ": 0.8569201297456976
+      },
+      "motion": {
+        "X": 0.0021704919861122844,
+        "Y": -0.1552320045166016,
+        "Z": 0.03399754642930438
+      },
+      "on_ground": false,
+      "collided": false
+    },
+    {
+      "strafe": 0,
+      "forward": 1,
+      "yaw": 356.3471,
+      "pitch": 0,
+      "jump": false,
+      "sprint": false,
+      "sneak": false,
+      "box": {
+        "MinX": 0.20705318149865115,
+        "MinY": 7.766367993957519,
+        "MinZ": 0.31047783010351615,
+        "MaxX": 0.8070532053405091,
+        "MaxY": 9.566367946273804,
+        "MaxZ": 0.9104778539453741
+      },
+      "motion": {
+        "X": 0.0031115309874842605,
+        "Y": -0.230527368912964,
+        "Z": 0.04873753042631275
+      },
+      "on_ground": false,
+      "collided": false
+    },
+    {
+      "strafe": 0,
+      "forward": 1,
+      "yaw": 356.3471,
+      "pitch": 0,
+      "jump": false,
+      "sprint": false,
+      "sneak": false,
+      "box": {
+        "MinX": 0.21141348522289183,
+        "MinY": 7.535840625044555,
+        "MinZ": 0.37877553830020094,
+        "MaxX": 0.8114135090647497,
+        "MaxY": 9.33584057736084,
+        "MaxZ": 0.9787755621420589
+      },
+      "motion": {
+        "X": 0.003967876503412489,
+        "Y": -0.30431682745754424,
+        "Z": 0.06215091625016184
+      },
+      "on_ground": false,
+      "collided": false
+    },
+    {
+      "strafe": 0,
+      "forward": 1,
+      "yaw": 356.3471,
+      "pitch": 0,
+      "jump": false,
+      "sprint": false,
+      "sneak": false,
+      "box": {
+        "MinX": 0.21663013446306068,
+        "MinY": 7.231523797587011,
+        "MinZ": 0.46048663232073483,
+        "MaxX": 0.8166301583049186,
+        "MaxY": 9.031523749903295,
+        "MaxZ": 1.0604866561625927
+      },
+      "motion": {
+        "X": 0.004747150945365732,
+        "Y": -0.37663049823865513,
+        "Z": 0.07435709770164455
+      },
+      "on_ground": false,
+      "collided": false
+    },
+    {
+      "strafe": 0,
+      "forward": 1,
+      "yaw": 356.3471,
+      "pitch": 0,
+      "jump": false,
+      "sprint": false,
+      "sneak": false,
+      "box": {
+        "MinX": 0.22262605814518277,
+        "MinY": 6.854893299348356,
+        "MinZ": 0.5544039077927514,
+        "MaxX": 0.8226260819870407,
+        "MaxY": 8.654893251664639,
+        "MaxZ": 1.1544039316346093
+      },
+      "motion": {
+        "X": 0.0054562907079804684,
+        "Y": -0.44749789698341763,
+        "Z": 0.08546472314261366
+      },
+      "on_ground": false,
+      "collided": false
+    },
+    {
+      "strafe": 0,
+      "forward": 1,
+      "yaw": 356.3471,
+      "pitch": 0,
+      "jump": false,
+      "sprint": false,
+      "sneak": false,
+      "box": {
+        "MinX": 0.22933112158991964,
+        "MinY": 6.407395402364938,
+        "MinZ": 0.6594288087057371,
+        "MaxX": 0.8293311454317775,
+        "MaxY": 8.207395354681221,
+        "MaxZ": 1.259428832547595
+      },
+      "motion": {
+        "X": 0.006101607910557809,
+        "Y": -0.5169479491049732,
+        "Z": 0.09557266258520462
+      },
+      "on_ground": false,
+      "collided": false
+    },
+    {
+      "strafe": 0,
+      "forward": 1,
+      "yaw": 356.3471,
+      "pitch": 0,
+      "jump": false,
+      "sprint": false,
+      "sneak": false,
+      "box": {
+        "MinX": 0.23668150223723383,
+        "MinY": 5.890447453259965,
+        "MinZ": 0.7745616490613136,
+        "MaxX": 0.8366815260790917,
+        "MaxY": 7.690447405576249,
+        "MaxZ": 1.3745616729031715
+      },
+      "motion": {
+        "X": 0.006688846581827306,
+        "Y": -0.5850090015087522,
+        "Z": 0.10477088774305367
+      },
+      "on_ground": false,
+      "collided": false
+    },
+    {
+      "strafe": 0,
+      "forward": 1,
+      "yaw": 356.3471,
+      "pitch": 0,
+      "jump": false,
+      "sprint": false,
+      "sneak": false,
+      "box": {
+        "MinX": 0.24461912155581755,
+        "MinY": 5.305438451751212,
+        "MinZ": 0.8988927145747394,
+        "MaxX": 0.8446191453976755,
+        "MaxY": 7.105438404067496,
+        "MaxZ": 1.4988927384165973
+      },
+      "motion": {
+        "X": 0.007223233788083495,
+        "Y": -0.6517088341626173,
+        "Z": 0.11314127287792936
+      },
+      "on_ground": false,
+      "collided": false
+    },
+    {
+      "strafe": 0,
+      "forward": 1,
+      "yaw": 356.3471,
+      "pitch": 0,
+      "jump": false,
+      "sprint": false,
+      "sneak": false,
+      "box": {
+        "MinX": 0.25309112808065737,
+        "MinY": 4.653729617588595,
+        "MinZ": 1.0315941652230407,
+        "MaxX": 0.8530911519225153,
+        "MaxY": 6.453729569904879,
+        "MaxZ": 1.6315941890648986
+      },
+      "motion": {
+        "X": 0.007709526159791489,
+        "Y": -0.7170746714356033,
+        "Z": 0.1207583235701883
+      },
+      "on_ground": false,
+      "collided": false
+    },
+    {
+      "strafe": 0,
+      "forward": 1,
+      "yaw": 356.3471,
+      "pitch": 0,
+      "jump": false,
+      "sprint": false,
+      "sneak": false,
+      "box": {
+        "MinX": 0.26204942697720524,
+        "MinY": 3.9366549461529914,
+        "MinZ": 1.171912666563601,
+        "MaxX": 0.8620494508190631,
+        "MaxY": 5.736654898469276,
+        "MaxZ": 1.771912690405459
+      },
+      "motion": {
+        "X": 0.008152052230799288,
+        "Y": -0.7811331932098841,
+        "Z": 0.12768983989990906
+      },
+      "on_ground": false,
+      "collided": false
+    },
+    {
+      "strafe": 0,
+      "forward": 1,
+      "yaw": 356.3471,
+      "pitch": 0,
+      "jump": false,
+      "sprint": false,
+      "sneak": false,
+      "box": {
+        "MinX": 0.2714502519447609,
+        "MinY": 3.155521752943107,
+        "MinZ": 1.3191626842338822,
+        "MaxX": 0.8714502757866188,
+        "MaxY": 4.955521705259391,
+        "MaxZ": 1.91916270807574
+      },
+      "motion": {
+        "X": 0.008554750967022092,
+        "Y": -0.8439105457704985,
+        "Z": 0.1339975199417412
+      },
+      "on_ground": false,
+      "collided": false
+    },
+    {
+      "strafe": 0,
+      "forward": 1,
+      "yaw": 356.3471,
+      "pitch": 0,
+      "jump": false,
+      "sprint": false,
+      "sneak": false,
+      "box": {
+        "MinX": 0.2812537756485394,
+        "MinY": 2.311611207172609,
+        "MinZ": 1.4727203819459953,
+        "MaxX": 0.8812537994903973,
+        "MaxY": 4.111611159488893,
+        "MaxZ": 2.0727204057878534
+      },
+      "motion": {
+        "X": 0.00892120682754604,
+        "Y": -0.9054323524772837,
+        "Z": 0.13973750894523393
+      },
+      "on_ground": false,
+      "collided": false
+    },
+    {
+      "strafe": 0,
+      "forward": 1,
+      "yaw": 356.3471,
+      "pitch": 0,
+      "jump": false,
+      "sprint": false,
+      "sneak": false,
+      "box": {
+        "MinX": 0.2914237552128418,
+        "MinY": 1.4061788546953253,
+        "MinZ": 1.6320180686616013,
+        "MaxX": 0.8914237790546997,
+        "MaxY": 3.2061788070116095,
+        "MaxZ": 2.232018092503459
+      },
+      "motion": {
+        "X": 0.00925468167023352,
+        "Y": -0.9657237242233685,
+        "Z": 0.14496089908894952
+      },
+      "on_ground": false,
+      "collided": false
+    },
+    {
+      "strafe": 0,
+      "forward": 1,
+      "yaw": 356.3471,
+      "pitch": 0,
+      "jump": false,
+      "sprint": false,
+      "sneak": false,
+      "box": {
+        "MinX": 0.30192720961983166,
+        "MinY": 1,
+        "MinZ": 1.796539145520923,
+        "MaxX": 0.9019272334616896,
+        "MaxY": 2.799999952316284,
+        "MaxZ": 2.396539169362781
+      },
+      "motion": {
+        "X": 0.009558143785824853,
+        "Y": -0.0784000015258789,
+        "Z": 0.14971418425671956
+      },
+      "on_ground": true,
+      "collided": false
+    },
+    {
+      "strafe": 0,
+      "forward": 1,
+      "yaw": 356.3471,
+      "pitch": 0,
+      "jump": false,
+      "sprint": false,
+      "sneak": false,
+      "box": {
+        "MinX": 0.3177292173220404,
+        "MinY": 1,
+        "MinZ": 2.04405422227287,
+        "MaxX": 0.9177292411638983,
+        "MaxY": 2.799999952316284,
+        "MaxZ": 2.644054246114728
+      },
+      "motion": {
+        "X": 0.008627897207558908,
+        "Y": -0.0784000015258789,
+        "Z": 0.13514324760380628
+      },
+      "on_ground": true,
+      "collided": false
+    },
+    {
+      "strafe": 0,
+      "forward": 1,
+      "yaw": 356.3471,
+      "pitch": 0,
+      "jump": false,
+      "sprint": false,
+      "sneak": false,
+      "box": {
+        "MinX": 0.33260097844598324,
+        "MinY": 1,
+        "MinZ": 2.2769983623719035,
+        "MaxX": 0.9326010022878412,
+        "MaxY": 2.799999952316284,
+        "MaxZ": 2.8769983862137614
+      },
+      "motion": {
+        "X": 0.008119982516830078,
+        "Y": -0.0784000015258789,
+        "Z": 0.12718751526723643
+      },
+      "on_ground": true,
+      "collided": false
+    },
+    {
+      "strafe": 0,
+      "forward": 1,
+      "yaw": 356.3471,
+      "pitch": 0,
+      "jump": false,
+      "sprint": false,
+      "sneak": false,
+      "box": {
+        "MinX": 0.3469648248791972,
+        "MinY": 1,
+        "MinZ": 2.399999976158142,
+        "MaxX": 0.9469648487210551,
+        "MaxY": 2.799999952316284,
+        "MaxZ": 3
+      },
+      "motion": {
+        "X": 0.00784266106348052,
+        "Y": -0.0784000015258789,
+        "Z": 0
+      },
+      "on_ground": true,
+      "collided": true
+    },
+    {
+      "strafe": 0,
+      "forward": 1,
+      "yaw": 356.3471,
+      "pitch": 0,
+      "jump": false,
+      "sprint": false,
+      "sneak": false,
+      "box": {
+        "MinX": 0.3610513498590616,
+        "MinY": 1,
+        "MinZ": 2.399999976158142,
+        "MaxX": 0.9610513737009195,
+        "MaxY": 2.799999952316284,
+        "MaxZ": 3
+      },
+      "motion": {
+        "X": 0.0076912435323641185,
+        "Y": -0.0784000015258789,
+        "Z": 0
+      },
+      "on_ground": true,
+      "collided": true
+    },
+    {
+      "strafe": 0,
+      "forward": 1,
+      "yaw": 356.3471,
+      "pitch": 0,
+      "jump": false,
+      "sprint": false,
+      "sneak": false,
+      "box": {
+        "MinX": 0.37498645730780966,
+        "MinY": 1,
+        "MinZ": 2.399999976158142,
+        "MaxX": 0.9749864811496676,
+        "MaxY": 2.799999952316284,
+        "MaxZ": 3
+      },
+      "motion": {
+        "X": 0.007608569550771762,
+        "Y": -0.0784000015258789,
+        "Z": 0
+      },
+      "on_ground": true,
+      "collided": true
+    },
+    {
+      "strafe": 0,
+      "forward": 1,
+      "yaw": 356.3471,
+      "pitch": 0,
+      "jump": false,
+      "sprint": false,
+      "sneak": false,
+      "box": {
+        "MinX": 0.38883889077496536,
+        "MinY": 1,
+        "MinZ": 2.399999976158142,
+        "MaxX": 0.9888389146168233,
+        "MaxY": 2.799999952316284,
+        "MaxZ": 3
+      },
+      "motion": {
+        "X": 0.007563429551579207,
+        "Y": -0.0784000015258789,
+        "Z": 0
+      },
+      "on_ground": true,
+      "collided": true
+    },
+    {
+      "strafe": 0,
+      "forward": 1,
+      "yaw": 356.3471,
+      "pitch": 0,
+      "jump": false,
+      "sprint": false,
+      "sneak": false,
+      "box": {
+        "MinX": 0.3999999761581421,
+        "MinY": 1,
+        "MinZ": 2.399999976158142,
+        "MaxX": 1,
+        "MaxY": 2.799999952316284,
+        "MaxZ": 3
+      },
+      "motion": {
+        "X": 0,
+        "Y": -0.0784000015258789,
+        "Z": 0
+      },
+      "on_ground": true,
+      "collided": true
+    },
+    {
+      "strafe": 0,
+      "forward": 1,
+      "yaw": 356.3471,
+      "pitch": 0,
+      "jump": false,
+      "sprint": false,
+      "sneak": false,
+      "box": {
+        "MinX": 0.3999999761581421,
+        "MinY": 1,
+        "MinZ": 2.399999976158142,
+        "MaxX": 1,
+        "MaxY": 2.799999952316284,
+        "MaxZ": 3
+      },
+      "motion": {
+        "X": 0,
+        "Y": -0.0784000015258789,
+        "Z": 0
+      },
+      "on_ground": true,
+      "collided": true
+    },
+    {
+      "strafe": 0,
+      "forward": 1,
+      "yaw": 356.3471,
+      "pitch": 0,
+      "jump": false,
+      "sprint": false,
+      "sneak": false,
+      "box": {
+        "MinX": 0.3999999761581421,
+        "MinY": 1,
+        "MinZ": 2.399999976158142,
+        "MaxX": 1,
+        "MaxY": 2.799999952316284,
+        "MaxZ": 3
+      },
+      "motion": {
+        "X": 0,
+        "Y": -0.0784000015258789,
+        "Z": 0
+      },
+      "on_ground": true,
+      "collided": true
+    },
+    {
+      "strafe": 0,
+      "forward": 1,
+      "yaw": 356.3471,
+      "pitch": 0,
+      "jump": false,
+      "sprint": false,
+      "sneak": false,
+      "box": {
+        "MinX": 0.3999999761581421,
+        "MinY": 1,
+        "MinZ": 2.399999976158142,
+        "MaxX": 1,
+        "MaxY": 2.799999952316284,
+        "MaxZ": 3
+      },
+      "motion": {
+        "X": 0,
+        "Y": -0.0784000015258789,
+        "Z": 0
+      },
+      "on_ground": true,
+      "collided": true
+    },
+    {
+      "strafe": 0,
+      "forward": 1,
+      "yaw": 356.3471,
+      "pitch": 0,
+      "jump": false,
+      "sprint": false,
+      "sneak": false,
+      "box": {
+        "MinX": 0.3999999761581421,
+        "MinY": 1,
+        "MinZ": 2.399999976158142,
+        "MaxX": 1,
+        "MaxY": 2.799999952316284,
+        "MaxZ": 3
+      },
+      "motion": {
+        "X": 0,
+        "Y": -0.0784000015258789,
+        "Z": 0
+      },
+      "on_ground": true,
+      "collided": true
+    },
+    {
+      "strafe": 0,
+      "forward": 1,
+      "yaw": 356.3471,
+      "pitch": 0,
+      "jump": false,
+      "sprint": false,
+      "sneak": false,
+      "box": {
+        "MinX": 0.3999999761581421,
+        "MinY": 1,
+        "MinZ": 2.399999976158142,
+        "MaxX": 1,
+        "MaxY": 2.799999952316284,
+        "MaxZ": 3
+      },
+      "motion": {
+        "X": 0,
+        "Y": -0.0784000015258789,
+        "Z": 0
+      },
+      "on_ground": true,
+      "collided": true
+    },
+    {
+      "strafe": 0,
+      "forward": 1,
+      "yaw": 356.3471,
+      "pitch": 0,
+      "jump": false,
+      "sprint": false,
+      "sneak": false,
+      "box": {
+        "MinX": 0.3999999761581421,
+        "MinY": 1,
+        "MinZ": 2.399999976158142,
+        "MaxX": 1,
+        "MaxY": 2.799999952316284,
+        "MaxZ": 3
+      },
+      "motion": {
+        "X": 0,
+        "Y": -0.0784000015258789,
+        "Z": 0
+      },
+      "on_ground": true,
+      "collided": true
+    },
+    {
+      "strafe": 0,
+      "forward": 1,
+      "yaw": 356.3471,
+      "pitch": 0,
+      "jump": false,
+      "sprint": false,
+      "sneak": false,
+      "box": {
+        "MinX": 0.3999999761581421,
+        "MinY": 1,
+        "MinZ": 2.399999976158142,
+        "MaxX": 1,
+        "MaxY": 2.799999952316284,
+        "MaxZ": 3
+      },
+      "motion": {
+        "X": 0,
+        "Y": -0.0784000015258789,
+        "Z": 0
+      },
+      "on_ground": true,
+      "collided": true
+    },
+    {
+      "strafe": 0,
+      "forward": 1,
+      "yaw": 356.3471,
+      "pitch": 0,
+      "jump": false,
+      "sprint": false,
+      "sneak": false,
+      "box": {
+        "MinX": 0.3999999761581421,
+        "MinY": 1,
+        "MinZ": 2.399999976158142,
+        "MaxX": 1,
+        "MaxY": 2.799999952316284,
+        "MaxZ": 3
+      },
+      "motion": {
+        "X": 0,
+        "Y": -0.0784000015258789,
+        "Z": 0
+      },
+      "on_ground": true,
+      "collided": true
+    },
+    {
+      "strafe": 0,
+      "forward": 1,
+      "yaw": 356.3471,
+      "pitch": 0,
+      "jump": false,
+      "sprint": false,
+      "sneak": false,
+      "box": {
+        "MinX": 0.3999999761581421,
+        "MinY": 1,
+        "MinZ": 2.399999976158142,
+        "MaxX": 1,
+        "MaxY": 2.799999952316284,
+        "MaxZ": 3
+      },
+      "motion": {
+        "X": 0,
+        "Y": -0.0784000015258789,
+        "Z": 0
+      },
+      "on_ground": true,
+      "collided": true
+    },
+    {
+      "strafe": 0,
+      "forward": 1,
+      "yaw": 356.3471,
+      "pitch": 0,
+      "jump": false,
+      "sprint": false,
+      "sneak": false,
+      "box": {
+        "MinX": 0.3999999761581421,
+        "MinY": 1,
+        "MinZ": 2.399999976158142,
+        "MaxX": 1,
+        "MaxY": 2.799999952316284,
+        "MaxZ": 3
+      },
+      "motion": {
+        "X": 0,
+        "Y": -0.0784000015258789,
+        "Z": 0
+      },
+      "on_ground": true,
+      "collided": true
+    },
+    {
+      "strafe": 0,
+      "forward": 1,
+      "yaw": 356.3471,
+      "pitch": 0,
+      "jump": false,
+      "sprint": false,
+      "sneak": false,
+      "box": {
+        "MinX": 0.3999999761581421,
+        "MinY": 1,
+        "MinZ": 2.399999976158142,
+        "MaxX": 1,
+        "MaxY": 2.799999952316284,
+        "MaxZ": 3
+      },
+      "motion": {
+        "X": 0,
+        "Y": -0.0784000015258789,
+        "Z": 0
+      },
+      "on_ground": true,
+      "collided": true
+    },
+    {
+      "strafe": 0,
+      "forward": 1,
+      "yaw": 356.3471,
+      "pitch": 0,
+      "jump": false,
+      "sprint": false,
+      "sneak": false,
+      "box": {
+        "MinX": 0.3999999761581421,
+        "MinY": 1,
+        "MinZ": 2.399999976158142,
+        "MaxX": 1,
+        "MaxY": 2.799999952316284,
+        "MaxZ": 3
+      },
+      "motion": {
+        "X": 0,
+        "Y": -0.0784000015258789,
+        "Z": 0
+      },
+      "on_ground": true,
+      "collided": true
+    },
+    {
+      "strafe": 0,
+      "forward": 1,
+      "yaw": 356.3471,
+      "pitch": 0,
+      "jump": false,
+      "sprint": false,
+      "sneak": false,
+      "box": {
+        "MinX": 0.3999999761581421,
+        "MinY": 1,
+        "MinZ": 2.399999976158142,
+        "MaxX": 1,
+        "MaxY": 2.799999952316284,
+        "MaxZ": 3
+      },
+      "motion": {
+        "X": 0,
+        "Y": -0.0784000015258789,
+        "Z": 0
+      },
+      "on_ground": true,
+      "collided": true
+    },
+    {
+      "strafe": 0,
+      "forward": 1,
+      "yaw": 356.3471,
+      "pitch": 0,
+      "jump": false,
+      "sprint": false,
+      "sneak": false,
+      "box": {
+        "MinX": 0.3999999761581421,
+        "MinY": 1,
+        "MinZ": 2.399999976158142,
+        "MaxX": 1,
+        "MaxY": 2.799999952316284,
+        "MaxZ": 3
+      },
+      "motion": {
+        "X": 0,
+        "Y": -0.0784000015258789,
+        "Z": 0
+      },
+      "on_ground": true,
+      "collided": true
+    },
+    {
+      "strafe": 0,
+      "forward": 1,
+      "yaw": 356.3471,
+      "pitch": 0,
+      "jump": false,
+      "sprint": false,
+      "sneak": false,
+      "box": {
+        "MinX": 0.3999999761581421,
+        "MinY": 1,
+        "MinZ": 2.399999976158142,
+        "MaxX": 1,
+        "MaxY": 2.799999952316284,
+        "MaxZ": 3
+      },
+      "motion": {
+        "X": 0,
+        "Y": -0.0784000015258789,
+        "Z": 0
+      },
+      "on_ground": true,
+      "collided": true
+    },
+    {
+      "strafe": 0,
+      "forward": 1,
+      "yaw": 356.3471,
+      "pitch": 0,
+      "jump": false,
+      "sprint": false,
+      "sneak": false,
+      "box": {
+        "MinX": 0.3999999761581421,
+        "MinY": 1,
+        "MinZ": 2.399999976158142,
+        "MaxX": 1,
+        "MaxY": 2.799999952316284,
+        "MaxZ": 3
+      },
+      "motion": {
+        "X": 0,
+        "Y": -0.0784000015258789,
+        "Z": 0
+      },
+      "on_ground": true,
+      "collided": true
+    },
+    {
+      "strafe": 0,
+      "forward": 1,
+      "yaw": 356.3471,
+      "pitch": 0,
+      "jump": false,
+      "sprint": false,
+      "sneak": false,
+      "box": {
+        "MinX": 0.3999999761581421,
+        "MinY": 1,
+        "MinZ": 2.399999976158142,
+        "MaxX": 1,
+        "MaxY": 2.799999952316284,
+        "MaxZ": 3
+      },
+      "motion": {
+        "X": 0,
+        "Y": -0.0784000015258789,
+        "Z": 0
+      },
+      "on_ground": true,
+      "collided": true
+    },
+    {
+      "strafe": 0,
+      "forward": 1,
+      "yaw": 356.3471,
+      "pitch": 0,
+      "jump": false,
+      "sprint": false,
+      "sneak": false,
+      "box": {
+        "MinX": 0.3999999761581421,
+        "MinY": 1,
+        "MinZ": 2.399999976158142,
+        "MaxX": 1,
+        "MaxY": 2.799999952316284,
+        "MaxZ": 3
+      },
+      "motion": {
+        "X": 0,
+        "Y": -0.0784000015258789,
+        "Z": 0
+      },
+      "on_ground": true,
+      "collided": true
+    }
+  ]
+}

@@ -166,6 +166,37 @@ public final class MoveOracle26 {
         // entities, its border is the default one every world starts with, and
         // its blocks are what this harness was told about.
 
+        // The world's extent and its fluids, answered without a dimension type.
+        // An unconstructed level has no dimension registration, and the three
+        // defaults that would read one are the height, the floor, and the fluid
+        // lookup a travel consults before it decides it is on land. The stub
+        // world holds no fluid, so every cell answers with its block's own —
+        // which for every block this harness places is none.
+
+        @Override
+        public int getMinY() {
+            return -64;
+        }
+
+        @Override
+        public int getHeight() {
+            return 384;
+        }
+
+        @Override
+        public FluidState getFluidState(BlockPos pos) {
+            return this.stateAt(pos).getFluidState();
+        }
+
+        // A block read that does not go through a chunk source. The move's own
+        // broad phase reaches blocks through getChunkForCollisions below; the
+        // tick around it reads single cells directly, and both must answer from
+        // the same table.
+        @Override
+        public BlockState getBlockState(BlockPos pos) {
+            return this.stateAt(pos);
+        }
+
         @Override
         public List<VoxelShape> getEntityCollisions(Entity source, AABB box) {
             return List.of();
@@ -496,13 +527,16 @@ public final class MoveOracle26 {
     /**
      * allocate makes an instance without running a constructor.
      *
+     * MovementOracle26 uses it for the same level, so that the two harnesses
+     * cannot disagree about what a world is.
+     *
      * The level's constructor is unreachable from here, as the file comment
      * explains, and this is the standard way of skipping one: the same
      * mechanism serialization uses to rebuild an object without its
      * constructor's side effects.
      */
     @SuppressWarnings("unchecked")
-    private static <T> T allocate(Class<T> type) throws Exception {
+    static <T> T allocate(Class<T> type) throws Exception {
         Constructor<Object> base = Object.class.getDeclaredConstructor();
         Constructor<?> bypass = sun.reflect.ReflectionFactory.getReflectionFactory()
                 .newConstructorForSerialization(type, base);

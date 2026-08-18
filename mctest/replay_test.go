@@ -7,10 +7,12 @@ import (
 	"testing"
 
 	gen "github.com/go-theft-craft/minecraft-protocol/generated/java/v1_8"
+	gen26 "github.com/go-theft-craft/minecraft-protocol/generated/java/v26_1"
 
 	"github.com/go-theft-craft/minecraft-simulation/geom"
 	"github.com/go-theft-craft/minecraft-simulation/mctest"
 	v1_8 "github.com/go-theft-craft/minecraft-simulation/profile/java/v1_8"
+	v26_1 "github.com/go-theft-craft/minecraft-simulation/profile/java/v26_1"
 	"github.com/go-theft-craft/minecraft-simulation/scene"
 	"github.com/go-theft-craft/minecraft-simulation/sim"
 )
@@ -52,6 +54,57 @@ func TestTheCommittedFixturesReplay(t *testing.T) {
 	}
 
 	built := profile(t)
+	for index, path := range paths {
+		name := want[index]
+		t.Run(name, func(t *testing.T) {
+			fixture, err := mctest.Load(path)
+			if err != nil {
+				t.Fatalf("Load: %v", err)
+			}
+			if fixture.Name != name {
+				t.Fatalf("%s records the scenario %q", path, fixture.Name)
+			}
+			if err := mctest.Replay(built, fixture); err != nil {
+				t.Fatalf("Replay: %v", err)
+			}
+		})
+	}
+}
+
+// profile26 builds the rules this version's committed fixtures were recorded
+// under.
+func profile26(t *testing.T) sim.Profile {
+	t.Helper()
+
+	set, err := gen26.Data()
+	if err != nil {
+		t.Fatalf("load the 26.1.2 data set: %v", err)
+	}
+	built, err := v26_1.New(set)
+	if err != nil {
+		t.Fatalf("build the 26.1.2 profile: %v", err)
+	}
+
+	return built
+}
+
+// TestTheCommitted26FixturesReplay is the same gate for the second version.
+//
+// It is a separate test rather than a loop over both, because the two suites are
+// two milestones' exit criteria and a failure should name which version drifted
+// before it names which scenario.
+func TestTheCommitted26FixturesReplay(t *testing.T) {
+	paths, err := filepath.Glob(filepath.Join("testdata", "26_1", "*.json"))
+	if err != nil {
+		t.Fatalf("list the fixtures: %v", err)
+	}
+
+	want := []string{"collide", "fall", "jump", "sneak", "sprint", "walk"}
+	if len(paths) != len(want) {
+		t.Fatalf("found %d fixtures, want %d: %v", len(paths), len(want), paths)
+	}
+
+	built := profile26(t)
 	for index, path := range paths {
 		name := want[index]
 		t.Run(name, func(t *testing.T) {

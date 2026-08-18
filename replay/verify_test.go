@@ -22,6 +22,19 @@ var theRecordings = []string{
 	"step-up",
 }
 
+// theRecordings26 are the same gate's runs for Java 26.1.2, in testdata/26_1.
+//
+// There is no slime-and-soul-sand here. Both blocks slow or bounce a body
+// through per-block behaviour this version reads from data the dataset does not
+// publish, so a recording of them would pin this module's own assumption rather
+// than the game's arithmetic.
+var theRecordings26 = []string{
+	"ice",
+	"jump-and-fall",
+	"sprint-diagonal",
+	"step-up",
+}
+
 // minimumTicks is how long a recording has to be to be evidence.
 //
 // The float32 paths this matrix tests are ones where a single differing bit
@@ -52,6 +65,29 @@ func TestRecordingsAreReproducible(t *testing.T) {
 	}
 }
 
+// TestRecordingsAreReproducible26 is the same check for the second version.
+//
+// It is a separate test rather than a loop over both profiles, because a failure
+// should name which version drifted before it names which run. Its name begins
+// the way the other one's does on purpose: the determinism task selects the
+// matrix's tests by that prefix, so a version added here joins the matrix
+// without a workflow change.
+func TestRecordingsAreReproducible26(t *testing.T) {
+	built := profile26(t)
+
+	for _, name := range theRecordings26 {
+		t.Run(name, func(t *testing.T) {
+			recording, err := replay.Load(filepath.Join("testdata", "26_1", name+".json"))
+			if err != nil {
+				t.Fatalf("Load: %v", err)
+			}
+			if err := replay.Verify(built, recording); err != nil {
+				t.Fatalf("Verify: %v", err)
+			}
+		})
+	}
+}
+
 func TestTheCommittedRecordingsAreNotTrivial(t *testing.T) {
 	paths, err := filepath.Glob(filepath.Join("testdata", "*.json"))
 	if err != nil {
@@ -61,9 +97,19 @@ func TestTheCommittedRecordingsAreNotTrivial(t *testing.T) {
 		t.Fatalf("found %d recordings, want %d: %v", len(paths), len(theRecordings), paths)
 	}
 
+	found, err := filepath.Glob(filepath.Join("testdata", "26_1", "*.json"))
+	if err != nil {
+		t.Fatalf("list the 26.1.2 recordings: %v", err)
+	}
+	if len(found) != len(theRecordings26) {
+		t.Fatalf("found %d 26.1.2 recordings, want %d: %v",
+			len(found), len(theRecordings26), found)
+	}
+	paths = append(paths, found...)
+
 	for _, path := range paths {
 		name := strings.TrimSuffix(filepath.Base(path), ".json")
-		if !slices.Contains(theRecordings, name) {
+		if !slices.Contains(theRecordings, name) && !slices.Contains(theRecordings26, name) {
 			t.Errorf("%s is committed but not in the list this gate checks", path)
 		}
 

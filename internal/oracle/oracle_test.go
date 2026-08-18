@@ -354,3 +354,15 @@ func identicalBox(a, b geom.AABB) bool {
 	return identical(a.MinX, b.MinX) && identical(a.MinY, b.MinY) && identical(a.MinZ, b.MinZ) &&
 		identical(a.MaxX, b.MaxX) && identical(a.MaxY, b.MaxY) && identical(a.MaxZ, b.MaxZ)
 }
+
+// parseHexFloat reads a single-width value the harness printed.
+func parseHexFloat(t *testing.T, text string) float32 {
+	t.Helper()
+
+	value, err := strconv.ParseFloat(text, 32)
+	if err != nil {
+		t.Fatalf("parse %q: %v", text, err)
+	}
+
+	return float32(value)
+}

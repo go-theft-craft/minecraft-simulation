@@ -59,9 +59,13 @@ type Recording struct {
 
 // Body is one entity's starting state.
 type Body struct {
-	ID         entity.ID           `json:"id"`
-	Family     entity.Family       `json:"family"`
-	Box        geom.AABB           `json:"box"`
+	ID     entity.ID     `json:"id"`
+	Family entity.Family `json:"family"`
+	Box    geom.AABB     `json:"box"`
+	// Position is where the body stands, for a version whose move rebuilds the
+	// box around it. A recording made under a version that keeps no position
+	// omits this, so every recording written before one did is unchanged.
+	Position   geom.Vec3           `json:"position,omitzero"`
 	Motion     geom.Vec3           `json:"motion"`
 	OnGround   bool                `json:"on_ground"`
 	StepHeight float64             `json:"step_height"`
