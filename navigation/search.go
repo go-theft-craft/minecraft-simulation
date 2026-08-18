@@ -293,8 +293,14 @@ func (c Capability) expand(o oracle, from node) ([]Edge, error) {
 	if err != nil {
 		return nil, err
 	}
+	edges = append(edges, climbs...)
 
-	return append(edges, climbs...), nil
+	doors, err := c.doors(o, from)
+	if err != nil {
+		return nil, err
+	}
+
+	return append(edges, doors...), nil
 }
 
 // arrival is what arriveAt decides: whether a body may come to rest in a cell,

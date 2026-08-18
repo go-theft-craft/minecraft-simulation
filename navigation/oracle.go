@@ -41,6 +41,11 @@ type oracle interface {
 	// body that climbed into an unloaded chunk would be climbing a ladder
 	// nobody has said is there.
 	climbable(cell geom.BlockPos) (bool, error)
+	// doorAt reports whether a cell holds a door and whether it can be worked.
+	doorAt(cell geom.BlockPos) (terrain.Door, error)
+	// passableThroughDoor classifies a cell as it would be with the door in it
+	// swung open.
+	passableThroughDoor(cell geom.BlockPos) (terrain.Passability, error)
 }
 
 // directOracle asks terrain every time, caching nothing.
@@ -85,6 +90,28 @@ func (d directOracle) passableCrawling(cell geom.BlockPos) (terrain.Passability,
 // fluidAt implements oracle.
 func (d directOracle) fluidAt(cell geom.BlockPos) (terrain.Fluid, world.Lookup, error) {
 	return d.query.FluidAt(cell)
+}
+
+// doorAt implements oracle.
+func (d directOracle) doorAt(cell geom.BlockPos) (terrain.Door, error) {
+	door, lookup, err := d.query.DoorAt(cell)
+	if err != nil || lookup == world.LookupUnknown {
+		return terrain.DoorNone, err
+	}
+
+	return door, nil
+}
+
+// passableThroughDoor implements oracle.
+//
+// The masked query is built per call rather than kept, because a door is rare
+// and the mask names one column: keeping one would mean keeping one per door
+// the search meets.
+func (d directOracle) passableThroughDoor(cell geom.BlockPos) (terrain.Passability, error) {
+	query := d.query
+	query.View = openedView{view: d.query.View, door: cell}
+
+	return query.Passable(cell)
 }
 
 // climbable implements oracle.

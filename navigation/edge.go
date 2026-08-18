@@ -51,6 +51,11 @@ const (
 	// EdgeClimb moves one cell vertically inside a climbable column, in either
 	// direction.
 	EdgeClimb
+	// EdgeDoor passes through a door the body opens on the way.
+	//
+	// The door is the edge's To cell, so a caller reading a path knows which
+	// one to work without the edge carrying a second position.
+	EdgeDoor
 )
 
 // String returns the kind's name.
@@ -70,6 +75,8 @@ func (e EdgeKind) String() string {
 		return "water-drop"
 	case EdgeClimb:
 		return "climb"
+	case EdgeDoor:
+		return "door"
 	default:
 		return fmt.Sprintf("EdgeKind(%d)", uint8(e))
 	}

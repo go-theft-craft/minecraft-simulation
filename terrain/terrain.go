@@ -11,7 +11,11 @@
 // predicates while disagreeing about the route.
 package terrain
 
-import "github.com/go-theft-craft/minecraft-simulation/world"
+import (
+	"fmt"
+
+	"github.com/go-theft-craft/minecraft-simulation/world"
+)
 
 // Hazard names what makes a position dangerous to occupy.
 type Hazard uint8
@@ -45,8 +49,9 @@ const (
 // sim.Profile for the same reason sim.BlockNames is — a tick never asks these
 // questions, and terrain must not import sim.
 //
-// A nil Facts is legal. It answers HazardNone, FluidNone, and not climbable for
-// everything, which is what a caller that only cares about geometry wants.
+// A nil Facts is legal. It answers HazardNone, FluidNone, not climbable, and
+// DoorNone for everything, which is what a caller that only cares about
+// geometry wants.
 type Facts interface {
 	// Hazard reports what a block does to a body occupying it.
 	Hazard(ref world.BlockRef) Hazard
@@ -61,4 +66,42 @@ type Facts interface {
 	// different. Like the other two answers it is a fact about a handle only
 	// the profile that minted it can resolve.
 	Climbable(ref world.BlockRef) bool
+	// Door reports whether a block is a door and whether a body may work it.
+	//
+	// It is a fact rather than a shape for the same reason the others are: a
+	// closed door and a wall have the same effect on a collision sweep, and
+	// only the profile that minted the handle can tell them apart.
+	Door(ref world.BlockRef) Door
+}
+
+// Door says whether a block is a door and whether a body may open it.
+type Door uint8
+
+const (
+	// DoorNone means the block is not a door.
+	DoorNone Door = iota
+	// DoorOperable is a door a body opens by hand.
+	DoorOperable
+	// DoorLocked is a door a body cannot open by hand: an iron one, or any
+	// door the version gates behind redstone.
+	//
+	// It is named rather than left out so that a caller can route around one
+	// deliberately. A bot that walks into an iron door forever is worse than
+	// one that takes the long way, and a door reported as "not a door" would
+	// be a wall the search never understood.
+	DoorLocked
+)
+
+// String returns the value's name.
+func (d Door) String() string {
+	switch d {
+	case DoorNone:
+		return "none"
+	case DoorOperable:
+		return "operable"
+	case DoorLocked:
+		return "locked"
+	default:
+		return fmt.Sprintf("Door(%d)", uint8(d))
+	}
 }

@@ -30,6 +30,8 @@ func (verticalFacts) Fluid(ref world.BlockRef) terrain.Fluid {
 // a caller reading geometry alone cannot tell this handle from air.
 func (verticalFacts) Climbable(ref world.BlockRef) bool { return ref == refLadder }
 
+func (verticalFacts) Door(world.BlockRef) terrain.Door { return terrain.DoorNone }
+
 // swimmer is walker with a swim, a shallow safe fall, and water deep enough to
 // land in stated at two blocks.
 func swimmer() Capability {

@@ -141,3 +141,13 @@ func (q Query) ClimbableAt(cell geom.BlockPos) (bool, world.Lookup, error) {
 
 	return q.Facts.Climbable(ref), lookup, nil
 }
+
+// DoorAt reports whether a cell holds a door, and whether a body may work it.
+func (q Query) DoorAt(cell geom.BlockPos) (Door, world.Lookup, error) {
+	ref, lookup := q.View.BlockState(cell)
+	if lookup == world.LookupUnknown || q.Facts == nil {
+		return DoorNone, lookup, nil
+	}
+
+	return q.Facts.Door(ref), lookup, nil
+}

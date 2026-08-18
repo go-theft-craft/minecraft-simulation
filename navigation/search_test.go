@@ -210,6 +210,8 @@ func (waterFacts) Hazard(world.BlockRef) terrain.Hazard { return terrain.HazardN
 
 func (waterFacts) Climbable(world.BlockRef) bool { return false }
 
+func (waterFacts) Door(world.BlockRef) terrain.Door { return terrain.DoorNone }
+
 func (waterFacts) Fluid(ref world.BlockRef) terrain.Fluid {
 	if ref == refWater {
 		return terrain.FluidWater
@@ -289,6 +291,8 @@ type burningFacts struct{}
 func (burningFacts) Fluid(world.BlockRef) terrain.Fluid { return terrain.FluidNone }
 
 func (burningFacts) Climbable(world.BlockRef) bool { return false }
+
+func (burningFacts) Door(world.BlockRef) terrain.Door { return terrain.DoorNone }
 
 func (burningFacts) Hazard(ref world.BlockRef) terrain.Hazard {
 	if ref == refFire {

@@ -205,6 +205,29 @@ func (m *memoOracle) fluidAt(cell geom.BlockPos) (terrain.Fluid, world.Lookup, e
 	return m.query.FluidAt(cell)
 }
 
+// doorAt implements oracle. It is uncached for the reason fluidAt is.
+func (m *memoOracle) doorAt(cell geom.BlockPos) (terrain.Door, error) {
+	door, lookup, err := m.query.DoorAt(cell)
+	if err != nil || lookup == world.LookupUnknown {
+		return terrain.DoorNone, err
+	}
+
+	return door, nil
+}
+
+// passableThroughDoor implements oracle.
+//
+// It is uncached, and deliberately so rather than by oversight: the answer
+// depends on a cell being masked, so it is not the same question as passable
+// and could not share that cache. Doors are rare enough that a fourth cache
+// would cost more bookkeeping than it saves.
+func (m *memoOracle) passableThroughDoor(cell geom.BlockPos) (terrain.Passability, error) {
+	query := m.query
+	query.View = openedView{view: m.recorder, door: cell}
+
+	return query.Passable(cell)
+}
+
 // climbable implements oracle. It is uncached for the reason fluidAt is.
 func (m *memoOracle) climbable(cell geom.BlockPos) (bool, error) {
 	climbable, lookup, err := m.query.ClimbableAt(cell)

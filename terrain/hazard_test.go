@@ -19,6 +19,7 @@ type testFacts struct {
 func (f testFacts) Hazard(ref world.BlockRef) Hazard  { return f.hazards[ref] }
 func (f testFacts) Fluid(ref world.BlockRef) Fluid    { return f.fluids[ref] }
 func (f testFacts) Climbable(ref world.BlockRef) bool { return f.climbable[ref] }
+func (f testFacts) Door(world.BlockRef) Door          { return DoorNone }
 
 const (
 	refLava   world.BlockRef = 10

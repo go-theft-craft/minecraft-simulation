@@ -202,6 +202,11 @@ type Capability struct {
 	// ClimbTicks is the cost of moving one cell vertically on a climbable
 	// block.
 	ClimbTicks float64
+	// CanOpenDoors allows door edges. A body with no hands, or one a caller
+	// does not want opening things, leaves it off.
+	CanOpenDoors bool
+	// DoorTicks is the cost of opening a door and stepping into its cell.
+	DoorTicks float64
 	// CandidateLimit bounds one terrain query's collision sweep. A
 	// non-positive value means no limit.
 	CandidateLimit int
@@ -242,6 +247,9 @@ func (c Capability) perBlockFloor() float64 {
 	}
 	if c.CanClimb && c.ClimbTicks < lowest {
 		lowest = c.ClimbTicks
+	}
+	if c.CanOpenDoors && c.DoorTicks < lowest {
+		lowest = c.DoorTicks
 	}
 	// A water drop of depth D closes 1+D blocks for FallTicks*D, which is the
 	// same rate the ordinary fall is priced at and is cheapest per block at
