@@ -47,7 +47,7 @@ func maze(seed uint64) *world.Blocks {
 // that teleports, and a caller following it walks into a wall.
 func TestPathsAreContiguous(t *testing.T) {
 	for _, seed := range seeds {
-		path := search(t, maze(seed))
+		path := findPath(t, maze(seed))
 		for i := 1; i < len(path.Edges); i++ {
 			if path.Edges[i].From != path.Edges[i-1].To {
 				t.Fatalf(
@@ -63,7 +63,7 @@ func TestPathsAreContiguous(t *testing.T) {
 // must still hand back something the caller can start walking.
 func TestPathsStartAtTheOrigin(t *testing.T) {
 	for _, seed := range seeds {
-		path := search(t, maze(seed))
+		path := findPath(t, maze(seed))
 		if len(path.Edges) == 0 {
 			continue
 		}
@@ -78,7 +78,7 @@ func TestPathsStartAtTheOrigin(t *testing.T) {
 // another.
 func TestPathCostIsTheSumOfItsEdges(t *testing.T) {
 	for _, seed := range seeds {
-		path := search(t, maze(seed))
+		path := findPath(t, maze(seed))
 		if !path.Complete {
 			continue
 		}
@@ -98,7 +98,7 @@ func TestPathCostIsTheSumOfItsEdges(t *testing.T) {
 func TestEveryEdgeLandsSomewhereStandable(t *testing.T) {
 	for _, seed := range seeds {
 		blocks := maze(seed)
-		path := search(t, blocks)
+		path := findPath(t, blocks)
 		query := walker.query(blocks, nil)
 
 		for i, edge := range path.Edges {
@@ -120,10 +120,10 @@ func TestEveryEdgeLandsSomewhereStandable(t *testing.T) {
 func TestSearchesAreReproducible(t *testing.T) {
 	for _, seed := range seeds {
 		blocks := maze(seed)
-		first := search(t, blocks)
+		first := findPath(t, blocks)
 
 		for run := 0; run < 100; run++ {
-			again := search(t, blocks)
+			again := findPath(t, blocks)
 			if again.Cost != first.Cost || again.Reason != first.Reason {
 				t.Fatalf("seed %d run %d: path summary changed", seed, run)
 			}
@@ -139,8 +139,9 @@ func TestSearchesAreReproducible(t *testing.T) {
 	}
 }
 
-// search runs one fixed query against a world.
-func search(t *testing.T, blocks *world.Blocks) Path {
+// findPath runs one fixed query against a world. It is not called search:
+// search is the package-level A* both Find and Planner.Plan run.
+func findPath(t *testing.T, blocks *world.Blocks) Path {
 	t.Helper()
 
 	path, err := Find(

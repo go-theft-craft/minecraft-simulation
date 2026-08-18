@@ -65,6 +65,19 @@ func Find(
 	// call cost one heap allocation per node expanded — 3,000 of them on
 	// BenchmarkFindLong.
 	var o oracle = directOracle{query: capability.query(view, facts), capability: capability}
+
+	return search(ctx, o, capability, from, goal, budget)
+}
+
+// search is the A* both Find and Planner.Plan run. It is separate from Find so
+// that a planner can supply a caching oracle without Find changing shape.
+func search(
+	ctx context.Context,
+	o oracle,
+	capability Capability,
+	from, goal geom.BlockPos,
+	budget Budget,
+) (Path, error) {
 	start := node{Pos: from, Posture: PostureStand}
 
 	cameFrom := make(map[node]link)
