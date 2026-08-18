@@ -9,21 +9,22 @@ import (
 // knockStrength is the base impulse every landed hit applies, in blocks per
 // tick. Both jars carry the same literal: 1.8.9's EntityLivingBase.knockBack
 // hardcodes 0.4F, and 26.1.2's LivingEntity.hurtServer calls knockback(0.4F,
-// …).
-const knockStrength = 0.4
+// …). It is a widened Java float, not 0.4 — the corpus comparison is exact,
+// and the doubles differ in their low bits.
+var knockStrength = float64(float32(0.4))
 
 // verticalCap is the most a base knockback may lift, from the same two
-// methods.
-const verticalCap = 0.4
+// methods, at the same width.
+var verticalCap = float64(float32(0.4))
 
 // extraLift is the vertical push the sprint-and-enchantment bonus adds, from
 // EntityPlayer.attackTargetEntityWithCurrentItem (1.8.9) and Player.push via
-// causeExtraKnockback (26.1.2).
+// causeExtraKnockback (26.1.2). This one is a Java double literal.
 const extraLift = 0.1
 
 // extraScale halves the bonus knockback's horizontal strength, from the same
-// two call sites.
-const extraScale = 0.5
+// two call sites: a widened Java float again.
+var extraScale = float64(float32(0.5))
 
 // Knockback returns the motion the target is left with after one strike.
 //
@@ -61,7 +62,10 @@ const extraScale = 0.5
 //     kernel would reject as ErrNaNInResult.
 func Knockback(from, to geom.Vec3, s Strike, base geom.Vec3) geom.Vec3 {
 	deltaX, deltaZ := to.X-from.X, to.Z-from.Z
-	distance := math.Sqrt(deltaX*deltaX + deltaZ*deltaZ)
+	// MathHelper.sqrt_double returns a Java float, and the divisions below
+	// widen it back — so the distance is a float32 at double width, and using
+	// a double sqrt here would disagree with the corpus in the last bits.
+	distance := float64(float32(math.Sqrt(deltaX*deltaX + deltaZ*deltaZ)))
 
 	out := geom.Vec3{X: base.X / 2, Y: base.Y/2 + verticalCap, Z: base.Z / 2}
 	if out.Y > verticalCap {

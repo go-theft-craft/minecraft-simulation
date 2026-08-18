@@ -1,0 +1,224 @@
+{
+  "version": "1.8.9",
+  "source": "asked of a Java Edition 1.8.9 server jar through internal/oracle/java/CombatOracle.java",
+  "dropped": [
+    "weapons and armour: the strike is bare-handed against an unarmoured player, so the damage is the base attribute and nothing folds an unverified reduction into it",
+    "sharpness, strength, and weakness: combat.Strike takes their damage already resolved, and which level gives what is version data no profile carries yet",
+    "zero distance: both games nudge the direction by Math.random until it is not zero, and a random answer cannot be a corpus case"
+  ],
+  "cooldownAbsent": "the attack cooldown arrived in 1.9; every 1.8.9 swing deals full damage regardless of timing",
+  "strikes": [
+    {
+      "name": "plain",
+      "dx": "0x1p+01",
+      "dz": "0x0p+00",
+      "motion": [
+        "0x0p+00",
+        "0x0p+00",
+        "0x0p+00"
+      ],
+      "damage": "0x1.0p0",
+      "result": [
+        "0x1.99999ap-2",
+        "0x1.99999ap-2",
+        "0x0.0p0"
+      ],
+      "sprintAfter": false
+    },
+    {
+      "name": "diagonal",
+      "dx": "0x1.8p+00",
+      "dz": "0x1.8p+00",
+      "motion": [
+        "0x0p+00",
+        "0x0p+00",
+        "0x0p+00"
+      ],
+      "damage": "0x1.0p0",
+      "result": [
+        "0x1.21a18644107f2p-2",
+        "0x1.99999ap-2",
+        "0x1.21a18644107f2p-2"
+      ],
+      "sprintAfter": false
+    },
+    {
+      "name": "behind",
+      "dx": "-0x1p+01",
+      "dz": "-0x1p-01",
+      "motion": [
+        "0x0p+00",
+        "0x0p+00",
+        "0x0p+00"
+      ],
+      "damage": "0x1.0p0",
+      "result": [
+        "-0x1.8d5ed17566345p-2",
+        "0x1.99999ap-2",
+        "-0x1.8d5ed17566345p-4"
+      ],
+      "sprintAfter": false
+    },
+    {
+      "name": "sprinting",
+      "sprint": true,
+      "dx": "0x1p+01",
+      "dz": "0x0p+00",
+      "motion": [
+        "0x0p+00",
+        "0x0p+00",
+        "0x0p+00"
+      ],
+      "damage": "0x1.0p0",
+      "result": [
+        "0x1.cccccdp-1",
+        "0x1.0000003333333p-1",
+        "0x0.0p0"
+      ],
+      "sprintAfter": false
+    },
+    {
+      "name": "critical",
+      "critical": true,
+      "dx": "0x1p+01",
+      "dz": "0x0p+00",
+      "motion": [
+        "0x0p+00",
+        "0x0p+00",
+        "0x0p+00"
+      ],
+      "damage": "0x1.8p0",
+      "result": [
+        "0x1.99999ap-2",
+        "0x1.99999ap-2",
+        "0x0.0p0"
+      ],
+      "sprintAfter": false
+    },
+    {
+      "name": "sprinting critical",
+      "sprint": true,
+      "critical": true,
+      "dx": "0x1p+01",
+      "dz": "0x0p+00",
+      "motion": [
+        "0x0p+00",
+        "0x0p+00",
+        "0x0p+00"
+      ],
+      "damage": "0x1.8p0",
+      "result": [
+        "0x1.cccccdp-1",
+        "0x1.0000003333333p-1",
+        "0x0.0p0"
+      ],
+      "sprintAfter": false
+    },
+    {
+      "name": "knockback I",
+      "knockback": 1,
+      "dx": "0x1p+01",
+      "dz": "0x0p+00",
+      "motion": [
+        "0x0p+00",
+        "0x0p+00",
+        "0x0p+00"
+      ],
+      "damage": "0x1.0p0",
+      "result": [
+        "0x1.cccccdp-1",
+        "0x1.0000003333333p-1",
+        "0x0.0p0"
+      ],
+      "sprintAfter": false
+    },
+    {
+      "name": "knockback II",
+      "knockback": 2,
+      "dx": "0x1p+01",
+      "dz": "0x0p+00",
+      "motion": [
+        "0x0p+00",
+        "0x0p+00",
+        "0x0p+00"
+      ],
+      "damage": "0x1.0p0",
+      "result": [
+        "0x1.6666668p0",
+        "0x1.0000003333333p-1",
+        "0x0.0p0"
+      ],
+      "sprintAfter": false
+    },
+    {
+      "name": "sprinting knockback I",
+      "sprint": true,
+      "knockback": 1,
+      "dx": "0x1p+01",
+      "dz": "0x0p+00",
+      "motion": [
+        "0x0p+00",
+        "0x0p+00",
+        "0x0p+00"
+      ],
+      "damage": "0x1.0p0",
+      "result": [
+        "0x1.6666668p0",
+        "0x1.0000003333333p-1",
+        "0x0.0p0"
+      ],
+      "sprintAfter": false
+    },
+    {
+      "name": "fleeing target",
+      "dx": "0x1p+01",
+      "dz": "0x0p+00",
+      "motion": [
+        "0x1p-01",
+        "0x0p+00",
+        "0x0p+00"
+      ],
+      "damage": "0x1.0p0",
+      "result": [
+        "0x1.4ccccdp-1",
+        "0x1.99999ap-2",
+        "0x0.0p0"
+      ],
+      "sprintAfter": false
+    },
+    {
+      "name": "approaching target",
+      "dx": "0x1p+01",
+      "dz": "0x0p+00",
+      "motion": [
+        "-0x1p-01",
+        "0x1.999999999999ap-03",
+        "0x1.3333333333333p-02"
+      ],
+      "damage": "0x1.0p0",
+      "result": [
+        "0x1.333334p-3",
+        "0x1.99999ap-2",
+        "0x1.3333333333333p-3"
+      ],
+      "sprintAfter": false
+    },
+    {
+      "name": "rising target",
+      "dx": "0x1p+01",
+      "dz": "0x0p+00",
+      "motion": [
+        "0x0p+00",
+        "0x1.8p+01",
+        "0x0p+00"
+      ],
+      "damage": "0x1.0p0",
+      "result": [
+        "0x1.99999ap-2",
+        "0x1.99999ap-2",
+        "0x0.0p0"
+      ],
+      "sprintAfter": false
+    }
+  ]
+}

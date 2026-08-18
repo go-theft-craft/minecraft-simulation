@@ -1,0 +1,145 @@
+{
+  "version": "26.1.2",
+  "source": "asked of a Java Edition 26.1.2 server jar through internal/oracle/java/CombatOracle26.java, at the fist's attack speed",
+  "dropped": [
+    "weapons and armour: the strike is bare-handed against an unarmoured player, so the damage is the base attribute and nothing folds an unverified reduction into it",
+    "sharpness, strength, and weakness: combat.Strike takes their damage already resolved, and which level gives what is version data no profile carries yet",
+    "zero distance: both games nudge the direction by Math.random until it is not zero, and a random answer cannot be a corpus case",
+    "the full attack round: Entity.hurtOrSimulate takes the server branch only over a real ServerLevel, so Player.attack's composition is transcribed into combat.Damage and pinned by the charge curve rather than executed",
+    "the sprint and enchantment bonus: this version routes it through a second LivingEntity.knockback call that halves the motion again, where 1.8.9 adds velocity; the shared impulse carries 1.8.9's composition and the divergence is recorded on combat.Knockback",
+    "airborne targets: this version keeps their vertical motion where 1.8.9 lifts them; recorded on combat.Knockback with the bonus divergence"
+  ],
+  "charges": [
+    {
+      "ticks": 0,
+      "charge": "0x1.99999ap-4"
+    },
+    {
+      "ticks": 1,
+      "charge": "0x1.333334p-2"
+    },
+    {
+      "ticks": 2,
+      "charge": "0x1.0p-1"
+    },
+    {
+      "ticks": 3,
+      "charge": "0x1.666666p-1"
+    },
+    {
+      "ticks": 4,
+      "charge": "0x1.ccccccp-1"
+    },
+    {
+      "ticks": 5,
+      "charge": "0x1.0p0"
+    },
+    {
+      "ticks": 6,
+      "charge": "0x1.0p0"
+    },
+    {
+      "ticks": 8,
+      "charge": "0x1.0p0"
+    },
+    {
+      "ticks": 10,
+      "charge": "0x1.0p0"
+    },
+    {
+      "ticks": 20,
+      "charge": "0x1.0p0"
+    },
+    {
+      "ticks": 100,
+      "charge": "0x1.0p0"
+    }
+  ],
+  "impulses": [
+    {
+      "name": "still",
+      "power": "0x1.99999ap-02",
+      "dx": "-0x1p+01",
+      "dz": "0x0p+00",
+      "motion": [
+        "0x0p+00",
+        "0x0p+00",
+        "0x0p+00"
+      ],
+      "ground": true,
+      "result": [
+        "0x1.999999999999ap-2",
+        "0x1.999999999999ap-2",
+        "0x0.0p0"
+      ]
+    },
+    {
+      "name": "diagonal",
+      "power": "0x1.99999ap-02",
+      "dx": "-0x1.8p+00",
+      "dz": "-0x1.8p+00",
+      "motion": [
+        "0x0p+00",
+        "0x0p+00",
+        "0x0p+00"
+      ],
+      "ground": true,
+      "result": [
+        "0x1.21a1851ff630bp-2",
+        "0x1.999999999999ap-2",
+        "0x1.21a1851ff630bp-2"
+      ]
+    },
+    {
+      "name": "fleeing",
+      "power": "0x1.99999ap-02",
+      "dx": "-0x1p+01",
+      "dz": "0x0p+00",
+      "motion": [
+        "0x1p-01",
+        "0x0p+00",
+        "0x0p+00"
+      ],
+      "ground": true,
+      "result": [
+        "0x1.4cccccccccccdp-1",
+        "0x1.999999999999ap-2",
+        "0x0.0p0"
+      ]
+    },
+    {
+      "name": "rising",
+      "power": "0x1.99999ap-02",
+      "dx": "-0x1p+01",
+      "dz": "0x0p+00",
+      "motion": [
+        "0x0p+00",
+        "0x1.8p+01",
+        "0x0p+00"
+      ],
+      "ground": true,
+      "result": [
+        "0x1.999999999999ap-2",
+        "0x1.999999999999ap-2",
+        "0x0.0p0"
+      ]
+    },
+    {
+      "name": "approaching",
+      "power": "0x1.99999ap-02",
+      "dx": "-0x1p+01",
+      "dz": "0x0p+00",
+      "motion": [
+        "-0x1p-01",
+        "0x1.999999999999ap-03",
+        "0x1.3333333333333p-02"
+      ],
+      "ground": true,
+      "result": [
+        "0x1.3333333333334p-3",
+        "0x1.999999999999ap-2",
+        "0x1.3333333333333p-3"
+      ]
+    }
+  ]
+}

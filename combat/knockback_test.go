@@ -47,9 +47,10 @@ func TestKnockbackLiftIsCapped(t *testing.T) {
 	// A target already moving up keeps at most 0.4 of lift, from the cap in
 	// both games' knockback methods.
 	from, to := geom.Vec3{}, geom.Vec3{X: 2}
+	// The cap is the game's 0.4F widened, which is not the double 0.4.
 	got := combat.Knockback(from, to, combat.Strike{Charge: 1}, geom.Vec3{Y: 3})
-	if got.Y != 0.4 {
-		t.Fatalf("knockback Y = %v for a rising target, want the 0.4 cap", got.Y)
+	if got.Y != float64(float32(0.4)) {
+		t.Fatalf("knockback Y = %v for a rising target, want the 0.4F cap", got.Y)
 	}
 }
 
