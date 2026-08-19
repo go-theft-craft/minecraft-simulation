@@ -42,8 +42,8 @@ var wideBudget = Budget{Nodes: 10_000, Ceiling: 10_000}
 func TestFindWalksAStraightLine(t *testing.T) {
 	path, err := Find(
 		context.Background(), flat(-1, -1, 5, 1), nil, walker,
-		geom.BlockPos{X: 0, Y: 0, Z: 0}, geom.BlockPos{X: 4, Y: 0, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 0, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 4, Y: 0, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -66,7 +66,7 @@ func TestFindWalksAStraightLine(t *testing.T) {
 func TestFindReturnsAnEmptyCompletePathAtTheGoal(t *testing.T) {
 	here := geom.BlockPos{X: 0, Y: 0, Z: 0}
 
-	path, err := Find(context.Background(), flat(-1, -1, 1, 1), nil, walker, here, here, wideBudget)
+	path, err := Find(context.Background(), flat(-1, -1, 1, 1), nil, walker, here, GoalBlock{Pos: here}, wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -82,8 +82,8 @@ func TestFindStepsOverAOneBlockRise(t *testing.T) {
 
 	path, err := Find(
 		context.Background(), blocks, nil, walker,
-		geom.BlockPos{X: 0, Y: 0, Z: 0}, geom.BlockPos{X: 2, Y: 1, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 0, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 2, Y: 1, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -108,8 +108,8 @@ func TestFindFallsWithinTheSafeFall(t *testing.T) {
 
 	path, err := Find(
 		context.Background(), blocks, nil, walker,
-		geom.BlockPos{X: 0, Y: 0, Z: 0}, geom.BlockPos{X: 1, Y: -2, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 0, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 1, Y: -2, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -130,8 +130,8 @@ func TestFindRefusesAFallBeyondTheSafeFall(t *testing.T) {
 
 	path, err := Find(
 		context.Background(), blocks, nil, walker,
-		geom.BlockPos{X: 0, Y: 0, Z: 0}, geom.BlockPos{X: 1, Y: -8, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 0, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 1, Y: -8, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -150,8 +150,8 @@ func TestFindRefusesToRouteThroughUnknownCells(t *testing.T) {
 
 	path, err := Find(
 		context.Background(), blocks, nil, walker,
-		geom.BlockPos{X: 0, Y: 0, Z: 0}, geom.BlockPos{X: 4, Y: 0, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 0, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 4, Y: 0, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -168,9 +168,8 @@ func TestFindRefusesToRouteThroughUnknownCells(t *testing.T) {
 func TestFindReturnsAPartialPathWhenTheBudgetRunsOut(t *testing.T) {
 	path, err := Find(
 		context.Background(), flat(-1, -1, 40, 1), nil, walker,
-		geom.BlockPos{X: 0, Y: 0, Z: 0}, geom.BlockPos{X: 39, Y: 0, Z: 0},
-		Budget{Nodes: 12, Ceiling: 10_000},
-	)
+		geom.BlockPos{X: 0, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 39, Y: 0, Z: 0}},
+		Budget{Nodes: 12, Ceiling: 10_000})
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -194,8 +193,9 @@ func TestFindHonoursACancelledContext(t *testing.T) {
 
 	_, err := Find(
 		ctx, flat(-1, -1, 40, 1), nil, walker,
-		geom.BlockPos{X: 0, Y: 0, Z: 0}, geom.BlockPos{X: 39, Y: 0, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 0, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 39, Y: 0, Z: 0}},
+		wideBudget)
+
 	if err == nil {
 		t.Fatal("Find ignored a cancelled context")
 	}
@@ -236,8 +236,8 @@ func TestFindCrossesWaterWhenTheBodyCanSwim(t *testing.T) {
 
 	path, err := Find(
 		context.Background(), pool(), waterFacts{}, swimmer,
-		geom.BlockPos{X: 0, Y: 0, Z: 0}, geom.BlockPos{X: 4, Y: 0, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 0, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 4, Y: 0, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -264,8 +264,8 @@ func TestFindCrossesWaterWhenTheBodyCanSwim(t *testing.T) {
 func TestFindRoutesAroundWaterWhenTheBodyCannotSwim(t *testing.T) {
 	path, err := Find(
 		context.Background(), pool(), waterFacts{}, walker,
-		geom.BlockPos{X: 0, Y: 0, Z: 0}, geom.BlockPos{X: 4, Y: 0, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 0, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 4, Y: 0, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -308,8 +308,8 @@ func TestFindRoutesAroundFire(t *testing.T) {
 
 	path, err := Find(
 		context.Background(), blocks, burningFacts{}, walker,
-		geom.BlockPos{X: 0, Y: 0, Z: 0}, geom.BlockPos{X: 4, Y: 0, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 0, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 4, Y: 0, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -345,8 +345,8 @@ func TestFindRefusesAFallOntoFire(t *testing.T) {
 
 	path, err := Find(
 		context.Background(), blocks, burningFacts{}, walker,
-		geom.BlockPos{X: 0, Y: 0, Z: 0}, geom.BlockPos{X: 3, Y: -2, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 0, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 3, Y: -2, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -371,8 +371,8 @@ func TestFindRefusesAStepIntoFire(t *testing.T) {
 
 	path, err := Find(
 		context.Background(), blocks, burningFacts{}, walker,
-		geom.BlockPos{X: 0, Y: 0, Z: 0}, geom.BlockPos{X: 4, Y: 0, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 0, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 4, Y: 0, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -393,8 +393,8 @@ func TestFindRefusesAFallIntoWaterWhenTheBodyCannotSwim(t *testing.T) {
 
 	path, err := Find(
 		context.Background(), blocks, waterFacts{}, walker,
-		geom.BlockPos{X: 0, Y: 0, Z: 0}, geom.BlockPos{X: 3, Y: -2, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 0, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 3, Y: -2, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -423,8 +423,8 @@ func TestFindFallsBeyondTheColumnWalkFloor(t *testing.T) {
 	landing := geom.BlockPos{X: 1, Y: -34, Z: 0}
 	path, err := Find(
 		context.Background(), blocks, nil, deepFaller,
-		geom.BlockPos{X: 0, Y: 0, Z: 0}, landing, wideBudget,
-	)
+		geom.BlockPos{X: 0, Y: 0, Z: 0}, GoalBlock{Pos: landing},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -453,8 +453,8 @@ func TestHeuristicNeverExceedsTheCostOfAFall(t *testing.T) {
 
 	trueCost := walker.FallTicks
 
-	if got := walker.heuristic(from, goal); got > trueCost {
-		t.Fatalf("heuristic = %v, exceeds the true cost %v of the fall that reaches the goal", got, trueCost)
+	if got := walker.toward(GoalBlock{Pos: goal}, from); got > trueCost {
+		t.Fatalf("toward = %v, exceeds the true cost %v of the fall that reaches the goal", got, trueCost)
 	}
 }
 
@@ -465,8 +465,8 @@ func TestHeuristicNeverExceedsTheCostOfAStep(t *testing.T) {
 
 	trueCost := walker.StepTicks
 
-	if got := walker.heuristic(from, goal); got > trueCost {
-		t.Fatalf("heuristic = %v, exceeds the true cost %v of the step that reaches the goal", got, trueCost)
+	if got := walker.toward(GoalBlock{Pos: goal}, from); got > trueCost {
+		t.Fatalf("toward = %v, exceeds the true cost %v of the step that reaches the goal", got, trueCost)
 	}
 }
 
@@ -484,7 +484,7 @@ func TestHeuristicIsTightForALevelWalk(t *testing.T) {
 
 	want := 3 * lander.WalkTicks
 
-	if got := lander.heuristic(from, goal); got != want {
-		t.Fatalf("heuristic = %v, want %v", got, want)
+	if got := lander.toward(GoalBlock{Pos: goal}, from); got != want {
+		t.Fatalf("toward = %v, want %v", got, want)
 	}
 }

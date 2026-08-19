@@ -257,9 +257,8 @@ func TestTheMeasuredReachCrossesTheHoleItMeasures(t *testing.T) {
 
 			path, err := navigation.Find(
 				t.Context(), blocks, nil, capability,
-				geom.BlockPos{X: 1, Y: 0, Z: 0}, geom.BlockPos{X: 3, Y: 0, Z: 0},
-				navigation.Budget{Nodes: 10_000, Ceiling: 10_000},
-			)
+				geom.BlockPos{X: 1, Y: 0, Z: 0}, navigation.GoalBlock{Pos: geom.BlockPos{X: 3, Y: 0, Z: 0}},
+				navigation.Budget{Nodes: 10_000, Ceiling: 10_000})
 			if err != nil {
 				t.Fatalf("Find: %v", err)
 			}

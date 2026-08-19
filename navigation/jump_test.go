@@ -57,8 +57,8 @@ func hasJump(path Path) bool {
 func TestABodyCrossesATwoBlockGap(t *testing.T) {
 	path, err := Find(
 		context.Background(), gap(5, 2, 3), nil, jumpingCapability(),
-		geom.BlockPos{X: 1, Y: 0, Z: 0}, geom.BlockPos{X: 4, Y: 0, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 1, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 4, Y: 0, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -81,8 +81,8 @@ func TestACapabilityWithNoJumpReachDoesNotJump(t *testing.T) {
 
 	path, err := Find(
 		context.Background(), gap(5, 2, 3), nil, capability,
-		geom.BlockPos{X: 1, Y: 0, Z: 0}, geom.BlockPos{X: 4, Y: 0, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 1, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 4, Y: 0, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -109,8 +109,8 @@ func TestACapabilityRoutesAroundAGapItCannotJump(t *testing.T) {
 
 	path, err := Find(
 		context.Background(), blocks, nil, capability,
-		geom.BlockPos{X: 1, Y: 0, Z: 0}, geom.BlockPos{X: 3, Y: 0, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 1, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 3, Y: 0, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -138,11 +138,11 @@ func TestAJumpUnderALowCeilingIsRefused(t *testing.T) {
 		geom.FullCube(),
 	)
 
-	openPath, err := Find(context.Background(), open, nil, jumpingCapability(), start, goal, wideBudget)
+	openPath, err := Find(context.Background(), open, nil, jumpingCapability(), start, GoalBlock{Pos: goal}, wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
-	blockedPath, err := Find(context.Background(), blocked, nil, jumpingCapability(), start, goal, wideBudget)
+	blockedPath, err := Find(context.Background(), blocked, nil, jumpingCapability(), start, GoalBlock{Pos: goal}, wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -163,8 +163,8 @@ func TestAJumpIsRefusedWhenTheLandingIsNotStandable(t *testing.T) {
 
 	path, err := Find(
 		context.Background(), blocks, nil, jumpingCapability(),
-		geom.BlockPos{X: 1, Y: 0, Z: 0}, geom.BlockPos{X: 4, Y: 0, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 1, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 4, Y: 0, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -180,8 +180,8 @@ func TestAJumpCostsItsDistance(t *testing.T) {
 
 	path, err := Find(
 		context.Background(), gap(5, 2), nil, capability,
-		geom.BlockPos{X: 1, Y: 0, Z: 0}, geom.BlockPos{X: 3, Y: 0, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 1, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 3, Y: 0, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}

@@ -40,8 +40,8 @@ func TestABodyPillarsOutOfAShaft(t *testing.T) {
 
 	path, err := Find(
 		context.Background(), wellShaft(depth, false), nil, pillaring(),
-		geom.BlockPos{X: 0, Y: -depth, Z: 0}, geom.BlockPos{X: 0, Y: 0, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 0, Y: -depth, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 0, Y: 0, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -59,8 +59,8 @@ func TestABodyWithNoBlocksStaysInTheShaft(t *testing.T) {
 
 	path, err := Find(
 		context.Background(), wellShaft(depth, false), nil, walker,
-		geom.BlockPos{X: 0, Y: -depth, Z: 0}, geom.BlockPos{X: 0, Y: 0, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 0, Y: -depth, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 0, Y: 0, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -76,8 +76,8 @@ func TestPillaringIntoACeilingIsRefused(t *testing.T) {
 
 	path, err := Find(
 		context.Background(), wellShaft(depth, true), nil, pillaring(),
-		geom.BlockPos{X: 0, Y: -depth, Z: 0}, geom.BlockPos{X: 0, Y: 0, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 0, Y: -depth, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 0, Y: 0, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -143,8 +143,8 @@ func TestThePerColumnPillarLimitIsRespected(t *testing.T) {
 
 	path, err := Find(
 		context.Background(), wellShaft(depth, false), nil, capability,
-		geom.BlockPos{X: 0, Y: -depth, Z: 0}, geom.BlockPos{X: 0, Y: 0, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 0, Y: -depth, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 0, Y: 0, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -178,8 +178,8 @@ func TestAGoalOutsideTheVerticalEnvelopeIsUnreachable(t *testing.T) {
 
 	path, err := Find(
 		context.Background(), wellShaft(depth, false), nil, capability,
-		geom.BlockPos{X: 0, Y: -depth, Z: 0}, geom.BlockPos{X: 0, Y: 0, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 0, Y: -depth, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 0, Y: 0, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -207,8 +207,8 @@ func TestAPillarCostsAPlacement(t *testing.T) {
 
 	path, err := Find(
 		context.Background(), wellShaft(3, false), nil, capability,
-		geom.BlockPos{X: 0, Y: -3, Z: 0}, geom.BlockPos{X: 0, Y: 0, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 0, Y: -3, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 0, Y: 0, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}

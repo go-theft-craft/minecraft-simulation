@@ -88,8 +88,8 @@ func TestAnOpenedDoorNeverInvalidatesAnEarlierEdge(t *testing.T) {
 
 	path, err := Find(
 		context.Background(), view, doorFacts{}, capability,
-		geom.BlockPos{X: 0, Y: 0, Z: 0}, geom.BlockPos{X: 6, Y: 0, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 0, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 6, Y: 0, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -164,8 +164,8 @@ func edgeIsStillLegal(t *testing.T, view world.View, capability Capability, edge
 func TestAClosedDoorStopsABodyThatCannotOpenIt(t *testing.T) {
 	path, err := Find(
 		context.Background(), corridorWithDoor(refWoodenDoor, false), doorFacts{}, walker,
-		geom.BlockPos{X: 0, Y: 0, Z: 0}, geom.BlockPos{X: 6, Y: 0, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 0, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 6, Y: 0, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -183,8 +183,8 @@ func TestAClosedDoorStopsABodyThatCannotOpenIt(t *testing.T) {
 func TestAnIronDoorIsNotOpened(t *testing.T) {
 	path, err := Find(
 		context.Background(), corridorWithDoor(refIronDoor, false), doorFacts{}, doorCapability(),
-		geom.BlockPos{X: 0, Y: 0, Z: 0}, geom.BlockPos{X: 6, Y: 0, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 0, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 6, Y: 0, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -210,8 +210,8 @@ func TestAnIronDoorIsRoutedAroundWhenThereIsAWayRound(t *testing.T) {
 
 	path, err := Find(
 		context.Background(), view, doorFacts{}, doorCapability(),
-		geom.BlockPos{X: 0, Y: 0, Z: 0}, geom.BlockPos{X: 6, Y: 0, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 0, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 6, Y: 0, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -232,8 +232,8 @@ func TestADoorCostsItsOwnPrice(t *testing.T) {
 
 	path, err := Find(
 		context.Background(), corridorWithDoor(refWoodenDoor, false), doorFacts{}, capability,
-		geom.BlockPos{X: 0, Y: 0, Z: 0}, geom.BlockPos{X: 6, Y: 0, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 0, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 6, Y: 0, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}

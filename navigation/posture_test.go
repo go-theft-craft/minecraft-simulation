@@ -56,8 +56,8 @@ func bridge() *world.Blocks {
 func TestABodySneaksAcrossALedgeAndStandsElsewhere(t *testing.T) {
 	path, err := Find(
 		context.Background(), bridge(), nil, careful(),
-		geom.BlockPos{X: 0, Y: 0, Z: 0}, geom.BlockPos{X: 5, Y: 0, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 0, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 5, Y: 0, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -94,8 +94,8 @@ func TestABodyThatCannotSneakRefusesTheLedge(t *testing.T) {
 
 	path, err := Find(
 		context.Background(), bridge(), nil, capability,
-		geom.BlockPos{X: 0, Y: 0, Z: 0}, geom.BlockPos{X: 5, Y: 0, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 0, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 5, Y: 0, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -112,8 +112,8 @@ func TestABodyThatCannotSneakRefusesTheLedge(t *testing.T) {
 func TestLedgeAvoidanceIsOffByDefault(t *testing.T) {
 	path, err := Find(
 		context.Background(), bridge(), nil, walker,
-		geom.BlockPos{X: 0, Y: 0, Z: 0}, geom.BlockPos{X: 5, Y: 0, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 0, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 5, Y: 0, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -148,8 +148,8 @@ func gapOneBlockTall() *world.Blocks {
 func TestABodyCrawlsThroughAOneBlockGap(t *testing.T) {
 	path, err := Find(
 		context.Background(), gapOneBlockTall(), nil, crawler(),
-		geom.BlockPos{X: 1, Y: 0, Z: 0}, geom.BlockPos{X: 4, Y: 0, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 1, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 4, Y: 0, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -176,8 +176,8 @@ func TestABodyCrawlsThroughAOneBlockGap(t *testing.T) {
 func TestABodyWithNoCrawlIsStoppedByAOneBlockGap(t *testing.T) {
 	path, err := Find(
 		context.Background(), gapOneBlockTall(), nil, walker,
-		geom.BlockPos{X: 1, Y: 0, Z: 0}, geom.BlockPos{X: 4, Y: 0, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 1, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 4, Y: 0, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -193,8 +193,8 @@ func TestACrawlHeightNoShorterThanTheBodyProducesNothing(t *testing.T) {
 
 	path, err := Find(
 		context.Background(), gapOneBlockTall(), nil, capability,
-		geom.BlockPos{X: 1, Y: 0, Z: 0}, geom.BlockPos{X: 4, Y: 0, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 1, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 4, Y: 0, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -215,7 +215,7 @@ func TestTheCrawlAsymmetryIsAssertedInBothDirections(t *testing.T) {
 	view := gapOneBlockTall()
 	start, goal := geom.BlockPos{X: 1, Y: 0, Z: 0}, geom.BlockPos{X: 4, Y: 0, Z: 0}
 
-	modern, err := Find(context.Background(), view, nil, crawler(), start, goal, wideBudget)
+	modern, err := Find(context.Background(), view, nil, crawler(), start, GoalBlock{Pos: goal}, wideBudget)
 	if err != nil {
 		t.Fatalf("Find with a crawl: %v", err)
 	}
@@ -226,7 +226,7 @@ func TestTheCrawlAsymmetryIsAssertedInBothDirections(t *testing.T) {
 	// 1.8.9 has no crawl. This is not a body that happens to lack the field —
 	// it is the version, and the capability says so by carrying no crawl
 	// height.
-	old, err := Find(context.Background(), view, nil, walker, start, goal, wideBudget)
+	old, err := Find(context.Background(), view, nil, walker, start, GoalBlock{Pos: goal}, wideBudget)
 	if err != nil {
 		t.Fatalf("Find without a crawl: %v", err)
 	}

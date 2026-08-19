@@ -23,7 +23,8 @@ func BenchmarkFindShort(b *testing.B) {
 	b.ReportAllocs()
 	for b.Loop() {
 		if _, err := Find(context.Background(), blocks, nil, walker,
-			geom.BlockPos{X: 0, Y: 0, Z: 0}, goal, benchBudget); err != nil {
+			geom.BlockPos{X: 0, Y: 0, Z: 0}, GoalBlock{Pos: goal},
+			benchBudget); err != nil {
 			b.Fatalf("Find returned an error: %v", err)
 		}
 	}
@@ -36,7 +37,8 @@ func BenchmarkFindLong(b *testing.B) {
 	b.ReportAllocs()
 	for b.Loop() {
 		if _, err := Find(context.Background(), blocks, nil, walker,
-			geom.BlockPos{X: 0, Y: 0, Z: 0}, goal, benchBudget); err != nil {
+			geom.BlockPos{X: 0, Y: 0, Z: 0}, GoalBlock{Pos: goal},
+			benchBudget); err != nil {
 			b.Fatalf("Find returned an error: %v", err)
 		}
 	}
@@ -52,7 +54,8 @@ func BenchmarkFindMaze(b *testing.B) {
 	b.ReportAllocs()
 	for b.Loop() {
 		if _, err := Find(context.Background(), blocks, nil, walker,
-			geom.BlockPos{X: 0, Y: 0, Z: 0}, goal, benchBudget); err != nil {
+			geom.BlockPos{X: 0, Y: 0, Z: 0}, GoalBlock{Pos: goal},
+			benchBudget); err != nil {
 			b.Fatalf("Find returned an error: %v", err)
 		}
 	}
@@ -69,7 +72,8 @@ func BenchmarkPlanCold(b *testing.B) {
 			b.Fatalf("NewPlanner returned an error: %v", err)
 		}
 		if _, err := planner.Plan(context.Background(),
-			geom.BlockPos{X: 0, Y: 0, Z: 0}, goal, benchBudget); err != nil {
+			geom.BlockPos{X: 0, Y: 0, Z: 0}, GoalBlock{Pos: goal},
+			benchBudget); err != nil {
 			b.Fatalf("Plan returned an error: %v", err)
 		}
 	}
@@ -84,14 +88,14 @@ func BenchmarkPlanWarm(b *testing.B) {
 	if err != nil {
 		b.Fatalf("NewPlanner returned an error: %v", err)
 	}
-	if _, err := planner.Plan(context.Background(), from, goal, benchBudget); err != nil {
+	if _, err := planner.Plan(context.Background(), from, GoalBlock{Pos: goal}, benchBudget); err != nil {
 		b.Fatalf("warming Plan returned an error: %v", err)
 	}
 
 	b.ResetTimer()
 	b.ReportAllocs()
 	for b.Loop() {
-		if _, err := planner.Plan(context.Background(), from, goal, benchBudget); err != nil {
+		if _, err := planner.Plan(context.Background(), from, GoalBlock{Pos: goal}, benchBudget); err != nil {
 			b.Fatalf("Plan returned an error: %v", err)
 		}
 	}
@@ -109,7 +113,7 @@ func BenchmarkPlanAfterChange(b *testing.B) {
 	if err != nil {
 		b.Fatalf("NewPlanner returned an error: %v", err)
 	}
-	if _, err := planner.Plan(context.Background(), from, goal, benchBudget); err != nil {
+	if _, err := planner.Plan(context.Background(), from, GoalBlock{Pos: goal}, benchBudget); err != nil {
 		b.Fatalf("warming Plan returned an error: %v", err)
 	}
 
@@ -117,7 +121,7 @@ func BenchmarkPlanAfterChange(b *testing.B) {
 	b.ReportAllocs()
 	for b.Loop() {
 		planner.Observe(changed)
-		if _, err := planner.Plan(context.Background(), from, goal, benchBudget); err != nil {
+		if _, err := planner.Plan(context.Background(), from, GoalBlock{Pos: goal}, benchBudget); err != nil {
 			b.Fatalf("Plan returned an error: %v", err)
 		}
 	}

@@ -57,8 +57,8 @@ func countKind(path Path, kind EdgeKind) int {
 func TestABodyBridgesAGapItCannotJump(t *testing.T) {
 	path, err := Find(
 		context.Background(), wideGap(6), nil, builder(),
-		geom.BlockPos{X: 0, Y: 0, Z: 0}, geom.BlockPos{X: 7, Y: 0, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 0, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 7, Y: 0, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -77,8 +77,8 @@ func TestABodyWithNoBlocksDoesNotBridge(t *testing.T) {
 
 	path, err := Find(
 		context.Background(), wideGap(6), nil, capability,
-		geom.BlockPos{X: 0, Y: 0, Z: 0}, geom.BlockPos{X: 7, Y: 0, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 0, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 7, Y: 0, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -103,8 +103,8 @@ func TestABodyThatCannotPlaceRoutesAsItDidBefore(t *testing.T) {
 	view := wideGap(6)
 	plain, err := Find(
 		context.Background(), view, nil, walker,
-		geom.BlockPos{X: 0, Y: 0, Z: 0}, geom.BlockPos{X: 7, Y: 0, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 0, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 7, Y: 0, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -125,8 +125,8 @@ func TestTheInventoryBoundsTheBridge(t *testing.T) {
 
 	path, err := Find(
 		context.Background(), wideGap(6), nil, capability,
-		geom.BlockPos{X: 0, Y: 0, Z: 0}, geom.BlockPos{X: 7, Y: 0, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 0, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 7, Y: 0, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -151,8 +151,8 @@ func TestAReturnedPathIsSelfConsistent(t *testing.T) {
 		view := wideGap(width)
 		path, err := Find(
 			context.Background(), view, nil, capability,
-			geom.BlockPos{X: 0, Y: 0, Z: 0}, geom.BlockPos{X: width + 1, Y: 0, Z: 0}, wideBudget,
-		)
+			geom.BlockPos{X: 0, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: width + 1, Y: 0, Z: 0}},
+			wideBudget)
 		if err != nil {
 			t.Fatalf("width %d: Find returned an error: %v", width, err)
 		}
@@ -191,9 +191,9 @@ func TestTheValidationLoopTerminates(t *testing.T) {
 		defer close(done)
 		if _, err := Find(
 			context.Background(), blocks, nil, capability,
-			geom.BlockPos{X: 0, Y: 0, Z: 0}, geom.BlockPos{X: 19, Y: 0, Z: 0},
-			Budget{Nodes: 20_000, Ceiling: 20_000},
-		); err != nil {
+			geom.BlockPos{X: 0, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 19, Y: 0, Z: 0}},
+
+			Budget{Nodes: 20_000, Ceiling: 20_000}); err != nil {
 			t.Errorf("Find returned an error: %v", err)
 		}
 	}()

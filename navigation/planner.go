@@ -61,7 +61,7 @@ func NewPlanner(view world.View, facts terrain.Facts, capability Capability, opt
 //
 // It returns what Find returns for the same inputs. The cache changes how long
 // that takes, never what it says.
-func (p *Planner) Plan(ctx context.Context, from, goal geom.BlockPos, budget Budget) (Path, error) {
+func (p *Planner) Plan(ctx context.Context, from geom.BlockPos, goal Goal, budget Budget) (Path, error) {
 	return plan(ctx, p.memo, p.capability, p.view, p.facts, from, goal, budget)
 }
 

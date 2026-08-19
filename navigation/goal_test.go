@@ -1,6 +1,8 @@
 package navigation
 
 import (
+	"context"
+	"errors"
 	"testing"
 
 	"github.com/go-theft-craft/minecraft-simulation/geom"
@@ -147,5 +149,32 @@ func TestGoalAxisMeasuresTheNearestAxisOrDiagonal(t *testing.T) {
 	// nearer than the x axis (8) or the z axis (6).
 	if got := goal.Heuristic(geom.BlockPos{X: 6, Y: 64, Z: 8}); got != 2 {
 		t.Fatalf("Heuristic = %v, want 2", got)
+	}
+}
+
+func TestFindRefusesANilGoal(t *testing.T) {
+	blocks := flat(-2, -2, 2, 2)
+
+	_, err := Find(context.Background(), blocks, nil, walker,
+		geom.BlockPos{}, nil, Budget{Nodes: 100})
+	if !errors.Is(err, ErrNoGoal) {
+		t.Fatalf("err = %v, want ErrNoGoal", err)
+	}
+}
+
+func TestFindReachesAGoalBlockExactlyAsBefore(t *testing.T) {
+	blocks := flat(-8, -8, 8, 8)
+	goal := geom.BlockPos{X: 4, Y: 0, Z: 0}
+
+	path, err := Find(context.Background(), blocks, nil, walker,
+		geom.BlockPos{}, GoalBlock{Pos: goal}, Budget{Nodes: 10_000})
+	if err != nil {
+		t.Fatalf("Find returned an error: %v", err)
+	}
+	if !path.Complete {
+		t.Fatalf("path incomplete, reason %v", path.Reason)
+	}
+	if end := path.End(geom.BlockPos{}); end != goal {
+		t.Fatalf("path ends at %v, want %v", end, goal)
 	}
 }

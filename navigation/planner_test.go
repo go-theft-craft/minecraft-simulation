@@ -16,7 +16,7 @@ func TestPlanEqualsFind(t *testing.T) {
 		goal := geom.BlockPos{X: 11, Y: 0, Z: 11}
 		budget := Budget{Nodes: 5_000, Ceiling: 5_000}
 
-		want, err := Find(context.Background(), blocks, nil, walker, from, goal, budget)
+		want, err := Find(context.Background(), blocks, nil, walker, from, GoalBlock{Pos: goal}, budget)
 		if err != nil {
 			t.Fatalf("seed %d: Find returned an error: %v", seed, err)
 		}
@@ -30,12 +30,12 @@ func TestPlanEqualsFind(t *testing.T) {
 		// cache with answers this route did not ask for.
 		for run := range 3 {
 			if run == 2 {
-				if _, err := planner.Plan(context.Background(), goal, from, budget); err != nil {
+				if _, err := planner.Plan(context.Background(), goal, GoalBlock{Pos: from}, budget); err != nil {
 					t.Fatalf("seed %d: warming Plan returned an error: %v", seed, err)
 				}
 			}
 
-			got, err := planner.Plan(context.Background(), from, goal, budget)
+			got, err := planner.Plan(context.Background(), from, GoalBlock{Pos: goal}, budget)
 			if err != nil {
 				t.Fatalf("seed %d run %d: Plan returned an error: %v", seed, run, err)
 			}
@@ -73,7 +73,7 @@ func TestObserveRestoresCorrectness(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewPlanner returned an error: %v", err)
 	}
-	if _, err := planner.Plan(context.Background(), from, goal, wideBudget); err != nil {
+	if _, err := planner.Plan(context.Background(), from, GoalBlock{Pos: goal}, wideBudget); err != nil {
 		t.Fatalf("Plan returned an error: %v", err)
 	}
 
@@ -84,11 +84,11 @@ func TestObserveRestoresCorrectness(t *testing.T) {
 	}
 	planner.Observe(changed)
 
-	got, err := planner.Plan(context.Background(), from, goal, wideBudget)
+	got, err := planner.Plan(context.Background(), from, GoalBlock{Pos: goal}, wideBudget)
 	if err != nil {
 		t.Fatalf("Plan returned an error: %v", err)
 	}
-	want, err := Find(context.Background(), blocks, nil, walker, from, goal, wideBudget)
+	want, err := Find(context.Background(), blocks, nil, walker, from, GoalBlock{Pos: goal}, wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -112,7 +112,7 @@ func TestWithoutObserveThePlanIsStale(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewPlanner returned an error: %v", err)
 	}
-	if _, err := planner.Plan(context.Background(), from, goal, wideBudget); err != nil {
+	if _, err := planner.Plan(context.Background(), from, GoalBlock{Pos: goal}, wideBudget); err != nil {
 		t.Fatalf("Plan returned an error: %v", err)
 	}
 
@@ -121,7 +121,7 @@ func TestWithoutObserveThePlanIsStale(t *testing.T) {
 	}
 	// Deliberately no Observe call — that is what this test is about.
 
-	stale, err := planner.Plan(context.Background(), from, goal, wideBudget)
+	stale, err := planner.Plan(context.Background(), from, GoalBlock{Pos: goal}, wideBudget)
 	if err != nil {
 		t.Fatalf("Plan returned an error: %v", err)
 	}
@@ -153,13 +153,13 @@ func TestResetDropsTheCache(t *testing.T) {
 	from := geom.BlockPos{X: 0, Y: 0, Z: 0}
 	goal := geom.BlockPos{X: 4, Y: 0, Z: 0}
 
-	if _, err := planner.Plan(context.Background(), from, goal, wideBudget); err != nil {
+	if _, err := planner.Plan(context.Background(), from, GoalBlock{Pos: goal}, wideBudget); err != nil {
 		t.Fatalf("Plan returned an error: %v", err)
 	}
 	planner.Reset()
 	before := planner.memo.misses
 
-	if _, err := planner.Plan(context.Background(), from, goal, wideBudget); err != nil {
+	if _, err := planner.Plan(context.Background(), from, GoalBlock{Pos: goal}, wideBudget); err != nil {
 		t.Fatalf("Plan returned an error: %v", err)
 	}
 	if planner.memo.misses == before {

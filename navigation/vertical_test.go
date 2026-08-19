@@ -68,8 +68,8 @@ func waterShaft(depth int32, fill world.BlockRef, shape geom.Shape) *world.Block
 func TestADeepDropIntoWaterIsTaken(t *testing.T) {
 	path, err := Find(
 		context.Background(), waterShaft(4, refWater, geom.EmptyShape()), verticalFacts{}, swimmer(),
-		geom.BlockPos{X: 1, Y: 0, Z: 0}, geom.BlockPos{X: 2, Y: -8, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 1, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 2, Y: -8, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -86,8 +86,8 @@ func TestADeepDropIntoWaterIsTaken(t *testing.T) {
 func TestTheSameDropOntoStoneIsRefused(t *testing.T) {
 	path, err := Find(
 		context.Background(), waterShaft(0, refWater, geom.EmptyShape()), verticalFacts{}, swimmer(),
-		geom.BlockPos{X: 1, Y: 0, Z: 0}, geom.BlockPos{X: 2, Y: -11, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 1, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 2, Y: -11, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -103,8 +103,8 @@ func TestTheSameDropOntoStoneIsRefused(t *testing.T) {
 func TestShallowWaterDoesNotBreakTheFall(t *testing.T) {
 	path, err := Find(
 		context.Background(), waterShaft(1, refWater, geom.EmptyShape()), verticalFacts{}, swimmer(),
-		geom.BlockPos{X: 1, Y: 0, Z: 0}, geom.BlockPos{X: 2, Y: -11, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 1, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 2, Y: -11, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -121,8 +121,8 @@ func TestACapabilityWithNoLandingDepthDropsNoFurtherThanItsSafeFall(t *testing.T
 
 	path, err := Find(
 		context.Background(), waterShaft(4, refWater, geom.EmptyShape()), verticalFacts{}, capability,
-		geom.BlockPos{X: 1, Y: 0, Z: 0}, geom.BlockPos{X: 2, Y: -8, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 1, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 2, Y: -8, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -166,11 +166,11 @@ func TestALadderIsClimbedInBothDirections(t *testing.T) {
 	view := shaft(6)
 	bottom, top := geom.BlockPos{X: 0, Y: 0, Z: 0}, geom.BlockPos{X: 0, Y: 6, Z: 0}
 
-	up, err := Find(context.Background(), view, verticalFacts{}, climberCapability(), bottom, top, wideBudget)
+	up, err := Find(context.Background(), view, verticalFacts{}, climberCapability(), bottom, GoalBlock{Pos: top}, wideBudget)
 	if err != nil {
 		t.Fatalf("Find up returned an error: %v", err)
 	}
-	down, err := Find(context.Background(), view, verticalFacts{}, climberCapability(), top, bottom, wideBudget)
+	down, err := Find(context.Background(), view, verticalFacts{}, climberCapability(), top, GoalBlock{Pos: bottom}, wideBudget)
 	if err != nil {
 		t.Fatalf("Find down returned an error: %v", err)
 	}
@@ -196,8 +196,8 @@ func TestACapabilityThatCannotClimbDoesNotClimb(t *testing.T) {
 
 	path, err := Find(
 		context.Background(), shaft(6), verticalFacts{}, capability,
-		geom.BlockPos{X: 0, Y: 0, Z: 0}, geom.BlockPos{X: 0, Y: 6, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 0, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 0, Y: 6, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -217,8 +217,8 @@ func TestAClimbCostsItsOwnPrice(t *testing.T) {
 
 	path, err := Find(
 		context.Background(), shaft(6), verticalFacts{}, capability,
-		geom.BlockPos{X: 0, Y: 0, Z: 0}, geom.BlockPos{X: 0, Y: 6, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 0, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 0, Y: 6, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
@@ -243,8 +243,8 @@ func TestNothingClimbsAColumnThatIsNotClimbable(t *testing.T) {
 
 	path, err := Find(
 		context.Background(), view, verticalFacts{}, climberCapability(),
-		geom.BlockPos{X: 0, Y: 0, Z: 0}, geom.BlockPos{X: 0, Y: 6, Z: 0}, wideBudget,
-	)
+		geom.BlockPos{X: 0, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 0, Y: 6, Z: 0}},
+		wideBudget)
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}

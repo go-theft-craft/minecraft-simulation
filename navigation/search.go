@@ -14,6 +14,9 @@ import (
 // everywhere, which would return routes through solid stone.
 var ErrNoBody = errors.New("navigation: a capability needs a body with a width and a height")
 
+// ErrNoGoal reports a nil goal. There is no default destination.
+var ErrNoGoal = errors.New("navigation: a search needs a goal")
+
 // Budget bounds one search.
 //
 // Both bounds exist because they stop different runaways: Nodes stops a search
@@ -53,11 +56,15 @@ func Find(
 	view terrainView,
 	facts terrain.Facts,
 	capability Capability,
-	from, goal geom.BlockPos,
+	from geom.BlockPos,
+	goal Goal,
 	budget Budget,
 ) (Path, error) {
 	if capability.Body.HalfWidth <= 0 || capability.Body.Height <= 0 {
 		return Path{}, ErrNoBody
+	}
+	if goal == nil {
+		return Path{}, ErrNoGoal
 	}
 
 	// Declared as the interface, not as directOracle, so the conversion happens
@@ -85,7 +92,8 @@ func plan(
 	capability Capability,
 	view terrainView,
 	facts terrain.Facts,
-	from, goal geom.BlockPos,
+	from geom.BlockPos,
+	goal Goal,
 	budget Budget,
 ) (Path, error) {
 	// A body that cannot change the world produces no mutating edge, so its
@@ -132,7 +140,8 @@ func search(
 	ctx context.Context,
 	o oracle,
 	capability Capability,
-	from, goal geom.BlockPos,
+	from geom.BlockPos,
+	goal Goal,
 	budget Budget,
 	banned map[Edge]struct{},
 ) (Path, error) {
@@ -142,9 +151,9 @@ func search(
 	cost := map[node]float64{start: 0}
 
 	var open frontier
-	open.push(start, capability.heuristic(from, goal))
+	open.push(start, capability.toward(goal, from))
 
-	best, bestScore := start, capability.heuristic(from, goal)
+	best, bestScore := start, capability.toward(goal, from)
 	reason := ReasonUnreachable
 	expanded := 0
 
@@ -157,7 +166,7 @@ func search(
 		if !ok {
 			break
 		}
-		if current.Pos == goal {
+		if goal.Reached(current.Pos) {
 			best, reason = current, ReasonFound
 
 			break
@@ -171,7 +180,7 @@ func search(
 
 		// The closest node seen is the fallback a partial path is built from,
 		// so an exhausted search still returns progress toward the goal.
-		if score := capability.heuristic(current.Pos, goal); score < bestScore {
+		if score := capability.toward(goal, current.Pos); score < bestScore {
 			best, bestScore = current, score
 		}
 
@@ -204,7 +213,7 @@ func search(
 			}
 			cost[next] = through
 			cameFrom[next] = link{edge: move, parent: current}
-			open.push(next, through+capability.heuristic(next.Pos, goal))
+			open.push(next, through+capability.toward(goal, next.Pos))
 		}
 	}
 
@@ -250,18 +259,14 @@ func assemble(cameFrom map[node]link, cost map[node]float64, start, end node, re
 	}
 }
 
-// heuristic estimates the remaining cost as Manhattan distance scaled by the
-// lowest cost the body can pay per block of that distance.
+// toward scales a goal's bound, in blocks, into ticks by the cheapest cost
+// this capability pays to close one block.
 //
 // The scale is per block closed rather than per edge because a step and a fall
 // each close two blocks at once. It never overestimates, which is what keeps
 // the search returning shortest paths.
-func (c Capability) heuristic(from, goal geom.BlockPos) float64 {
-	distance := math.Abs(float64(goal.X-from.X)) +
-		math.Abs(float64(goal.Y-from.Y)) +
-		math.Abs(float64(goal.Z-from.Z))
-
-	return distance * c.perBlockFloor()
+func (c Capability) toward(goal Goal, pos geom.BlockPos) float64 {
+	return goal.Heuristic(pos) * c.perBlockFloor()
 }
 
 // expand returns every edge leaving a node, in the fixed neighbour order.

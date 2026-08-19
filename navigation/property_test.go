@@ -406,9 +406,8 @@ func findPathWith(t *testing.T, blocks *world.Blocks, capability Capability) Pat
 
 	path, err := Find(
 		context.Background(), blocks, nil, capability,
-		geom.BlockPos{X: 0, Y: 0, Z: 0}, geom.BlockPos{X: 11, Y: 0, Z: 11},
-		Budget{Nodes: 5_000, Ceiling: 5_000},
-	)
+		geom.BlockPos{X: 0, Y: 0, Z: 0}, GoalBlock{Pos: geom.BlockPos{X: 11, Y: 0, Z: 11}},
+		Budget{Nodes: 5_000, Ceiling: 5_000})
 	if err != nil {
 		t.Fatalf("Find returned an error: %v", err)
 	}
