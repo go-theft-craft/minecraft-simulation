@@ -178,3 +178,64 @@ func TestFindReachesAGoalBlockExactlyAsBefore(t *testing.T) {
 		t.Fatalf("path ends at %v, want %v", end, goal)
 	}
 }
+
+func TestFindStopsAnywhereInsideGoalNear(t *testing.T) {
+	blocks := flat(-8, -8, 8, 8)
+	center := geom.BlockPos{X: 6, Y: 0, Z: 0}
+
+	path, err := Find(context.Background(), blocks, nil, walker,
+		geom.BlockPos{}, GoalNear{Pos: center, Radius: 2}, Budget{Nodes: 10_000})
+	if err != nil {
+		t.Fatalf("Find returned an error: %v", err)
+	}
+	if !path.Complete {
+		t.Fatalf("path incomplete, reason %v", path.Reason)
+	}
+	end := path.End(geom.BlockPos{})
+	if euclidean(end, center) > 2 {
+		t.Fatalf("path ends at %v, outside the radius", end)
+	}
+	if end == center {
+		t.Fatal("path walked all the way to the center; the radius is the point")
+	}
+}
+
+func TestFindFleesEverySourceOfGoalRunAway(t *testing.T) {
+	blocks := flat(-16, -16, 16, 16)
+	sources := []geom.BlockPos{{X: 2}, {X: -2}}
+
+	path, err := Find(context.Background(), blocks, nil, walker,
+		geom.BlockPos{}, GoalRunAway{From: sources, Distance: 6}, Budget{Nodes: 10_000})
+	if err != nil {
+		t.Fatalf("Find returned an error: %v", err)
+	}
+	if !path.Complete {
+		t.Fatalf("path incomplete, reason %v", path.Reason)
+	}
+	end := path.End(geom.BlockPos{})
+	for _, source := range sources {
+		if euclidean(end, source) < 6 {
+			t.Fatalf("path ends at %v, still within 6 of %v", end, source)
+		}
+	}
+}
+
+func TestFindSpendsItsBudgetFleeingAnInvertedGoal(t *testing.T) {
+	blocks := flat(-16, -16, 16, 16)
+	home := geom.BlockPos{}
+
+	path, err := Find(context.Background(), blocks, nil, walker,
+		home, GoalInverted{Goal: GoalBlock{Pos: home}}, Budget{Nodes: 500})
+	if err != nil {
+		t.Fatalf("Find returned an error: %v", err)
+	}
+	if path.Complete {
+		t.Fatal("an inverted goal can never complete")
+	}
+	if path.Reason != ReasonBudget {
+		t.Fatalf("reason = %v, want budget: fleeing runs until stopped", path.Reason)
+	}
+	if end := path.End(home); manhattan(end, home) == 0 {
+		t.Fatal("the partial path went nowhere")
+	}
+}
