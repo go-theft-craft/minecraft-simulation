@@ -146,7 +146,7 @@ func arrivalIsLegal(o directOracle, edge Edge) (bool, error) {
 		passable, err := o.passableThroughDoor(edge.To)
 
 		return passable == terrainClear, err
-	case EdgePlace, EdgePillar:
+	case EdgePlace, EdgePillar, EdgeDig:
 		// A mutating edge is legal against the world as its own route leaves
 		// it, not against the untouched one this property reads. Find has
 		// already validated it forward through an overlay, and
@@ -357,11 +357,26 @@ func capabilities() []named {
 	full.PlacedBlock = refStone
 	full.MaxPillarHeight = 8
 
+	// The maze's walls are set as shapes without handles, so a breaker keyed
+	// by handle would price none of them and the dig edges would never appear
+	// in any property. This one prices whatever it is shown, which is what
+	// puts EdgeDig under the contiguity, self-consistency, and determinism
+	// properties alongside every other kind.
+	tooled := full
+	tooled.Breaker = flatBreaker(41)
+	tooled.DigBudget = 8
+
 	return []named{
 		{name: "the shipped body", value: walker},
 		{name: "every behaviour on", value: full},
+		{name: "every behaviour on, with a tool", value: tooled},
 	}
 }
+
+// flatBreaker prices every block the same, whatever its handle.
+type flatBreaker float64
+
+func (f flatBreaker) BreakTicks(world.BlockRef) (float64, bool) { return float64(f), true }
 
 // TestSearchesAreReproducible is the determinism gate. Go randomizes map
 // iteration, so a search that let map order reach an output would return a
