@@ -228,6 +228,30 @@ func (m *memoOracle) passableThroughDoor(cell geom.BlockPos) (terrain.Passabilit
 	return query.Passable(cell)
 }
 
+// passableAfterDig implements oracle. It is uncached for the reason
+// passableThroughDoor is: the answer depends on cells being masked, so it is
+// not the same question as passable and could not share that cache.
+func (m *memoOracle) passableAfterDig(cell geom.BlockPos, span []geom.BlockPos) (terrain.Passability, error) {
+	query := m.query
+	query.View = dugView{view: m.recorder, span: span}
+
+	return query.Passable(cell)
+}
+
+// arriveAfterDig implements oracle. It is uncached for the reason
+// passableAfterDig is.
+func (m *memoOracle) arriveAfterDig(cell geom.BlockPos, span []geom.BlockPos) (arrival, error) {
+	query := m.query
+	query.View = dugView{view: m.recorder, span: span}
+
+	return m.capability.arrivalAt(query, cell)
+}
+
+// breakTicks implements oracle. It is uncached for the reason fluidAt is.
+func (m *memoOracle) breakTicks(cell geom.BlockPos) (float64, bool, error) {
+	return breakTicksThrough(m.recorder, m.capability, cell)
+}
+
 // hazardous implements oracle. It is uncached for the reason fluidAt is: it
 // is one block lookup through the recording view, not a collision sweep.
 func (m *memoOracle) hazardous(cell geom.BlockPos) (bool, error) {

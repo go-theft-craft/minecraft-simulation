@@ -14,12 +14,14 @@ type terrainView = world.View
 
 // EdgeKind names one way of getting from one cell to the next.
 //
-// The design also specifies Dig, Support, and Collapse. They are absent rather
-// than stubbed: each needs a number a milestone still owes — break times for
-// the first, placement legality and a falling-column trace for the other two —
-// and a kind that exists but is never produced is a kind a caller will switch
-// on and be wrong about. A body that mines at a plausible-looking wrong speed
-// is worse than one that refuses to mine.
+// The design also specifies Support and Collapse. They are absent rather than
+// stubbed: each needs a number a milestone still owes — placement legality and
+// a falling-column trace — and a kind that exists but is never produced is a
+// kind a caller will switch on and be wrong about. Dig was absent for the same
+// reason until M9.4 measured break times against both jars; it is here now,
+// and it is produced only for a body whose Breaker can say how long a block
+// takes. A body that mines at a plausible-looking wrong speed is worse than
+// one that refuses to mine.
 //
 // Values are appended, never inserted. A kind's number reaches a recorded path,
 // so renumbering one would make every recording taken before the change
@@ -75,6 +77,18 @@ const (
 	//
 	// The block goes into the edge's From cell.
 	EdgePillar
+	// EdgeDig enters a blocked cell by breaking what is in the way.
+	//
+	// It clears the cells the body would occupy standing in To — its whole
+	// span, because a two-block body walking into a filled column needs both
+	// of them gone. Like the placing edges, the cells are derived from the
+	// destination and the body rather than carried: a caller reading a path
+	// knows which cells were broken from where the body ended up and how tall
+	// it is.
+	//
+	// It is produced only for a destination the body could not otherwise
+	// enter, so it never competes with a plain walk over the same cell.
+	EdgeDig
 )
 
 // String returns the kind's name.
@@ -100,6 +114,8 @@ func (e EdgeKind) String() string {
 		return "place"
 	case EdgePillar:
 		return "pillar"
+	case EdgeDig:
+		return "dig"
 	default:
 		return fmt.Sprintf("EdgeKind(%d)", uint8(e))
 	}

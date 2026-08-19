@@ -112,6 +112,7 @@ func (c Capability) validate(
 	}
 
 	placed := 0
+	broke := 0
 	column := make(map[geom.BlockPos]int)
 
 	for _, edge := range path.Edges {
@@ -121,6 +122,31 @@ func (c Capability) validate(
 		}
 		if !legal {
 			return edge, true, nil
+		}
+
+		if dug, digs := removalOf(c.Body, edge); digs {
+			for _, cell := range dug {
+				// Already a hole, from this route's own earlier edge: the
+				// spans of two dig edges in the same column overlap, and
+				// charging the second one for a break the first made would
+				// price a tunnel by its length twice over.
+				if overlay.Broken(cell) {
+					continue
+				}
+				if _, lookup := overlay.CollisionShape(cell); lookup == world.LookupAir {
+					continue
+				}
+
+				broke++
+				if c.DigBudget > 0 && broke > c.DigBudget {
+					// Out of digging. Banning the edge is what makes the next
+					// search find a route that fits the budget.
+					return edge, true, nil
+				}
+				overlay.Break(cell)
+			}
+
+			continue
 		}
 
 		block, mutates := placementOf(edge)
@@ -159,11 +185,29 @@ func placementOf(edge Edge) (geom.BlockPos, bool) {
 		return geom.BlockPos{X: edge.To.X, Y: edge.To.Y - 1, Z: edge.To.Z}, true
 	case EdgePillar:
 		return edge.From, true
-	case EdgeWalk, EdgeStep, EdgeFall, EdgeSwim, EdgeJumpGap, EdgeWaterDrop, EdgeClimb, EdgeDoor:
+	case EdgeWalk, EdgeStep, EdgeFall, EdgeSwim, EdgeJumpGap, EdgeWaterDrop, EdgeClimb, EdgeDoor, EdgeDig:
 		return geom.BlockPos{}, false
 	}
 
 	return geom.BlockPos{}, false
+}
+
+// removalOf returns the cells an edge digs out, and whether it digs any.
+//
+// Derived rather than carried, for the reason placementOf's cell is: the cells
+// are fixed by the geometry — a dig clears the span the body will stand in —
+// so putting them on Edge would be storing what can be recomputed and letting
+// the two disagree.
+func removalOf(body terrain.Body, edge Edge) ([]geom.BlockPos, bool) {
+	switch edge.Kind {
+	case EdgeDig:
+		return spanOf(body, edge.To), true
+	case EdgeWalk, EdgeStep, EdgeFall, EdgeSwim, EdgeJumpGap, EdgeWaterDrop,
+		EdgeClimb, EdgeDoor, EdgePlace, EdgePillar:
+		return nil, false
+	}
+
+	return nil, false
 }
 
 // edgeHolds re-checks one edge's destination against the world as it now
@@ -189,6 +233,12 @@ func (c Capability) edgeHolds(o directOracle, edge Edge) (bool, error) {
 		}
 
 		return o.placeable(edge.From)
+	case EdgeDig:
+		// The cells are still filled — the break has not happened yet — so
+		// what has to hold is that clearing them still opens the way.
+		passable, err := o.passableAfterDig(edge.To, spanOf(c.Body, edge.To))
+
+		return passable == terrain.Clear, err
 	case EdgeWalk, EdgeStep, EdgeFall, EdgeSwim, EdgeJumpGap, EdgeWaterDrop:
 		passable, err := o.passable(edge.To)
 
@@ -201,7 +251,9 @@ func (c Capability) edgeHolds(o directOracle, edge Edge) (bool, error) {
 // mutates reports whether this body can change the world at all, which is what
 // decides whether a search needs validating.
 //
-// A body that cannot place produces no mutating edge, so its path cannot be
-// self-inconsistent and the loop is skipped entirely. That is what keeps the
+// A body that can neither place nor break produces no mutating edge, so its
+// path cannot be self-inconsistent and the loop is skipped entirely. That is what keeps the
 // read-only search exactly as fast and exactly as deterministic as it was.
-func (c Capability) mutates() bool { return c.CanPlace && c.BlockBudget > 0 }
+func (c Capability) mutates() bool {
+	return (c.CanPlace && c.BlockBudget > 0) || c.Breaker != nil
+}

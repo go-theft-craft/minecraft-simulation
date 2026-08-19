@@ -46,6 +46,26 @@ type oracle interface {
 	// passableThroughDoor classifies a cell as it would be with the door in it
 	// swung open.
 	passableThroughDoor(cell geom.BlockPos) (terrain.Passability, error)
+	// passableAfterDig classifies a cell as it would be with the span cleared.
+	//
+	// It is the door's question for a different mask: the ordinary rules over
+	// a view that answers air for the cells the dig breaks. Passing the span
+	// rather than deriving it keeps the builder's one computation of it, so
+	// the cost and the legality are answered about the same cells.
+	passableAfterDig(cell geom.BlockPos, span []geom.BlockPos) (terrain.Passability, error)
+	// arriveAfterDig reports whether the body may come to rest in a cell once
+	// the span is cleared, and how. It is arriveAt's question over the same
+	// mask passableAfterDig uses, because a cell that a break opens still has
+	// to be somewhere this body may stand: a dug-out doorway over lava is
+	// passable and is not somewhere to arrive.
+	arriveAfterDig(cell geom.BlockPos, span []geom.BlockPos) (arrival, error)
+	// breakTicks reports how long the block in a cell takes to break, and
+	// whether it can be broken at all.
+	//
+	// An undescribed cell cannot: a body that dug through what nobody has
+	// described would be pricing a break against a block that might not be
+	// there.
+	breakTicks(cell geom.BlockPos) (float64, bool, error)
 	// hazardous reports whether the cell itself holds a hazard. An
 	// undescribed cell is not hazardous: geometry already refuses to route
 	// through what nobody has described, and charging a penalty for the
@@ -126,6 +146,31 @@ func (d directOracle) passableThroughDoor(cell geom.BlockPos) (terrain.Passabili
 	return query.Passable(cell)
 }
 
+// passableAfterDig implements oracle.
+//
+// The masked query is built per call rather than kept, for the reason
+// passableThroughDoor's is: the mask names the cells of one destination, and
+// keeping one would mean keeping one per cell the search considers breaking.
+func (d directOracle) passableAfterDig(cell geom.BlockPos, span []geom.BlockPos) (terrain.Passability, error) {
+	query := d.query
+	query.View = dugView{view: d.query.View, span: span}
+
+	return query.Passable(cell)
+}
+
+// arriveAfterDig implements oracle.
+func (d directOracle) arriveAfterDig(cell geom.BlockPos, span []geom.BlockPos) (arrival, error) {
+	query := d.query
+	query.View = dugView{view: d.query.View, span: span}
+
+	return d.capability.arrivalAt(query, cell)
+}
+
+// breakTicks implements oracle.
+func (d directOracle) breakTicks(cell geom.BlockPos) (float64, bool, error) {
+	return breakTicksThrough(d.query.View, d.capability, cell)
+}
+
 // hazardous implements oracle.
 func (d directOracle) hazardous(cell geom.BlockPos) (bool, error) {
 	hazard, lookup, err := d.query.HazardAt(cell)
@@ -149,6 +194,26 @@ func (d directOracle) climbable(cell geom.BlockPos) (bool, error) {
 	}
 
 	return climbable, nil
+}
+
+// breakTicksThrough is the shared rule behind every oracle's breakTicks.
+//
+// A body with no breaker breaks nothing, which is the same answer as a block
+// that cannot be broken: the search produces no dig edge either way, and the
+// caller that wanted one is the caller that supplies a breaker.
+func breakTicksThrough(view world.View, capability Capability, cell geom.BlockPos) (float64, bool, error) {
+	if capability.Breaker == nil {
+		return 0, false, nil
+	}
+
+	ref, lookup := view.BlockState(cell)
+	if lookup == world.LookupUnknown {
+		return 0, false, nil
+	}
+
+	ticks, ok := capability.Breaker.BreakTicks(ref)
+
+	return ticks, ok, nil
 }
 
 // isPlaceable is the shared rule behind every oracle's placeable.

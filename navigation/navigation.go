@@ -107,6 +107,22 @@ func (p Posture) String() string {
 	}
 }
 
+// Breaker answers how long a body takes to break one block.
+//
+// It is an interface this package declares rather than a dependency on mining,
+// because mining imports sim and nothing in navigation does — that separation
+// is what lets the search be tested without a tick loop. A caller holds the
+// three things the answer depends on (the held tool, the effects, and the
+// version profile), closes over all of them, and answers per block handle.
+//
+// The bool is "can this be broken at all". mining reports that as
+// ErrUnbreakable, which is a fact about bedrock rather than a failure, so the
+// seam takes it as an answer and leaves the error for things that really went
+// wrong.
+type Breaker interface {
+	BreakTicks(ref world.BlockRef) (float64, bool)
+}
+
 // Capability is what one body can do and what each thing costs it.
 //
 // A mob is this value with CanSwim false; it gets a ground navigator out of
@@ -254,6 +270,24 @@ type Capability struct {
 	// CandidateLimit bounds one terrain query's collision sweep. A
 	// non-positive value means no limit.
 	CandidateLimit int
+	// Breaker answers how long this body takes to break a block, and whether
+	// it can at all. A nil breaker is a body with no tool: it produces no dig
+	// edge and the search is exactly what it was.
+	//
+	// There is no CanDig flag beside it, deliberately. A nil breaker cannot
+	// answer the question, and a non-nil one is a caller saying it holds
+	// something to dig with; a second knob would only let the two disagree.
+	Breaker Breaker
+	// DigBudget bounds how many cells one route may break. A non-positive
+	// value means no bound.
+	//
+	// It is not BlockBudget's twin, and the difference is the point: a placed
+	// block is consumed from a finite stack, so running out is a state the
+	// search has to model, while a pickaxe does not run out part-way along a
+	// route in any way the search can see. This budget exists because a caller
+	// that does not want a tunnel driven through a mountain needs a way to say
+	// so, and cost alone does not say it.
+	DigBudget int
 	// HazardPenalty is added to the cost of any edge arriving in a cell with
 	// a hazardous horizontal neighbour, in ticks. Zero means hazards beside
 	// the route cost nothing, which is exactly the search before this field

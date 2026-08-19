@@ -383,6 +383,15 @@ func (c Capability) expand(o oracle, from node) ([]Edge, error) {
 	}
 	edges = append(edges, pillars...)
 
+	// Digging is last for the reason placing is: a body with no breaker
+	// expands exactly what it did before this existed, in exactly the order it
+	// did.
+	dug, err := c.digs(o, from)
+	if err != nil {
+		return nil, err
+	}
+	edges = append(edges, dug...)
+
 	if c.HazardPenalty > 0 {
 		for i := range edges {
 			near, err := hazardBeside(o, edges[i].To)
