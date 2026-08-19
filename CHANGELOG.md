@@ -16,6 +16,16 @@ This file records notable user-visible changes. It follows [Keep a Changelog](ht
 
 ### Added
 
+- `navigation`: `EdgeDig` — a body that carries a tool enters a blocked cell by
+  breaking what is in the way, priced at the walk it replaces plus the break
+  time of every cell of its span that is still filled. `Capability.Breaker` is
+  the seam: an interface this package declares rather than a dependency on
+  `mining`, because `mining` imports `sim` and nothing in `navigation` does. A
+  caller closes over its held tool, its effects, and its version profile and
+  answers per block handle; `mining.BreakTicks` is what it answers from.
+  `Capability.DigBudget` bounds a route's holes. With `Breaker` nil — the
+  default — the search is exactly what it was, to the allocation.
+
 - `navigation`: `Capability.HazardPenalty` charges edges that arrive beside a
   hazard, in ticks. Zero — the default — is the search exactly as it was;
   a positive value makes a route one lane away from lava beat the rim walk.

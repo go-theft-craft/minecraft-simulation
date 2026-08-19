@@ -2,6 +2,15 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use `subagent-driven-development` (recommended) or `executing-plans` to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+> **Status: complete, 2026-08-19.** `task verify` is green and the benchmarks
+> are unchanged to the allocation on the nil-breaker path. Two deviations:
+> Tasks 1 through 4 landed as one commit, because the exhaustive lint rejects
+> an `EdgeKind` whose switches do not handle it and so the kind, its cases, and
+> its producer cannot land apart; and the oracle grew a third question,
+> `arriveAfterDig`, that the plan did not name — `passableAfterDig` says the
+> body fits and is held up, not that the cell is somewhere it may rest, and a
+> dug doorway over lava is passable. Task 5's consumer note stands open.
+
 **Goal:** Add `EdgeDig` to the navigation vocabulary: a body that carries a tool routes through a blocked cell by breaking what is in its way, at the break time the `mining` package computes, and the winning route is validated against the holes it made.
 
 **Parent spec:** `headless-minecraft/docs/superpowers/specs/2026-08-18-baritone-adoption-design.md`, stage 2. It follows stage 1 (goals and hazard costs), which is complete.
@@ -89,11 +98,11 @@ Go, Devbox, Task. Repository: `minecraft-simulation`, package `navigation`.
 - Modify: `navigation/navigation.go` (`Breaker`, `Capability.Breaker`, `Capability.DigBudget`)
 - Create: `navigation/dig_test.go`
 
-- [ ] **Step 1:** Test that `EdgeDig.String()` is `"dig"` and that it is numbered after `EdgePillar`, in the style of `edge_test.go`'s existing kind test.
-- [ ] **Step 2:** Run, watch it fail on `undefined: EdgeDig`.
-- [ ] **Step 3:** Append `EdgeDig` to the `EdgeKind` block with a doc comment saying what it clears and why the cells are derived; add the `String` case; delete the sentence in the `EdgeKind` comment that says Dig is absent, and leave Support and Collapse named there. Declare `Breaker` and the two `Capability` fields.
-- [ ] **Step 4:** Run, watch it pass.
-- [ ] **Step 5:** Commit.
+- [x] **Step 1:** Test that `EdgeDig.String()` is `"dig"` and that it is numbered after `EdgePillar`, in the style of `edge_test.go`'s existing kind test.
+- [x] **Step 2:** Run, watch it fail on `undefined: EdgeDig`.
+- [x] **Step 3:** Append `EdgeDig` to the `EdgeKind` block with a doc comment saying what it clears and why the cells are derived; add the `String` case; delete the sentence in the `EdgeKind` comment that says Dig is absent, and leave Support and Collapse named there. Declare `Breaker` and the two `Capability` fields.
+- [x] **Step 4:** Run, watch it pass.
+- [x] **Step 5:** Commit.
 
 ---
 
@@ -108,11 +117,11 @@ Go, Devbox, Task. Repository: `minecraft-simulation`, package `navigation`.
 **Interfaces:**
 - Produces: `func spanOf(body terrain.Body, cell geom.BlockPos) []geom.BlockPos`; `type dugView struct{ view world.View; span []geom.BlockPos }`; oracle methods `passableAfterDig(cell geom.BlockPos, span []geom.BlockPos) (terrain.Passability, error)` and `breakTicks(cell geom.BlockPos) (float64, bool, error)`.
 
-- [ ] **Step 1:** Test that `spanOf` returns two cells for a 1.8-tall body and three for a 2.5-tall one, and that `dugView` answers air for a span cell and defers for every other — including leaving an undescribed cell undescribed.
-- [ ] **Step 2:** Run, watch it fail.
-- [ ] **Step 3:** Implement. `spanOf` is `cell.Y` through `cell.Y + ceil(Height) - 1`. `dugView` mirrors `openedView`: `CollisionShape` masks a covered, described cell to `geom.EmptyShape()`/`world.LookupAir`, `BlockState` tells the truth. `passableAfterDig` builds the masked query per call, as `passableThroughDoor` does and for the same reason. `breakTicks` reads `BlockState`, refuses an unknown lookup, and asks the capability's `Breaker`. Both are uncached on `memoOracle`, for the reason `fluidAt` is: a single block lookup, not a collision sweep.
-- [ ] **Step 4:** Run, watch it pass.
-- [ ] **Step 5:** Commit.
+- [x] **Step 1:** Test that `spanOf` returns two cells for a 1.8-tall body and three for a 2.5-tall one, and that `dugView` answers air for a span cell and defers for every other — including leaving an undescribed cell undescribed.
+- [x] **Step 2:** Run, watch it fail.
+- [x] **Step 3:** Implement. `spanOf` is `cell.Y` through `cell.Y + ceil(Height) - 1`. `dugView` mirrors `openedView`: `CollisionShape` masks a covered, described cell to `geom.EmptyShape()`/`world.LookupAir`, `BlockState` tells the truth. `passableAfterDig` builds the masked query per call, as `passableThroughDoor` does and for the same reason. `breakTicks` reads `BlockState`, refuses an unknown lookup, and asks the capability's `Breaker`. Both are uncached on `memoOracle`, for the reason `fluidAt` is: a single block lookup, not a collision sweep.
+- [x] **Step 4:** Run, watch it pass.
+- [x] **Step 5:** Commit.
 
 ---
 
@@ -123,11 +132,11 @@ Go, Devbox, Task. Repository: `minecraft-simulation`, package `navigation`.
 - Modify: `navigation/search.go` (`expand` calls it)
 - Modify: `navigation/dig_test.go`
 
-- [ ] **Step 1:** Tests: a wall of one breakable block across a corridor is routed through by a body with a breaker and around by one without; the dig edge's cost is the walk cost plus the break time of every cell it clears; an unbreakable wall (the breaker answers false) produces no dig edge; a body whose `DigBudget` is smaller than the wall is thick still finds no route through it.
-- [ ] **Step 2:** Run, watch them fail.
-- [ ] **Step 3:** Implement `digs(o, from)`: for each of the four horizontal neighbours, when `passable` is not `Clear`, compute the span, ask `breakTicks` for each span cell that is not already clear, and refuse the edge if any answers "never". Then ask `passableAfterDig` for the destination and produce an `EdgeDig` at `WalkTicks` plus the sum when it says `Clear`. `expand` calls `digs` only when `c.Breaker != nil`, so the read-only search pays nothing.
-- [ ] **Step 4:** Run, watch them pass. Run the benchmarks and confirm the nil-breaker path is unchanged.
-- [ ] **Step 5:** Commit.
+- [x] **Step 1:** Tests: a wall of one breakable block across a corridor is routed through by a body with a breaker and around by one without; the dig edge's cost is the walk cost plus the break time of every cell it clears; an unbreakable wall (the breaker answers false) produces no dig edge; a body whose `DigBudget` is smaller than the wall is thick still finds no route through it.
+- [x] **Step 2:** Run, watch them fail.
+- [x] **Step 3:** Implement `digs(o, from)`: for each of the four horizontal neighbours, when `passable` is not `Clear`, compute the span, ask `breakTicks` for each span cell that is not already clear, and refuse the edge if any answers "never". Then ask `passableAfterDig` for the destination and produce an `EdgeDig` at `WalkTicks` plus the sum when it says `Clear`. `expand` calls `digs` only when `c.Breaker != nil`, so the read-only search pays nothing.
+- [x] **Step 4:** Run, watch them pass. Run the benchmarks and confirm the nil-breaker path is unchanged.
+- [x] **Step 5:** Commit.
 
 ---
 
@@ -138,11 +147,11 @@ Go, Devbox, Task. Repository: `minecraft-simulation`, package `navigation`.
 - Modify: `navigation/place.go` (`removalOf`, `validate`, `edgeHolds`, `mutates`)
 - Modify: `navigation/dig_test.go`
 
-- [ ] **Step 1:** Tests: a route that digs through a wall and then walks over the cell it dug is caught by validation and re-searched (the ban loop already exists — this asserts a dig participates in it); `mutates` is true for a breaker-only body; the count of broken cells is charged against `DigBudget` across the whole route rather than per edge.
-- [ ] **Step 2:** Run, watch them fail.
-- [ ] **Step 3:** Implement. `Overlay.Break(pos)` records a hole in a second map that `CollisionShape` and `BlockState` consult; `Remove`'s comment loses the sentence about dig edges not being built. `removalOf(edge)` returns the span for `EdgeDig` and nothing for every other kind, in the shape `placementOf` already has — including its exhaustive `case` list, so a new kind fails to compile rather than falling through. `validate` counts broken cells against `DigBudget` and replays them into the overlay. `edgeHolds` gains an `EdgeDig` case asking `passableAfterDig`. `mutates` becomes `(CanPlace && BlockBudget > 0) || Breaker != nil`.
-- [ ] **Step 4:** Run the package suite and `task determinism`.
-- [ ] **Step 5:** Commit.
+- [x] **Step 1:** Tests: a route that digs through a wall and then walks over the cell it dug is caught by validation and re-searched (the ban loop already exists — this asserts a dig participates in it); `mutates` is true for a breaker-only body; the count of broken cells is charged against `DigBudget` across the whole route rather than per edge.
+- [x] **Step 2:** Run, watch them fail.
+- [x] **Step 3:** Implement. `Overlay.Break(pos)` records a hole in a second map that `CollisionShape` and `BlockState` consult; `Remove`'s comment loses the sentence about dig edges not being built. `removalOf(edge)` returns the span for `EdgeDig` and nothing for every other kind, in the shape `placementOf` already has — including its exhaustive `case` list, so a new kind fails to compile rather than falling through. `validate` counts broken cells against `DigBudget` and replays them into the overlay. `edgeHolds` gains an `EdgeDig` case asking `passableAfterDig`. `mutates` becomes `(CanPlace && BlockBudget > 0) || Breaker != nil`.
+- [x] **Step 4:** Run the package suite and `task determinism`.
+- [x] **Step 5:** Commit.
 
 ---
 
@@ -152,7 +161,7 @@ Go, Devbox, Task. Repository: `minecraft-simulation`, package `navigation`.
 - Modify: `CHANGELOG.md` (Unreleased)
 - Modify: this plan (status header, checkboxes)
 
-- [ ] **Step 1:** Changelog entry under the existing Unreleased section, in the house style: `EdgeDig`, the `Breaker` seam and why it is an interface rather than a `mining` import, and `DigBudget`.
-- [ ] **Step 2:** `devbox run -- task verify`.
-- [ ] **Step 3:** Commit.
-- [ ] **Step 4:** Consumer note, recorded and **not acted on here**: a caller that wants digging builds a `Breaker` from `mining.BreakTicks` and its version's `mining.Classifier`. That adapter belongs in the consumer, next to where the held item and the effects live, and `headless-minecraft` owns writing it. Nothing in this repository ships one, so nothing in this repository proves the two halves meet — say so when tagging.
+- [x] **Step 1:** Changelog entry under the existing Unreleased section, in the house style: `EdgeDig`, the `Breaker` seam and why it is an interface rather than a `mining` import, and `DigBudget`.
+- [x] **Step 2:** `devbox run -- task verify`.
+- [x] **Step 3:** Commit.
+- [x] **Step 4:** Consumer note, recorded and **not acted on here**: a caller that wants digging builds a `Breaker` from `mining.BreakTicks` and its version's `mining.Classifier`. That adapter belongs in the consumer, next to where the held item and the effects live, and `headless-minecraft` owns writing it. Nothing in this repository ships one, so nothing in this repository proves the two halves meet — say so when tagging.
