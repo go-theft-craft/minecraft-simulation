@@ -228,6 +228,17 @@ func (m *memoOracle) passableThroughDoor(cell geom.BlockPos) (terrain.Passabilit
 	return query.Passable(cell)
 }
 
+// hazardous implements oracle. It is uncached for the reason fluidAt is: it
+// is one block lookup through the recording view, not a collision sweep.
+func (m *memoOracle) hazardous(cell geom.BlockPos) (bool, error) {
+	hazard, lookup, err := m.query.HazardAt(cell)
+	if err != nil || lookup == world.LookupUnknown {
+		return false, err
+	}
+
+	return hazard != terrain.HazardNone, nil
+}
+
 // placeable implements oracle. It is uncached for the reason fluidAt is.
 func (m *memoOracle) placeable(cell geom.BlockPos) (bool, error) {
 	return isPlaceable(m.recorder, cell)

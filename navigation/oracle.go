@@ -46,6 +46,11 @@ type oracle interface {
 	// passableThroughDoor classifies a cell as it would be with the door in it
 	// swung open.
 	passableThroughDoor(cell geom.BlockPos) (terrain.Passability, error)
+	// hazardous reports whether the cell itself holds a hazard. An
+	// undescribed cell is not hazardous: geometry already refuses to route
+	// through what nobody has described, and charging a penalty for the
+	// unknown would double-count that caution.
+	hazardous(cell geom.BlockPos) (bool, error)
 	// placeable reports whether a block may be put in a cell: the view
 	// describes it and nothing is there.
 	//
@@ -119,6 +124,16 @@ func (d directOracle) passableThroughDoor(cell geom.BlockPos) (terrain.Passabili
 	query.View = openedView{view: d.query.View, door: cell}
 
 	return query.Passable(cell)
+}
+
+// hazardous implements oracle.
+func (d directOracle) hazardous(cell geom.BlockPos) (bool, error) {
+	hazard, lookup, err := d.query.HazardAt(cell)
+	if err != nil || lookup == world.LookupUnknown {
+		return false, err
+	}
+
+	return hazard != terrain.HazardNone, nil
 }
 
 // placeable implements oracle.

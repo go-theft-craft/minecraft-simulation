@@ -254,6 +254,17 @@ type Capability struct {
 	// CandidateLimit bounds one terrain query's collision sweep. A
 	// non-positive value means no limit.
 	CandidateLimit int
+	// HazardPenalty is added to the cost of any edge arriving in a cell with
+	// a hazardous horizontal neighbour, in ticks. Zero means hazards beside
+	// the route cost nothing, which is exactly the search before this field
+	// existed.
+	//
+	// It is a penalty rather than a refusal: the cell itself is legal —
+	// arrivalAt already refuses a hazardous one outright — but a body walking
+	// the rim of a lava lake pays for every step it spends there, so a route
+	// one lane over wins whenever one exists. A body with no route but the rim
+	// still takes it.
+	HazardPenalty float64
 }
 
 // perBlockFloor returns the lowest cost this capability can pay for one block

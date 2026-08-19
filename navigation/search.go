@@ -381,8 +381,41 @@ func (c Capability) expand(o oracle, from node) ([]Edge, error) {
 	if err != nil {
 		return nil, err
 	}
+	edges = append(edges, pillars...)
 
-	return append(edges, pillars...), nil
+	if c.HazardPenalty > 0 {
+		for i := range edges {
+			near, err := hazardBeside(o, edges[i].To)
+			if err != nil {
+				return nil, err
+			}
+			if near {
+				edges[i].Cost += c.HazardPenalty
+			}
+		}
+	}
+
+	return edges, nil
+}
+
+// hazardBeside reports whether any horizontal neighbour of a cell holds a
+// hazard. Only the four flat neighbours are asked: the cell itself is already
+// refused by arrival when hazardous, and the cell below is already refused as
+// support when it burns.
+func hazardBeside(o oracle, cell geom.BlockPos) (bool, error) {
+	for _, step := range steps {
+		neighbour := geom.BlockPos{X: cell.X + step.X, Y: cell.Y, Z: cell.Z + step.Z}
+
+		hazard, err := o.hazardous(neighbour)
+		if err != nil {
+			return false, err
+		}
+		if hazard {
+			return true, nil
+		}
+	}
+
+	return false, nil
 }
 
 // arrival is what arriveAt decides: whether a body may come to rest in a cell,
