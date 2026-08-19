@@ -4,6 +4,8 @@ This file records notable user-visible changes. It follows [Keep a Changelog](ht
 
 ## Unreleased
 
+## 0.4.0 - 2026-08-19
+
 ### Changed
 
 - `navigation`: `Find` and `Planner.Plan` take a `Goal` — a heuristic and a
