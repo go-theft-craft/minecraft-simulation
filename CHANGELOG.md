@@ -4,6 +4,24 @@ This file records notable user-visible changes. It follows [Keep a Changelog](ht
 
 ## Unreleased
 
+### Changed
+
+- `navigation`: `Find` and `Planner.Plan` take a `Goal` — a heuristic and a
+  completion test — instead of one exact cell. `GoalBlock` is the old
+  behaviour under the new signature; `GoalXZ`, `GoalYLevel`, `GoalNear`,
+  `GoalGetToBlock`, `GoalRunAway`, `GoalComposite`, `GoalInverted`, and
+  `GoalAxis` are the shapes a destination actually takes. Callers wrap their
+  cell in `GoalBlock{Pos: cell}` and behave exactly as before. A nil goal is
+  `ErrNoGoal`; there is no default destination.
+
+### Added
+
+- `navigation`: `Capability.HazardPenalty` charges edges that arrive beside a
+  hazard, in ticks. Zero — the default — is the search exactly as it was;
+  a positive value makes a route one lane away from lava beat the rim walk.
+  It is a penalty and not a refusal, so a body whose only route is the rim
+  still takes it.
+
 ## 0.3.0 - 2026-08-18
 
 ### Added
